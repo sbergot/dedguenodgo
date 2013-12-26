@@ -1,0 +1,16 @@
+<!doctype html>
+<head>
+	<title>Dedguenodgo</title>
+	<script src="jquery.min.js"></script>
+	<script src="knockout-2.3.0.js"></script>
+	<script src="main.js"></script>
+</head>
+<body>
+	<select data-bind="options: listChoices; value: selectedList"></select>
+	<p>hello world <strong data-bind="text: toto"></strong></p>
+	<script>
+		$(document).ready(function() {
+			ko.applyBindings(new ViewModel());
+		});
+	</script>
+</body>
