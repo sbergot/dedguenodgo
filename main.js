@@ -15,7 +15,7 @@ function ViewModel() {
 	});
 	this.loggedInUser = ko.observable('idOlivier');
 	this.selectedList = ko.observable('idOlivier');
-	this.presents = ko.observableArray([
+	this.presents = ko.observable([
 		{
 			id: "1",
 			title: "Gelatine rose",
@@ -28,7 +28,12 @@ function ViewModel() {
 			deleted: false
 		}
 	]);
+	this.presents.extend({notify: 'always'});
 	this.selectedPresent = ko.observable(null);
+	this.selectedPresentEdits = {
+		title: ko.observable(),
+		description: ko.observable()
+	};
 	this.newPresentTitle = ko.observable();
 }
 
@@ -46,7 +51,7 @@ ViewModel.prototype = {
 		return ids.map(function(id) {return users[id];});
 	},
 	_comparePresents: function(a, b) {
-		return b.creationDate.getTime() - a.creationDate.getTime();
+		return a.creationDate.getTime() - b.creationDate.getTime();
 	},
 	displayedPresents: function() {
 		var selectedList = this.selectedList();
@@ -65,10 +70,34 @@ ViewModel.prototype = {
 		var loggedInUser = this.loggedInUser();
 		return present.to != loggedInUser && present.givenBy != null;
 	},
+	isSelectedPresentModified: function() {
+		var hasChanges = false;
+		if (this.selectedPresent() != null && this.selectedPresentEdits.title() != this.selectedPresent().title) {hasChanges = true;}
+		if (this.selectedPresent() != null && this.selectedPresentEdits.description() != this.selectedPresent().description) {hasChanges = true;}
+		return hasChanges;
+	},
+	selectPresent: function(present) {
+		if (this.isSelectedPresentModified()) {
+			var changeAnyways = confirm('Vous avez modifi\u00e9 ce cadeau. Annuler vos changements ?');
+			if (!changeAnyways) {return;}
+		}
+		this.selectedPresent(present);
+		this.selectedPresentEdits.title(present.title);
+		this.selectedPresentEdits.description(present.description);
+	},
+	saveSelectedPresent: function() {
+		var presents = this.presents();
+		var selected = this.selectedPresent();
+		var index = presents.indexOf(selected);
+		if (index == -1) {throw new Error('selected present not found');}
+		selected.title = this.selectedPresentEdits.title();
+		selected.description = this.selectedPresentEdits.description();
+		this.presents(presents);
+	},
 	addPresent: function() {
 		var title = this.newPresentTitle();
 		var id = "tempId" + this.nextId++;
-		this.presents.push({
+		var present = {
 			id: id,
 			title: title,
 			description: "",
@@ -78,8 +107,12 @@ ViewModel.prototype = {
 			givenBy: null,
 			givenDate: null,
 			deleted: false
-		});
-		this.selectedPresent(id);
+		};
+		var newPresents = this.presents();
+		newPresents.push(present);
+		this.presents(newPresents);
+		this.selectPresent(present);
+		this.newPresentTitle('');
 	}
 
 };
