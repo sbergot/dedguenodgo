@@ -1,15 +1,17 @@
-console.log('ok');
 function ViewModel() {
 	this.users = ko.observable({
+		'idNicolas': {
+			id: 'idNicolas',
+		name: 'Nicolas'
+		},
 		'idOlivier': {
-			name: 'Olivier'
+			id: 'idOlivier',
+		name: 'Olivier'
 		},
 		'idElisa': {
-			name: 'Elisa'
+			id: 'idElisa',
+		name: 'Elisa'
 		},
-		'idNicolas': {
-			name: 'Nicolas'
-		}
 	});
 	this.loggedInUser = ko.observable('idOlivier');
 	this.selectedList = ko.observable('idOlivier');
@@ -27,6 +29,7 @@ function ViewModel() {
 		}
 	]);
 	this.selectedPresent = ko.observable(null);
+	this.newPresentTitle = ko.observable();
 }
 
 ViewModel.prototype = {
@@ -62,7 +65,8 @@ ViewModel.prototype = {
 		var loggedInUser = this.loggedInUser();
 		return present.to != loggedInUser && present.givenBy != null;
 	},
-	addPresent: function(title) {
+	addPresent: function() {
+		var title = this.newPresentTitle();
 		var id = "tempId" + this.nextId++;
 		this.presents.push({
 			id: id,

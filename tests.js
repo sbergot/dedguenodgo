@@ -76,7 +76,8 @@ describe("The view model", function() {
 	});
 
 	it("can add present and select it when added", function() {
-		viewModel.addPresent("Gelatine grise");
+		viewModel.newPresentTitle("Gelatine grise");
+		viewModel.addPresent();
 		var id = viewModel.selectedPresent();
 		expect(id).not.toEqual(null);
 		var added = viewModel.presents().filter(function(p){return p.id == id;})[0];

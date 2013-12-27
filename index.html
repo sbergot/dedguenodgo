@@ -2,15 +2,25 @@
 <head>
 	<title>Dedguenodgo</title>
 	<script src="jquery.min.js"></script>
-	<script src="knockout-2.3.0.js"></script>
+	<script src="knockout-3.0.0.js"></script>
 	<script src="main.js"></script>
 </head>
 <body>
-	<select data-bind="options: listChoices; value: selectedList"></select>
-	<p>hello world <strong data-bind="text: toto"></strong></p>
+	Logged in user : <select data-bind="options: lists(), value: loggedInUser, optionsValue: 'id', optionsText:'name'"></select> 
+	<br>List : <select data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'name'"></select> 
+	<ul data-bind="foreach: displayedPresents()">
+		<li>
+		<div data-bind="text:title"></div>
+		</li>
+	</ul>
+	<form data-bind="submit: addPresent">
+		<input data-bind="value: newPresentTitle" type="text"></input>
+		<input type="submit" value="Ajouter">
+	</form>
 	<script>
 		$(document).ready(function() {
-			ko.applyBindings(new ViewModel());
+			window.viewModel = new ViewModel();
+			ko.applyBindings(window.viewModel);
 		});
 	</script>
 </body>
