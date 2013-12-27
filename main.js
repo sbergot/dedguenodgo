@@ -28,7 +28,6 @@ function ViewModel() {
 			deleted: false
 		}
 	]);
-	this.presents.extend({notify: 'always'});
 	this.selectedPresent = ko.observable(null);
 	this.selectedPresentEdits = {
 		title: ko.observable(),
@@ -92,6 +91,7 @@ ViewModel.prototype = {
 		if (index == -1) {throw new Error('selected present not found');}
 		selected.title = this.selectedPresentEdits.title();
 		selected.description = this.selectedPresentEdits.description();
+		this.presents([]);//force redisplay
 		this.presents(presents);
 	},
 	addPresent: function() {

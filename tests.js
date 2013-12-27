@@ -78,12 +78,18 @@ describe("The view model", function() {
 	it("can add present and select it when added", function() {
 		viewModel.newPresentTitle("Gelatine grise");
 		viewModel.addPresent();
-		var id = viewModel.selectedPresent();
-		expect(id).not.toEqual(null);
-		var added = viewModel.presents().filter(function(p){return p.id == id;})[0];
-		expect(added.to).toEqual(viewModel.selectedList());
-		expect(added.createdBy).toEqual(viewModel.loggedInUser());
-		expect(added.givenBy).toEqual(null);
-		expect(added.title).toEqual("Gelatine grise");
+		var selected = viewModel.selectedPresent();
+		expect(selected).not.toEqual(null);
+		expect(selected.to).toEqual(viewModel.selectedList());
+		expect(selected.createdBy).toEqual(viewModel.loggedInUser());
+		expect(selected.givenBy).toEqual(null);
+		expect(selected.title).toEqual("Gelatine grise");
+	});
+	
+	it("can edit an existing present", function() {
+		viewModel.selectedPresent(viewModel.presents()[0]);
+		viewModel.selectedPresentEdits.title('edited title');
+		viewModel.saveSelectedPresent();
+		expect(viewModel.presents()[0].title).toEqual('edited title');
 	});
 });
