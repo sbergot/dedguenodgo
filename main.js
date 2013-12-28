@@ -38,6 +38,7 @@ function ViewModel() {
 
 ViewModel.prototype = {
 	nextId: 1,
+	vowels: {a: true, e: true, i: true, o: true, u: true, y: true},
 	lists: function() {
 		var users = this.users();
 		var loggedInUser = this.loggedInUser();
@@ -47,7 +48,12 @@ ViewModel.prototype = {
 			if (b === loggedInUser) {return 1;}
 			return users[a].name < users[b].name ? -1 : 1;
 		});
-		return ids.map(function(id) {return users[id];});
+		return ids.map(function(id) {
+			var userName = users[id].name;
+			var beginByVowel = ViewModel.prototype.vowels[userName.slice(0,1).toLowerCase()];
+			var label = 'Liste ' + (beginByVowel ? "d'" : "de ") + userName;
+			return {id: id, label: label};
+		});
 	},
 	_comparePresents: function(a, b) {
 		return a.creationDate.getTime() - b.creationDate.getTime();
@@ -75,14 +81,20 @@ ViewModel.prototype = {
 		if (this.selectedPresent() != null && this.selectedPresentEdits.description() != this.selectedPresent().description) {hasChanges = true;}
 		return hasChanges;
 	},
+	isPresentSelected: function(present) {
+		return this.selectedPresent() === present;
+	},
 	selectPresent: function(present) {
+		if (this.isPresentSelected(present)) {return;}
 		if (this.isSelectedPresentModified()) {
 			var changeAnyways = confirm('Vous avez modifi\u00e9 ce cadeau. Annuler vos changements ?');
 			if (!changeAnyways) {return;}
 		}
 		this.selectedPresent(present);
-		this.selectedPresentEdits.title(present.title);
-		this.selectedPresentEdits.description(present.description);
+		if (present) {
+			this.selectedPresentEdits.title(present.title);
+			this.selectedPresentEdits.description(present.description);
+		}
 	},
 	saveSelectedPresent: function() {
 		var presents = this.presents();
@@ -93,6 +105,7 @@ ViewModel.prototype = {
 		selected.description = this.selectedPresentEdits.description();
 		this.presents([]);//force redisplay
 		this.presents(presents);
+		this.selectPresent(null);
 	},
 	addPresent: function() {
 		var title = this.newPresentTitle();

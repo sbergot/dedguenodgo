@@ -2,19 +2,36 @@
 <head>
 	<title>Dedguenodgo</title>
 	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="bootstrap-theme.min.css" />
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<script src="jquery.min.js"></script>
 	<script src="knockout-3.0.0.debug.js"></script>
 	<script src="main.js"></script>
 </head>
 <body>
-	Logged in user : <select data-bind="options: lists(), value: loggedInUser, optionsValue: 'id', optionsText:'name'"></select> 
-	<br>List : <select data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'name'"></select> 
-	<ul data-bind="foreach: displayedPresents()">
-		<li class="present" data-bind="click: function(){$root.selectPresent($data);}, css:{selected: $root.selectedPresent() == $data }">
-			<div class="readonly" data-bind="text:title"></div>
-			<input class="edit" type="text" data-bind="value:$root.selectedPresentEdits.title"></input>
-			<button class="edit" data-bind="click: function() {$root.saveSelectedPresent();}">Sauver</button>
+	Connecté en tant que: <select data-bind="options: lists(), value: loggedInUser, optionsValue: 'id', optionsText:'label'"></select> 
+	<br><select class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select> 
+	<ul class="list-group" data-bind="foreach: displayedPresents()">
+		<li class="present list-group-item" data-bind="visible: !$root.isPresentSelected($data), click: function(){$root.selectPresent($data);}, css:{active: $root.isPresentSelected($data)}">
+		<h4 class="list-group-item-heading" data-bind="text:title"> </h4>
+		<p class="list-group-item-text" data-bind="text:description"> </p>
+		</li>
+		<li class="present list-group-item" data-bind="visible: $root.isPresentSelected($data), click: function(){$root.selectPresent($data);}, css:{active: $root.isPresentSelected($data)}">
+		<h4 class="list-group-item-heading">
+			<div class="form-group">
+				<label>Titre</label>
+				<input class="edit" type="text" data-bind="value:$root.selectedPresentEdits.title"></input>
+			</div>
+		</h4>
+		<p class="list-group-item-text">
+		<div class="form-group">
+			<label>Description</label>
+			<textarea class="edit form-control" data-bind="value:$root.selectedPresentEdits.description"></textarea>
+		</div>
+		</p>
+		<button class="btn btn-default" data-bind="click: function(){$root.selectPresent(null);}">Annuler</button>
+		<button class="btn btn-primary" data-bind="click: function() {$root.saveSelectedPresent();}">Sauver</button>
 		</li>
 	</ul>
 	<form data-bind="submit: addPresent">
