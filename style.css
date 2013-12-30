@@ -1,6 +1,3 @@
-.present > .readonly, .present.selected > .edit {
-	display: initial;
-}
-.present.selected > .readonly, .present > .edit {
-	display: none;
+.modal {
+	display: block;
 }

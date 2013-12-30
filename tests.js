@@ -54,7 +54,6 @@ describe("The view model", function() {
 			deleted: false
 			},
 		]);
-		viewModel.selectedPresent(null);
 	});
 
 	it("lists the users in the expected order", function() {
@@ -76,20 +75,22 @@ describe("The view model", function() {
 	});
 
 	it("can add present and select it when added", function() {
-		viewModel.newPresentTitle("Gelatine grise");
 		viewModel.addPresent();
-		var selected = viewModel.selectedPresent();
-		expect(selected).not.toEqual(null);
-		expect(selected.to).toEqual(viewModel.selectedList());
-		expect(selected.createdBy).toEqual(viewModel.loggedInUser());
-		expect(selected.givenBy).toEqual(null);
-		expect(selected.title).toEqual("Gelatine grise");
+		viewModel.edition.title("Gelatine grise");
+		viewModel.saveEditedPresent();
+		var presents = viewModel.presents();
+		var last = presents[presents.length - 1];
+		expect(last).not.toEqual(null);
+		expect(last.to).toEqual(viewModel.selectedList());
+		expect(last.createdBy).toEqual(viewModel.loggedInUser());
+		expect(last.givenBy).toEqual(null);
+		expect(last.title).toEqual("Gelatine grise");
 	});
 	
 	it("can edit an existing present", function() {
-		viewModel.selectedPresent(viewModel.presents()[0]);
-		viewModel.selectedPresentEdits.title('edited title');
-		viewModel.saveSelectedPresent();
+		viewModel.editPresent(viewModel.presents()[0]);
+		viewModel.edition.title('edited title');
+		viewModel.saveEditedPresent();
 		expect(viewModel.presents()[0].title).toEqual('edited title');
 	});
 });
