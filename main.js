@@ -14,7 +14,7 @@ function ViewModel() {
 		},
 	});
 	this.loggedInUser = ko.observable('idOlivier');
-	this.selectedList = ko.observable('idOlivier');
+	this.selectedList = ko.observable('idElisa');
 	this.presents = ko.observable([
 		{
 			id: "1",

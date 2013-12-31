@@ -1,3 +1,11 @@
 .modal {
 	display: block;
 }
+.present.offered h4, .present.offered p {
+	text-decoration: line-through;
+	color: grey;
+}
+.present .btn {
+	float: right;
+	margin-left: 0.5em;
+}
