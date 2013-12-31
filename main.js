@@ -28,12 +28,13 @@ function ViewModel() {
 			deleted: false
 		}
 	]);
-	this.selectedPresent = ko.observable(null);
-	this.selectedPresentEdits = {
+	//present edition
+	this.editing = ko.observable(false);
+	this.editedPresent = ko.observable(null);
+	this.edition = {
 		title: ko.observable(),
 		description: ko.observable()
 	};
-	this.newPresentTitle = ko.observable();
 }
 
 ViewModel.prototype = {
@@ -75,26 +76,31 @@ ViewModel.prototype = {
 		var loggedInUser = this.loggedInUser();
 		return present.to != loggedInUser && present.offeredBy != null;
 	},
-	isSelectedPresentModified: function() {
+	isEditedPresentModified: function() {
+		var beforeModification = this._isCreating() ? {title: '', description: ''} : this.editedPresent();
 		var hasChanges = false;
-		if (this.selectedPresent() != null && this.selectedPresentEdits.title() != this.selectedPresent().title) {hasChanges = true;}
-		if (this.selectedPresent() != null && this.selectedPresentEdits.description() != this.selectedPresent().description) {hasChanges = true;}
+		if (this.edition.title() != beforeModification.title) {hasChanges = true;}
+		if (this.edition.description() != beforeModification.description) {hasChanges = true;}
 		return hasChanges;
 	},
-	isPresentSelected: function(present) {
-		return this.selectedPresent() === present;
+	editPresent: function(present) {
+		this.editedPresent(present);
+		this.edition.title(present.title);
+		this.edition.description(present.description);
+		this.editing(true);
 	},
-	selectPresent: function(present) {
-		if (this.isPresentSelected(present)) {return;}
-		if (this.isSelectedPresentModified()) {
-			var changeAnyways = confirm('Vous avez modifi\u00e9 ce cadeau. Annuler vos changements ?');
+	cancelEdition: function() {
+		if (this.isEditedPresentModified()) {
+			var changeAnyways = confirm('Vous avez modifi\u00e9 ce cadeau. OK pour perdre vos modifications ?');
 			if (!changeAnyways) {return;}
 		}
-		this.selectedPresent(present);
-		if (present) {
-			this.selectedPresentEdits.title(present.title);
-			this.selectedPresentEdits.description(present.description);
-		}
+		this.editing(false);
+	},
+	_isCreating: function() {
+		return this.editedPresent() == null;
+	},
+	editPopupText: function() {
+		return this._isCreating() ? 'Ajouter un cadeau' : 'Modifier ' + this.editedPresent().title;
 	},
 	_savePresent: function(present) {
 		var presents = this.presents();
@@ -102,33 +108,6 @@ ViewModel.prototype = {
 		if (index == -1) {throw new Error('present not found');}
 		this.presents([]);//force redisplay
 		this.presents(presents);
-	},
-	saveSelectedPresent: function() {
-		var selected = this.selectedPresent();
-		selected.title = this.selectedPresentEdits.title();
-		selected.description = this.selectedPresentEdits.description();
-		this._savePresent(selected);
-		this.selectPresent(null);
-	},
-	addPresent: function() {
-		var title = this.newPresentTitle();
-		var id = "tempId" + this.nextId++;
-		var present = {
-			id: id,
-			title: title,
-			description: "",
-			to: this.selectedList(),
-			createdBy: this.loggedInUser(),
-			creationDate: new Date(),
-			offeredBy: null,
-			offeredDate: null,
-			deleted: false
-		};
-		var newPresents = this.presents();
-		newPresents.push(present);
-		this.presents(newPresents);
-		this.selectPresent(present);
-		this.newPresentTitle('');
 	},
 	togglePresentOffered: function(present) {
 		if (!present.offeredBy) {
@@ -144,6 +123,37 @@ ViewModel.prototype = {
 			present.offeredDate = null;
 		}
 		this._savePresent(present);
+	},
+	saveEditedPresent: function() {
+		var title = this.edition.title();
+		var description = this.edition.description();
+		if (this._isCreating()) {
+			var id = "tempId" + this.nextId++;
+			var present = {
+				id: id,
+				title: title,
+				description: description,
+				to: this.selectedList(),
+				createdBy: this.loggedInUser(),
+				creationDate: new Date(),
+				givenBy: null,
+				givenDate: null,
+				deleted: false
+			};
+			this.presents(this.presents().concat([present]));
+		} else {
+			var selected = this.editedPresent();
+			selected.title = title;
+			selected.description = description;
+			this._savePresent(selected);
+		}
+		this.editing(false);
+	},
+	addPresent: function() {
+		this.editedPresent(null);
+		this.edition.title('');
+		this.edition.description('');
+		this.editing(true);
 	}
 
 };
