@@ -18,13 +18,24 @@ function ViewModel() {
 	this.presents = ko.observable([
 		{
 			id: "1",
-			title: "Gelatine rose",
-			description: "Une matière gluante et fluo",
+			title: "Des mugs",
+			description: "Des jolis mugs aux motifs africains",
 			to: "idElisa",
 			createdBy: "idElisa",
 			creationDate: new Date(),
 			offeredBy: "idOlivier",
 			offeredDate: new Date(),
+			deleted: false
+		},
+		{
+			id: "2",
+			title: "Le prix Goncourt",
+			description: "C'est le \"serment de josette\" de Gaston Serpette aux édition boiron",
+			to: "idElisa",
+			createdBy: "idElisa",
+			creationDate: new Date(),
+			offeredBy: null,
+			offeredDate: null,
 			deleted: false
 		}
 	]);
@@ -72,9 +83,12 @@ ViewModel.prototype = {
 			return self._comparePresents(a, b);
 		});
 	},
+	/**Returns a string or null*/
 	displayPresentAsOffered: function(present) {
 		var loggedInUser = this.loggedInUser();
-		return present.to != loggedInUser && present.offeredBy != null;
+		if (present.offeredBy == null) {return null;}
+		if (present.to == loggedInUser) {return null;}
+	        return '(Offert par ' + this.users()[present.offeredBy].name + ')';
 	},
 	isEditedPresentModified: function() {
 		var beforeModification = this._isCreating() ? {title: '', description: ''} : this.editedPresent();
@@ -116,7 +130,7 @@ ViewModel.prototype = {
 		} else {
 			if (present.offeredBy != this.loggedInUser()) {
 				var offeredByName = this.users()[present.offeredBy].name;
-				var ok = confirm("Ce cadeau a \u00e9t\u00e9 offert par " + offeredByName + ". Voulez-vous malgr\u00e9 tout le marquer comme n'\00e9tant pas encore offert ?");
+				var ok = confirm("Ce cadeau a \u00e9t\u00e9 offert par " + offeredByName + ". Voulez-vous le marquer comme non encore offert ?");
 				if (!ok) {return;}
 			}
 			present.offeredBy = null;

@@ -68,10 +68,10 @@ describe("The view model", function() {
 	});
 
 	it("displays the present as offered only when relevant", function() {
-		expect(viewModel.displayPresentAsOffered(viewModel.presents()[2])).toEqual(false);
+		expect(viewModel.displayPresentAsOffered(viewModel.presents()[2])).toEqual(null);
 		viewModel.loggedInUser("idElisa");
-		expect(viewModel.displayPresentAsOffered(viewModel.presents()[2])).toEqual(true);
-		expect(viewModel.displayPresentAsOffered(viewModel.presents()[1])).toEqual(false);
+		expect(viewModel.displayPresentAsOffered(viewModel.presents()[2])).not.toEqual(null);
+		expect(viewModel.displayPresentAsOffered(viewModel.presents()[1])).toEqual(null);
 	});
 
 	it("can add present and select it when added", function() {

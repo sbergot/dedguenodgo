@@ -6,9 +6,12 @@
 	pointer-events: auto;/*to allow clicking modal-backdrop*/
 }
 
-.present.offered h4, .present.offered p {
+.present.offered .title, .present.offered p {
 	text-decoration: line-through;
 	color: grey;
+}
+.present .offered-by {
+	font-size: 0.7em;
 }
 .present .btn {
 	float: right;
