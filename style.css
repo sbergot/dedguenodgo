@@ -1,6 +1,11 @@
 .modal {
 	display: block;
+	pointer-events: none;/*to allow clicking modal-backdrop*/
 }
+.modal-dialog {
+	pointer-events: auto;/*to allow clicking modal-backdrop*/
+}
+
 .present.offered h4, .present.offered p {
 	text-decoration: line-through;
 	color: grey;

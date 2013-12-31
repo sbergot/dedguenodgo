@@ -23,6 +23,7 @@
 	</ul>
 	<button data-bind="click: addPresent">Ajouter un cadeau</button>
 	<!--present edition dialog -->
+	<div class="modal-backdrop in" data-bind="visible: editing, click: cancelEdition"></div>
 	<div class="modal" data-bind="visible: editing" style="display: block;">
 		<div class="modal-dialog">
 			<div class="modal-content">
