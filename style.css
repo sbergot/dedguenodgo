@@ -10,8 +10,14 @@
 	text-decoration: line-through;
 	color: grey;
 }
-.present .offered-by {
+.present .offered-by, .present .deleted-by {
 	font-size: 0.7em;
+}
+.present.deleted {
+	background: #FFF1A9;
+}
+.present.deleted-by {
+	font-weight: bold;
 }
 .present .btn {
 	float: right;

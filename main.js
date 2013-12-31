@@ -25,7 +25,7 @@ function ViewModel() {
 			creationDate: new Date(),
 			offeredBy: "idOlivier",
 			offeredDate: new Date(),
-			deleted: false
+			deletedBy: null
 		},
 		{
 			id: "2",
@@ -36,7 +36,7 @@ function ViewModel() {
 			creationDate: new Date(),
 			offeredBy: null,
 			offeredDate: null,
-			deleted: false
+			deletedBy: null
 		}
 	]);
 	//present edition
@@ -76,7 +76,7 @@ ViewModel.prototype = {
 		var self = this;
 		return this.presents().filter(function(p) {
 			if (p.to != selectedList) {return false;}
-			if (p.deleted == true && p.to == loggedInUser) {return false;}
+			if (p.deletedBy != null && p.to == loggedInUser) {return false;}
 			if (p.to == loggedInUser && p.createdBy != loggedInUser) {return false;}
 			return true;
 		}).sort(function(a, b) {
@@ -152,7 +152,7 @@ ViewModel.prototype = {
 				creationDate: new Date(),
 				givenBy: null,
 				givenDate: null,
-				deleted: false
+				deletedBy: null
 			};
 			this.presents(this.presents().concat([present]));
 		} else {
@@ -168,6 +168,23 @@ ViewModel.prototype = {
 		this.edition.title('');
 		this.edition.description('');
 		this.editing(true);
+	},
+	deletePresent: function(present) {
+		if (present.createdBy != this.loggedInUser()) {
+			var createdByName = this.users()[present.createdBy].name;
+			var ok = confirm('Ce cadeau a \u00e9t\u00e9 cr\u00e9\u00e9 par ' + createdByName + '. Supprimer ?');
+			if (!ok) {return;}
+		}
+		if (present.offeredBy != null) {
+			present.deletedBy = this.loggedInUser();
+			this._savePresent(present);
+		} else {
+			var presents = this.presents().filter(function(p) {
+				return p.id != present.id;
+			});
+			this.presents(presents);
+		}
+
 	}
 
 };

@@ -101,9 +101,15 @@ describe("The view model", function() {
 		expect(viewModel.presents()[1].offeredBy).toEqual(null);
 	});
 
-	xit("can delete a present", function() {
+	it("can delete a present", function() {
+		viewModel.loggedInUser("idElisa");
+		
 		viewModel.deletePresent(viewModel.presents()[1]);
 		expect(viewModel.presents().length).toEqual(2);
+
+		viewModel.deletePresent(viewModel.presents()[0]);
+		expect(viewModel.presents().length).toEqual(2);
+		expect(viewModel.presents()[0].deletedBy).not.toEqual(null);
 	});
 
 });
