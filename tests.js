@@ -101,4 +101,9 @@ describe("The view model", function() {
 		expect(viewModel.presents()[1].offeredBy).toEqual(null);
 	});
 
+	xit("can delete a present", function() {
+		viewModel.deletePresent(viewModel.presents()[1]);
+		expect(viewModel.presents().length).toEqual(2);
+	});
+
 });
