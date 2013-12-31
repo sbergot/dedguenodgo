@@ -27,7 +27,7 @@ describe("The view model", function() {
 			to: "idElisa",
 			createdBy: "idElisa",
 			creationDate: new Date(),
-			givenBy: "idOlivier",
+			offeredBy: "idOlivier",
 			givenDate: new Date(),
 			deleted: false
 			},
@@ -38,7 +38,7 @@ describe("The view model", function() {
 			to: "idOlivier",
 			createdBy: "idElisa",
 			creationDate: new Date(),
-			givenBy: null,
+			offeredBy: null,
 			givenDate: null,
 			deleted: false
 			},
@@ -49,7 +49,7 @@ describe("The view model", function() {
 			to: "idOlivier",
 			createdBy: "idOlivier",
 			creationDate: new Date(),
-			givenBy: "idNicolas",
+			offeredBy: "idNicolas",
 			givenDate: new Date(),
 			deleted: false
 			},
@@ -68,11 +68,11 @@ describe("The view model", function() {
 		})).toEqual(["3"]);
 	});
 
-	it("displays the present as given only when relevant", function() {
-		expect(viewModel.displayPresentAsGiven(viewModel.presents()[2])).toEqual(false);
+	it("displays the present as offered only when relevant", function() {
+		expect(viewModel.displayPresentAsOffered(viewModel.presents()[2])).toEqual(false);
 		viewModel.loggedInUser("idElisa");
-		expect(viewModel.displayPresentAsGiven(viewModel.presents()[2])).toEqual(true);
-		expect(viewModel.displayPresentAsGiven(viewModel.presents()[1])).toEqual(false);
+		expect(viewModel.displayPresentAsOffered(viewModel.presents()[2])).toEqual(true);
+		expect(viewModel.displayPresentAsOffered(viewModel.presents()[1])).toEqual(false);
 	});
 
 	it("can add present and select it when added", function() {
@@ -82,7 +82,7 @@ describe("The view model", function() {
 		expect(selected).not.toEqual(null);
 		expect(selected.to).toEqual(viewModel.selectedList());
 		expect(selected.createdBy).toEqual(viewModel.loggedInUser());
-		expect(selected.givenBy).toEqual(null);
+		expect(selected.offeredBy).toEqual(null);
 		expect(selected.title).toEqual("Gelatine grise");
 	});
 	
@@ -92,4 +92,12 @@ describe("The view model", function() {
 		viewModel.saveSelectedPresent();
 		expect(viewModel.presents()[0].title).toEqual('edited title');
 	});
+
+	it("can toggle a present being offered", function() {
+		viewModel.togglePresentOffered(viewModel.presents()[1]);
+		expect(viewModel.presents()[1].offeredBy).toEqual(viewModel.loggedInUser());
+		viewModel.togglePresentOffered(viewModel.presents()[1]);
+		expect(viewModel.presents()[1].offeredBy).toEqual(null);
+	});
+
 });

@@ -23,8 +23,8 @@ function ViewModel() {
 			to: "idElisa",
 			createdBy: "idElisa",
 			creationDate: new Date(),
-			givenBy: "idOlivier",
-			givenDate: new Date(),
+			offeredBy: "idOlivier",
+			offeredDate: new Date(),
 			deleted: false
 		}
 	]);
@@ -71,9 +71,9 @@ ViewModel.prototype = {
 			return self._comparePresents(a, b);
 		});
 	},
-	displayPresentAsGiven: function(present) {
+	displayPresentAsOffered: function(present) {
 		var loggedInUser = this.loggedInUser();
-		return present.to != loggedInUser && present.givenBy != null;
+		return present.to != loggedInUser && present.offeredBy != null;
 	},
 	isSelectedPresentModified: function() {
 		var hasChanges = false;
@@ -96,15 +96,18 @@ ViewModel.prototype = {
 			this.selectedPresentEdits.description(present.description);
 		}
 	},
-	saveSelectedPresent: function() {
+	_savePresent: function(present) {
 		var presents = this.presents();
-		var selected = this.selectedPresent();
-		var index = presents.indexOf(selected);
-		if (index == -1) {throw new Error('selected present not found');}
-		selected.title = this.selectedPresentEdits.title();
-		selected.description = this.selectedPresentEdits.description();
+		var index = presents.indexOf(present);
+		if (index == -1) {throw new Error('present not found');}
 		this.presents([]);//force redisplay
 		this.presents(presents);
+	},
+	saveSelectedPresent: function() {
+		var selected = this.selectedPresent();
+		selected.title = this.selectedPresentEdits.title();
+		selected.description = this.selectedPresentEdits.description();
+		this._savePresent(selected);
 		this.selectPresent(null);
 	},
 	addPresent: function() {
@@ -117,8 +120,8 @@ ViewModel.prototype = {
 			to: this.selectedList(),
 			createdBy: this.loggedInUser(),
 			creationDate: new Date(),
-			givenBy: null,
-			givenDate: null,
+			offeredBy: null,
+			offeredDate: null,
 			deleted: false
 		};
 		var newPresents = this.presents();
@@ -126,6 +129,21 @@ ViewModel.prototype = {
 		this.presents(newPresents);
 		this.selectPresent(present);
 		this.newPresentTitle('');
+	},
+	togglePresentOffered: function(present) {
+		if (!present.offeredBy) {
+			present.offeredBy = this.loggedInUser();
+			present.offeredDate = new Date();
+		} else {
+			if (present.offeredBy != this.loggedInUser()) {
+				var offeredByName = this.users()[present.offeredBy].name;
+				var ok = confirm("Ce cadeau a \u00e9t\u00e9 offert par " + offeredByName + ". Voulez-vous malgr\u00e9 tout le marquer comme n'\00e9tant pas encore offert ?");
+				if (!ok) {return;}
+			}
+			present.offeredBy = null;
+			present.offeredDate = null;
+		}
+		this._savePresent(present);
 	}
 
 };
