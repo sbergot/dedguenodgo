@@ -9,6 +9,7 @@
 	<script src="jquery.min.js"></script>
 	<script src="knockout-3.0.0.debug.js"></script>
 	<script src="view-model.js"></script>
+	<script src="localstorage-model.js"></script>
 </head>
 <body>
 	Connecté en tant que: <select data-bind="options: lists(), value: loggedInUser, optionsValue: 'id', optionsText:'label'"></select> 
@@ -66,21 +67,7 @@
 	</div>
 	<script>
 		$(document).ready(function() {
-				var addPresentCommand = function(newPresent) {
-				return $.Deferred(function(dfd) {
-					setTimeout(function() {
-						dfd.resolve($.extend({}, newPresent, {id: 'generatedId' + Math.random()}));
-						}, Math.random() < 0.4 ? 2500 : 100);
-					});
-				};
-				var editPresentCommand = function(oldPresent, newPresent) {
-				return $.Deferred(function(dfd) {
-					setTimeout(function() {
-						dfd.resolve($.extend({}, newPresent));
-						}, Math.random() < 0.4 ? 2500 : 100);
-					});
-				};
-				window.viewModel = new ViewModel(function(text) {return window.confirm(text);}, addPresentCommand, editPresentCommand);
+			window.viewModel = createLocalStorageModel();
 			ko.applyBindings(window.viewModel);
 		});
 	</script>
