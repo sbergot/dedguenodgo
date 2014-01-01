@@ -135,11 +135,11 @@ ViewModel.prototype = {
 		if (present.offeredBy == null) {
 			return null;
 		}
-		if (present.to == loggedInUser) {
+		if (present.to == loggedInUser && present.offeredBy != loggedInUser) {
 			return null;
 		}
 		var username = this.users()[present.offeredBy].name;
-		return '(Rayé par ' + username + ')';
+		return '(par ' + username + ')';
 	},
 	isEditedPresentModified: function() {
 		var beforeModification = this._isCreating() ? {
