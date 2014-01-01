@@ -59,7 +59,7 @@
 
 	<script>
 		$(document).ready(function() {
-			window.viewModel = new ViewModel();
+				window.viewModel = new ViewModel(function(text) {return window.confirm(text);});
 			ko.applyBindings(window.viewModel);
 		});
 	</script>

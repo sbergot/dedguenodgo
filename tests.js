@@ -1,70 +1,88 @@
 describe("The view model", function() {
 	var viewModel;
+	var throwIfConfirm, nextConfirmAnswer;
 
 	beforeEach(function() {
-		viewModel = new ViewModel();
+		throwIfConfirm = true;
+		nextConfirmAnswer = false;
+		var confirm = function(text) {
+			if (throwIfConfirm) {
+				throw new Error('test triggered confirm but throwIfConfirm == true');
+			}
+			return nextConfirmAnswer;
+		};
+		viewModel = new ViewModel(confirm);
 		viewModel.users({
 			'idNicolas': {
 				id: 'idNicolas',
-			name: 'Nicolas'
+				name: 'Nicolas'
 			},
 			'idOlivier': {
 				id: 'idOlivier',
-			name: 'Olivier'
+				name: 'Olivier'
 			},
 			'idElisa': {
 				id: 'idElisa',
-			name: 'Elisa'
+				name: 'Elisa'
 			},
 		});
 		viewModel.loggedInUser('idOlivier');
 		viewModel.selectedList('idOlivier');
-		viewModel.presents([
-			{
-			id: "1",
-			title: "Gelatine rose",
-			description: "Une matière gluante et fluo",
-			to: "idElisa",
-			createdBy: "idElisa",
-			creationDate: new Date(),
-			offeredBy: "idOlivier",
-			givenDate: new Date(),
-			deleted: false
-			},
-			{
-			id: "2",
-			title: "Gelatine verte",
-			description: "Une matière gluante et fluo",
-			to: "idOlivier",
-			createdBy: "idElisa",
-			creationDate: new Date(),
-			offeredBy: null,
-			givenDate: null,
-			deleted: false
-			},
-			{
-			id: "3",
-			title: "Gelatine jaune",
-			description: "Une matière gluante et fluo",
-			to: "idOlivier",
-			createdBy: "idOlivier",
-			creationDate: new Date(),
-			offeredBy: "idNicolas",
-			givenDate: new Date(),
-			deleted: false
+		viewModel.presents([{
+				id: "1",
+				title: "Gelatine rose",
+				description: "Une matière gluante et fluo",
+				to: "idElisa",
+				createdBy: "idElisa",
+				creationDate: new Date(),
+				offeredBy: "idOlivier",
+				givenDate: new Date(),
+				deleted: false
+			}, {
+				id: "2",
+				title: "Gelatine verte",
+				description: "Une matière gluante et fluo",
+				to: "idOlivier",
+				createdBy: "idOlivier",
+				creationDate: new Date(),
+				offeredBy: null,
+				givenDate: null,
+				deleted: false
+			}, {
+				id: "3",
+				title: "Gelatine jaune",
+				description: "Une matière gluante et fluo",
+				to: "idOlivier",
+				createdBy: "idOlivier",
+				creationDate: new Date(),
+				offeredBy: "idNicolas",
+				givenDate: new Date(),
+				deleted: false
+			}, {
+				id: "4",
+				title: "Gelatine rose",
+				description: "Une matière gluante et fluo",
+				to: "idOlivier",
+				createdBy: "idNicolas",
+				creationDate: new Date(),
+				offeredBy: "idNicolas",
+				givenDate: new Date(),
+				deleted: false
 			},
 		]);
 	});
 
 	it("lists the users in the expected order", function() {
 		expect(viewModel.lists().length).toEqual(Object.keys(viewModel.users()).length);
-		expect(viewModel.lists().map(function(u){return u.id;})).toEqual(['idOlivier', 'idElisa', 'idNicolas']);
+		expect(viewModel.lists().map(function(u) {
+			return u.id;
+		})).toEqual(['idOlivier', 'idElisa', 'idNicolas']);
 	});
 
 	it("lists the presents created by loggedInUser", function() {
-		expect(viewModel.displayedPresents().map(function(p){
+		expect(viewModel.displayedPresents().map(function(p) {
 			return p.id;
-		})).toEqual(["3"]);
+		})).toEqual(["2", "3"]);
 	});
 
 	it("displays the present as offered only when relevant", function() {
@@ -86,7 +104,7 @@ describe("The view model", function() {
 		expect(last.offeredBy).toEqual(null);
 		expect(last.title).toEqual("Gelatine grise");
 	});
-	
+
 	it("can edit an existing present", function() {
 		viewModel.editPresent(viewModel.presents()[0]);
 		viewModel.edition.title('edited title');
@@ -102,14 +120,33 @@ describe("The view model", function() {
 	});
 
 	it("can delete a present", function() {
-		viewModel.loggedInUser("idElisa");
-		
-		viewModel.deletePresent(viewModel.presents()[1]);
-		expect(viewModel.presents().length).toEqual(2);
+		viewModel.loggedInUser("idOlivier");
+		expect(viewModel.displayedPresents().length).toEqual(2);
 
-		viewModel.deletePresent(viewModel.presents()[0]);
-		expect(viewModel.presents().length).toEqual(2);
-		expect(viewModel.presents()[0].deletedBy).not.toEqual(null);
+		//delete non offered
+		viewModel.deletePresent(viewModel.presents()[2]);
+		expect(viewModel.displayedPresents().length).toEqual(1);
+
+		//delete offered
+		viewModel.deletePresent(viewModel.presents()[1]);
+		expect(viewModel.displayedPresents().length).toEqual(0);
 	});
+
+	it("hides deleted presents that are not offered", function() {
+		viewModel.loggedInUser("idElisa");
+		expect(viewModel.displayedPresents().length).toEqual(3);
+		//delete non offered
+		viewModel.loggedInUser("idOlivier");
+		viewModel.deletePresent(viewModel.presents()[1]);
+		viewModel.loggedInUser("idElisa");
+		expect(viewModel.displayedPresents().length).toEqual(2);
+
+		//delete offered
+		viewModel.loggedInUser("idOlivier");
+		viewModel.deletePresent(viewModel.presents()[2]);
+		viewModel.loggedInUser("idElisa");
+		expect(viewModel.displayedPresents().length).toEqual(2);
+	});
+
 
 });
