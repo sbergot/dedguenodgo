@@ -103,6 +103,11 @@ ViewModel.prototype = {
 		});
 	},
 	_comparePresents: function(a, b) {
+		var aAsOffered = this.displayPresentAsOffered(a);
+		var bAsOffered = this.displayPresentAsOffered(b);
+		if (aAsOffered != bAsOffered) {
+			return aAsOffered ? 1 : -1;
+		}
 		return a.creationDate.getTime() - b.creationDate.getTime();
 	},
 	displayedPresents: function() {
