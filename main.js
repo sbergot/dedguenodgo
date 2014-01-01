@@ -133,7 +133,8 @@ ViewModel.prototype = {
 		if (present.to == loggedInUser) {
 			return null;
 		}
-		return '(Offert par ' + this.users()[present.offeredBy].name + ')';
+		var username = this.users()[present.offeredBy].name;
+		return '(Rayé par ' + username + ')';
 	},
 	isEditedPresentModified: function() {
 		var beforeModification = this._isCreating() ? {
