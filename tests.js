@@ -1,17 +1,31 @@
 describe("The view model", function() {
 	var viewModel;
 	var throwIfConfirm, nextConfirmAnswer;
+	var addPresentCall, addPresentDfd;
+	var editPresentCall, editPresentDfd;
 
 	beforeEach(function() {
 		throwIfConfirm = true;
 		nextConfirmAnswer = false;
+		addPresentCall = null, addPresentDfd = null;
+		editPresentCall = null, editPresentDfd = null;
 		var confirm = function(text) {
 			if (throwIfConfirm) {
 				throw new Error('test triggered confirm but throwIfConfirm == true');
 			}
 			return nextConfirmAnswer;
 		};
-		viewModel = new ViewModel(confirm);
+		var addPresentCommand = function(present) {
+			addPresentCall = present;
+			addPresentDfd = $.Deferred();
+			return addPresentDfd.promise();
+		};
+		var editPresentCommand = function(present) {
+			editPresentCall = present;
+			editPresentDfd = $.Deferred();
+			return editPresentDfd.promise();
+		};
+		viewModel = new ViewModel(confirm, addPresentCommand, editPresentCommand);
 		viewModel.users({
 			'idNicolas': {
 				id: 'idNicolas',
@@ -93,16 +107,24 @@ describe("The view model", function() {
 	});
 
 	it("can add present and select it when added", function() {
+		var nbPresentsBefore = viewModel.presents().length;
 		viewModel.addPresent();
 		viewModel.edition.title("Gelatine grise");
 		viewModel.saveEditedPresent();
+
 		var presents = viewModel.presents();
-		var last = presents[presents.length - 1];
+		var last = presents[nbPresentsBefore];
 		expect(last).not.toEqual(null);
 		expect(last.to).toEqual(viewModel.selectedList());
 		expect(last.createdBy).toEqual(viewModel.loggedInUser());
 		expect(last.offeredBy).toEqual(null);
 		expect(last.title).toEqual("Gelatine grise");
+
+		//server call
+		expect(viewModel.loadingMessage()).not.toEqual(null);
+		addPresentDfd.resolve($.extend({}, last, {id: 'genratedId'}));
+		expect(viewModel.presents()[nbPresentsBefore].title).toEqual('Gelatine grise');
+		
 	});
 
 	it("can edit an existing present", function() {

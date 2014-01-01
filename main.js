@@ -1,7 +1,12 @@
-/**@param confirm function(text): boolean    ie window.confirm*/
+/**
+ * @param confirm function(text): boolean    ie window.confirm
+ * @param addPresentCommand function(present): JQueryPromise
+ * */
 
-function ViewModel(confirm) {
+function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.confirm = confirm;
+	this.addPresentCommand = addPresentCommand;
+	this.editPresentCommand = editPresentCommand;
 	this.users = ko.observable({
 		'idNicolas': {
 			id: 'idNicolas',
@@ -47,6 +52,21 @@ function ViewModel(confirm) {
 		title: ko.observable(),
 		description: ko.observable()
 	};
+	this.successMessage = ko.observable();
+	this.errorMessage = ko.observable();
+	this.undoAction = ko.observable();
+	this.loadingMessage = ko.observable();
+	
+	var self = this;
+	var throttledHasLoading = ko.computed(function() {
+		    return self.loadingMessage() != null;
+	}).extend({ throttle: 400 });
+	//display null immediatly but wait a few ms before displaying non null
+	this.slowShowingLoadingMessage = ko.computed(function() {
+		var loadingMessage = self.loadingMessage();
+		var hasLoading = throttledHasLoading();
+		return hasLoading ? loadingMessage : null;
+	});
 }
 
 ViewModel.prototype = {
@@ -150,19 +170,74 @@ ViewModel.prototype = {
 	editPopupText: function() {
 		return this._isCreating() ? 'Ajouter un cadeau' : 'Modifier ' + this.editedPresent().title;
 	},
-	_savePresent: function(present) {
+	_addPresent: function(present) {
+		this.presents(this.presents().concat([present]));
+		this.discardConfirm();
+		this.loadingMessage('Ajout de "' + present.title + '" en cours...');
+		var self = this;
+		this.addPresentCommand(present)
+			.always(function() {
+				self.loadingMessage(null);
+			})
+			.fail(function() {
+				self.errorMessage('Erreur pendant la sauvegarde de ' + present.title);
+				var presents = self.presents();
+				var index = presents.indexOf(present);
+				presents.splice(index, 1);
+				self.presents(presents);
+			}).done(function(newPresent) {
+				var presents = self.presents();
+				var index = presents.indexOf(present);
+				presents[index] = newPresent;
+				self.presents(presents);
+				self.successMessage('"' + newPresent.title + '" a bien été créé');
+				self.undoAction(function() {
+					self.deletePresent(newPresent);
+				});
+			});
+	},
+	_savePresent: function(oldPresent, newPresent) {
 		var presents = this.presents();
-		var index = presents.indexOf(present);
+		var index = presents.indexOf(oldPresent);
 		if (index == -1) {
 			throw new Error('present not found');
 		}
-		this.presents([]); //force redisplay
+		presents[index] = newPresent;
+//		this.presents([]); //force redisplay
 		this.presents(presents);
+		this.discardConfirm();
+		this.loadingMessage('Modification de "' + newPresent.title + '" en cours...');
+		var self = this;
+		this.editPresentCommand(oldPresent, newPresent)
+			.always(function() {
+				self.loadingMessage(null);
+			})
+			.fail(function() {
+				self.errorMessage('Erreur pendant la sauvegarde de ' + newPresent.title);
+				var presents = self.presents();
+				var index = presents.indexOf(newPresent);
+				if (index == -1) {
+					throw new Error('present not found');
+				}
+				presents[index] = oldPresent;
+		//		this.presents([]); //force redisplay
+				self.presents(presents);
+			}).done(function(savedPresent) {
+				var presents = self.presents();
+				var index = presents.indexOf(newPresent);
+				presents[index] = savedPresent;
+				self.presents(presents);
+				self.successMessage('"' + savedPresent.title + '" a bien été modifié');
+				self.undoAction(function() {
+					self._savePresent(savedPresent, oldPresent);
+				});
+			});
 	},
 	togglePresentOffered: function(present) {
+		var clone = $.extend({}, present);
 		if (!present.offeredBy) {
-			present.offeredBy = this.loggedInUser();
-			present.offeredDate = new Date();
+			clone.offeredBy = this.loggedInUser();
+			clone.offeredDate = new Date();
 		} else {
 			if (present.offeredBy != this.loggedInUser()) {
 				var offeredByName = this.users()[present.offeredBy].name;
@@ -171,10 +246,10 @@ ViewModel.prototype = {
 					return;
 				}
 			}
-			present.offeredBy = null;
-			present.offeredDate = null;
+			clone.offeredBy = null;
+			clone.offeredDate = null;
 		}
-		this._savePresent(present);
+		this._savePresent(present, clone);
 	},
 	saveEditedPresent: function() {
 		var title = this.edition.title();
@@ -192,12 +267,13 @@ ViewModel.prototype = {
 				givenDate: null,
 				deletedBy: null
 			};
-			this.presents(this.presents().concat([present]));
+			this._addPresent(present);
 		} else {
 			var selected = this.editedPresent();
-			selected.title = title;
-			selected.description = description;
-			this._savePresent(selected);
+			var clone = $.extend({}, selected);
+			clone.title = title;
+			clone.description = description;
+			this._savePresent(selected, clone);
 		}
 		this.editing(false);
 	},
@@ -215,8 +291,13 @@ ViewModel.prototype = {
 				return;
 			}
 		}
-		present.deletedBy = this.loggedInUser();
-		this._savePresent(present);
+		var clone = $.extend({}, present);
+		clone.deletedBy = this.loggedInUser();
+		this._savePresent(present, clone);
+	},
+	discardConfirm: function() {
+		this.successMessage(null);
+		this.errorMessage(null);
+		this.undoAction(null);
 	}
-
 };

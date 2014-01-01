@@ -57,9 +57,30 @@
 		</div>
 	</div>
 
+	<!--command execution panel-->
+	<div id="command-execution" data-bind="visible: slowShowingLoadingMessage() || successMessage() || undoAction()">
+		<div class="loading" data-bind="text: slowShowingLoadingMessage"></div>
+		<div class="confirm">
+			<button type="button" class="close" data-bind="visible: successMessage() || undoAction(), click: discardConfirm">&times;</button> <span data-bind="text: successMessage"></span> <a href="" data-bind="visible: undoAction, click: undoAction()">Annuler</a> 
+		</div>
+	</div>
 	<script>
 		$(document).ready(function() {
-				window.viewModel = new ViewModel(function(text) {return window.confirm(text);});
+				var addPresentCommand = function(newPresent) {
+				return $.Deferred(function(dfd) {
+					setTimeout(function() {
+						dfd.resolve($.extend({}, newPresent, {id: 'generatedId' + Math.random()}));
+						}, Math.random() < 0.4 ? 2500 : 100);
+					});
+				};
+				var editPresentCommand = function(oldPresent, newPresent) {
+				return $.Deferred(function(dfd) {
+					setTimeout(function() {
+						dfd.resolve($.extend({}, newPresent));
+						}, Math.random() < 0.4 ? 2500 : 100);
+					});
+				};
+				window.viewModel = new ViewModel(function(text) {return window.confirm(text);}, addPresentCommand, editPresentCommand);
 			ko.applyBindings(window.viewModel);
 		});
 	</script>
