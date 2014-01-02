@@ -12,7 +12,7 @@
 	<script src="localstorage-model.js"></script>
 </head>
 <body>
-	Connecté en tant que: <select data-bind="options: lists(), value: loggedInUser, optionsValue: 'id', optionsText:'label'"></select> 
+Connecté en tant que: <select data-bind="options: Object.keys(users()), value: loggedInUser, optionsText:function(id) {return users()[id].name;}"></select> 
 	<br><select class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select> 
 	<ul class="list-group" data-bind="foreach: displayedPresents()">
 		<!-- the present -->
