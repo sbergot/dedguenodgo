@@ -198,11 +198,11 @@ ViewModel.prototype = {
 				self.presents(presents);
 				self.successMessage('"' + newPresent.title + '" a bien été créé');
 				self.undoAction(function() {
-					self.deletePresent(newPresent);
+					self.deletePresent(newPresent, true);
 				});
 			});
 	},
-	_savePresent: function(oldPresent, newPresent) {
+	_savePresent: function(oldPresent, newPresent, hideUndo) {
 		var presents = this.presents();
 		var index = presents.indexOf(oldPresent);
 		if (index == -1) {
@@ -233,10 +233,12 @@ ViewModel.prototype = {
 				var index = presents.indexOf(newPresent);
 				presents[index] = savedPresent;
 				self.presents(presents);
-				self.successMessage('"' + savedPresent.title + '" a bien été modifié');
-				self.undoAction(function() {
-					self._savePresent(savedPresent, oldPresent);
-				});
+				if (!hideUndo) {
+					self.successMessage('"' + savedPresent.title + '" a bien été modifié');
+					self.undoAction(function() {
+						self._savePresent(savedPresent, oldPresent, true);
+					});
+				}
 			});
 	},
 	togglePresentOffered: function(present) {
@@ -247,7 +249,7 @@ ViewModel.prototype = {
 		} else {
 			if (present.offeredBy != this.loggedInUser()) {
 				var offeredByName = this.users()[present.offeredBy].name;
-				var ok = this.confirm("Ce cadeau a \u00e9t\u00e9 offert par " + offeredByName + ". Voulez-vous le marquer comme non encore offert ?");
+				var ok = this.confirm("Ce cadeau a \u00e9t\u00e9 ray\u00e9 par " + offeredByName + ". Voulez-vous le d\u00e9-rayer ?");
 				if (!ok) {
 					return;
 				}
@@ -289,7 +291,7 @@ ViewModel.prototype = {
 		this.edition.description('');
 		this.editing(true);
 	},
-	deletePresent: function(present) {
+	deletePresent: function(present, hideUndo) {
 		if (present.createdBy != this.loggedInUser()) {
 			var createdByName = this.users()[present.createdBy].name;
 			var ok = this.confirm('Ce cadeau a \u00e9t\u00e9 cr\u00e9\u00e9 par ' + createdByName + '. Supprimer ?');
@@ -299,7 +301,7 @@ ViewModel.prototype = {
 		}
 		var clone = $.extend({}, present);
 		clone.deletedBy = this.loggedInUser();
-		this._savePresent(present, clone);
+		this._savePresent(present, clone, hideUndo);
 	},
 	discardConfirm: function() {
 		this.successMessage(null);
