@@ -139,7 +139,7 @@ ViewModel.prototype = {
 			return null;
 		}
 		var username = this.users()[present.offeredBy].name;
-		return '(par ' + username + ')';
+		return '(rayé par ' + username + ')';
 	},
 	isEditedPresentModified: function() {
 		var beforeModification = this._isCreating() ? {
