@@ -173,4 +173,8 @@ describe("The view model", function() {
 	});
 
 
+	it("let a user mark a present offered in his list event when already offered", function() {
+		viewModel.togglePresentOffered(viewModel.presents()[2]);
+	expect(viewModel.presents()[2].offeredBy).toEqual('idOlivier');	
+	});
 });

@@ -251,7 +251,7 @@ ViewModel.prototype = {
 	togglePresentOffered: function(present) {
 		this.discardConfirm();
 		var clone = $.extend({}, present);
-		if (!present.offeredBy) {
+		if (!this.displayPresentAsOffered(present)) {
 			clone.offeredBy = this.loggedInUser();
 			clone.offeredDate = new Date();
 		} else {
