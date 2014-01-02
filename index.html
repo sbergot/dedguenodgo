@@ -19,7 +19,7 @@ Connecté en tant que: <select data-bind="options: Object.keys(users()), value: 
 		<li class="present list-group-item" data-bind="event: { dblclick: function(){$root.editPresent($data);} }, css: { offered: $root.displayPresentAsOffered($data) , deleted: deletedBy }">
 		<button class="btn btn-default" data-bind="visible: !deletedBy, click: function() { $root.deletePresent($data); }">Supprimer</button>
 		<button class="btn btn-default" data-bind="click: function() { $root.editPresent($data); }">Modifier</button>
-		<button class="btn btn-default" data-bind="click: function() { $root.togglePresentOffered($data); }, text: $data.offeredBy ? 'Dé-rayer' : 'Rayer', attr: { title: $data.offeredBy ? 'Marquer comme non offert': 'Marquer comme offert' }"></button>
+		<button class="btn btn-default" data-bind="click: function() { $root.togglePresentOffered($data); }, text: $root.displayPresentAsOffered($data) ? 'Dé-rayer' : 'Rayer', attr: { title: $root.displayPresentAsOffered($data) ? 'Marquer comme non offert': 'Marquer comme offert' }"></button>
 		<h4 class="list-group-item-heading">
 			<span class="title" data-bind="text:title"></span>
 			<span class="offered-by" data-bind="text: $root.displayPresentAsOffered($data) || ''"></span>
