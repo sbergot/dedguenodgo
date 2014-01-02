@@ -67,6 +67,13 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 		var hasLoading = throttledHasLoading();
 		return hasLoading ? loadingMessage : null;
 	});
+
+	this.loggedInUser.subscribe(function() {	
+		self.discardConfirm();
+	});
+	this.selectedList.subscribe(function() {	
+		self.discardConfirm();
+	});
 }
 
 ViewModel.prototype = {
@@ -156,6 +163,7 @@ ViewModel.prototype = {
 		return hasChanges;
 	},
 	editPresent: function(present) {
+		this.discardConfirm();
 		this.editedPresent(present);
 		this.edition.title(present.title);
 		this.edition.description(present.description);
@@ -178,7 +186,6 @@ ViewModel.prototype = {
 	},
 	_addPresent: function(present) {
 		this.presents(this.presents().concat([present]));
-		this.discardConfirm();
 		this.loadingMessage('Ajout de "' + present.title + '" en cours...');
 		var self = this;
 		this.addPresentCommand(present)
@@ -242,6 +249,7 @@ ViewModel.prototype = {
 			});
 	},
 	togglePresentOffered: function(present) {
+		this.discardConfirm();
 		var clone = $.extend({}, present);
 		if (!present.offeredBy) {
 			clone.offeredBy = this.loggedInUser();
@@ -286,12 +294,14 @@ ViewModel.prototype = {
 		this.editing(false);
 	},
 	addPresent: function() {
+		this.discardConfirm();
 		this.editedPresent(null);
 		this.edition.title('');
 		this.edition.description('');
 		this.editing(true);
 	},
 	deletePresent: function(present, hideUndo) {
+		this.discardConfirm();
 		if (present.createdBy != this.loggedInUser()) {
 			var createdByName = this.users()[present.createdBy].name;
 			var ok = this.confirm('Ce cadeau a \u00e9t\u00e9 cr\u00e9\u00e9 par ' + createdByName + '. Supprimer ?');
