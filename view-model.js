@@ -55,11 +55,11 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.successMessage = ko.observable();
 	this.errorMessage = ko.observable();
 	this.undoAction = ko.observable();
-	this.loadingMessage = ko.observable();
+	this.loadingMessage = ko.observable(null);
 	
 	var self = this;
 	var throttledHasLoading = ko.computed(function() {
-		    return self.loadingMessage() != null;
+		return self.loadingMessage() !== null;
 	}).extend({ throttle: 400 });
 	//display null immediatly but wait a few ms before displaying non null
 	this.slowShowingLoadingMessage = ko.computed(function() {
@@ -125,7 +125,7 @@ ViewModel.prototype = {
 			if (p.to != selectedList) {
 				return false;
 			}
-			if (p.deletedBy != null && !self.displayPresentAsOffered(p)) {
+			if (p.deletedBy && !self.displayPresentAsOffered(p)) {
 				return false;
 			}
 			if (p.to == loggedInUser && p.createdBy != loggedInUser) {
@@ -139,7 +139,7 @@ ViewModel.prototype = {
 	/**Returns a string or null*/
 	displayPresentAsOffered: function(present) {
 		var loggedInUser = this.loggedInUser();
-		if (present.offeredBy == null) {
+		if (!present.offeredBy) {
 			return null;
 		}
 		if (present.to == loggedInUser && present.offeredBy != loggedInUser) {
@@ -179,7 +179,7 @@ ViewModel.prototype = {
 		this.editing(false);
 	},
 	_isCreating: function() {
-		return this.editedPresent() == null;
+		return this.editedPresent() === null;
 	},
 	editPopupText: function() {
 		return this._isCreating() ? 'Ajouter un cadeau' : 'Modifier ' + this.editedPresent().title;

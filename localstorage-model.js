@@ -2,7 +2,7 @@ window.createLocalStorageModel = function() {
 	function load(id) {
 		try {
 			var json = localStorage.getItem(id);
-			if (json == null) {return null;}
+			if (!json) {return null;}
 			return JSON.parse(json);
 		} catch (e) {
 			console.log(e);
@@ -63,29 +63,29 @@ window.createLocalStorageModel = function() {
 			}, Math.random() < 0.4 ? 2500 : 100);
 			return dfd.promise();
 		};
-	};
+	}
 	function loadPresents() {
 		var presents = load('presents');
-		if (presents == null) {return null;}
+		if (!presents) {return null;}
 		var dateProperties = ['creationDate', 'offeredDate'];
 		for (var i = 0; i < presents.length; i++) {
 			var p = presents[i];
 			for (var j = 0; j < dateProperties.length; j++) {
 				var dateProp = dateProperties[j];
-				if (p[dateProp] != null) {
+				if (p[dateProp]) {
 					p[dateProp] = new Date(p[dateProp]);
 				}
 			}
 		}
 		return presents;
-	};
+	}
 	var addPresent = function(newPresent) {
 		var presents = loadPresents();
 		var ids = {};
 		for (var i = 0; i < presents.length; i++) {
 			ids[presents[i].id] = true;
 		}
-		while(newPresent.id == null || ids[newPresent.id]) {
+		while(!newPresent.id || ids[newPresent.id]) {
 			newPresent.id = 'randomId' + Math.random();
 		}
 		presents.push(newPresent);
@@ -110,4 +110,4 @@ window.createLocalStorageModel = function() {
 	var viewModel = new ViewModel(function(t) {return confirm(t);}, makeFakeAsync(addPresent), makeFakeAsync(editPresent));
 	viewModel.presents(loadPresents());
 	return viewModel;
-}
+};
