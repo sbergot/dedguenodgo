@@ -14,16 +14,23 @@
 <body>
 	<h1>Dedguenodgo <a class="pull-right" id="deconnection" href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a> </h1>
 	<!-- ko if:!loggedInUser() -->
-	<div class="jumbotron">
-		<h2>Bienvenue sur dedguenodgo 2.0 !</h2>
-		<p>Ce site permet, à la manière d'un petit carnet en papier, de réaliser des listes de Noël. Vous pouvez ajouter des cadeaux et les rayer si vous comptez les offrir. Deux exemples d'utilisation :<p>
-		<p>Anne ajoute "nain de jardin" dans sa liste. Franck raye le cadeau pour dire qu'il va l'acheter. Tout le monde sauf Anne voit que le cadeau est rayé (pas de surprise gachée)</p>
-			<p> Olivier ajoute "vernis à ongles mauve" dans la liste d'Elisabeth. Tout le monde sauf Elisabeth voit le cadeau dans liste d'Elisabeth (pas de surprise gachée). Celui qui achète le cadeau le raye. Tout le monde sauf Elisabeth voit le cadeau rayé.</p>
+	<div class="container">
+		<div class="jumbotron">
+			<h2>Bienvenue sur dedguenodgo 2.0 !</h2>
+			<p>Ce site permet, à la manière d'un petit carnet en papier, de réaliser des listes de Noël. Vous pouvez ajouter des cadeaux et les rayer si vous comptez les offrir.<p>
+		</div>
+		<h4>Exemples</h4>
+		<ul>
+			<li>Anne ajoute "nain de jardin" dans sa liste. Franck raye le cadeau pour dire qu'il va l'acheter. Tout le monde sauf Anne voit que le cadeau est rayé (pas de surprise gachée)</li>
+			<li>Olivier ajoute "vernis à ongles mauve" dans la liste d'Elisabeth. Tout le monde sauf Elisabeth voit le cadeau dans liste d'Elisabeth (pas de surprise gachée). Celui qui achète le cadeau le raye. Tout le monde sauf Elisabeth voit le cadeau rayé.</li>
+		</ul>
 		<h2>C'est parti !</h2>
-		<label>Qui êtes-vous ?</label>
 		<form class="form" data-bind="submit: function() {loggedInUser(loggedInUserChoice());}">
-			<select class="form-control" data-bind="options: Object.keys(users()), value: loggedInUserChoice, optionsText:function(id) {return users()[id].name;}, optionsCaption: 'choisir...'"></select> 
-			<input class="btn btn-primary" type="submit" value="Se connecter"/>
+			<div class="form-group">
+				<label>Qui êtes-vous ?</label>
+				<select class="form-control" data-bind="options: Object.keys(users()), value: loggedInUserChoice, optionsText:function(id) {return users()[id].name;}, optionsCaption: 'choisir...'"></select> 
+			</div>
+			<button class="btn btn-primary" type="submit"> Se connecter</button>
 		</form>
 	</div>
 	<!-- /ko -->
