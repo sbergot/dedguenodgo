@@ -38,4 +38,9 @@
 #command-execution > .loading {
 	font-style: italic;
 }
-
+#deconnection {
+	font-size: 14px;
+}
+#list-select {
+	margin-bottom: 1em;
+}

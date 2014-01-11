@@ -12,8 +12,24 @@
 	<script src="localstorage-model.js"></script>
 </head>
 <body>
-Connecté en tant que: <select data-bind="options: Object.keys(users()), value: loggedInUser, optionsText:function(id) {return users()[id].name;}"></select> 
-	<br><select class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select> 
+	<h1>Dedguenodgo <a class="pull-right" id="deconnection" href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a> </h1>
+	<!-- ko if:!loggedInUser() -->
+	<div class="jumbotron">
+		<h2>Bienvenue sur dedguenodgo 2.0 !</h2>
+		<p>Ce site permet, à la manière d'un petit carnet en papier, de réaliser des listes de Noël. Vous pouvez ajouter des cadeaux et les rayer si vous comptez les offrir. Deux exemples d'utilisation :<p>
+		<p>Anne ajoute "nain de jardin" dans sa liste. Franck raye le cadeau pour dire qu'il va l'acheter. Tout le monde sauf Anne voit que le cadeau est rayé (pas de surprise gachée)</p>
+			<p> Olivier ajoute "vernis à ongles mauve" dans la liste d'Elisabeth. Tout le monde sauf Elisabeth voit le cadeau dans liste d'Elisabeth (pas de surprise gachée). Celui qui achète le cadeau le raye. Tout le monde sauf Elisabeth voit le cadeau rayé.</p>
+		<h2>C'est parti !</h2>
+		<label>Qui êtes-vous ?</label>
+		<form class="form" data-bind="submit: function() {loggedInUser(loggedInUserChoice());}">
+			<select class="form-control" data-bind="options: Object.keys(users()), value: loggedInUserChoice, optionsText:function(id) {return users()[id].name;}, optionsCaption: 'choisir...'"></select> 
+			<input class="btn btn-primary" type="submit" value="Se connecter"/>
+		</form>
+	</div>
+	<!-- /ko -->
+
+	<!-- ko if:loggedInUser() -->
+	<select id="list-select" class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select> 
 	<ul class="list-group" data-bind="foreach: displayedPresents()">
 		<!-- the present -->
 		<li class="present list-group-item" data-bind="event: { dblclick: function(){$root.editPresent($data);} }, css: { offered: $root.displayPresentAsOffered($data) , deleted: deletedBy }">
@@ -24,7 +40,7 @@ Connecté en tant que: <select data-bind="options: Object.keys(users()), value: 
 			<span class="title" data-bind="text:title"></span>
 			<span class="offered-by" data-bind="text: $root.displayPresentAsOffered($data) || ''"></span>
 			<span class="deleted-by" data-bind="visible: deletedBy, text: !deletedBy ? '' : '(Ce cadeau a été supprimé par ' + $root.users()[deletedBy].name + ')'"></span>
-	       	</h4>
+		</h4>
 		<p class="list-group-item-text" data-bind="text:description"> </p>
 		</li>
 	</ul>
@@ -65,6 +81,7 @@ Connecté en tant que: <select data-bind="options: Object.keys(users()), value: 
 			<button type="button" class="close" data-bind="visible: successMessage() || undoAction(), click: discardConfirm">&times;</button> <span data-bind="text: successMessage"></span> <a href="" data-bind="visible: undoAction, click: undoAction()">Annuler</a> 
 		</div>
 	</div>
+	<!-- /ko -->
 	<script>
 		$(document).ready(function() {
 			window.viewModel = createLocalStorageModel();
