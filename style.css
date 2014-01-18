@@ -19,7 +19,7 @@
 .present.deleted-by {
 	font-weight: bold;
 }
-.present .btn {
+.present a {
 	float: right;
 	margin-left: 0.5em;
 }
