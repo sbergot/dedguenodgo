@@ -7,8 +7,10 @@ describe("The view model", function() {
 	beforeEach(function() {
 		throwIfConfirm = true;
 		nextConfirmAnswer = false;
-		addPresentCall = null, addPresentDfd = null;
-		editPresentCall = null, editPresentDfd = null;
+		addPresentCall = null;
+		addPresentDfd = null;
+		editPresentCall = null;
+		editPresentDfd = null;
 		var confirm = function(text) {
 			if (throwIfConfirm) {
 				throw new Error('test triggered confirm but throwIfConfirm == true');
@@ -171,4 +173,8 @@ describe("The view model", function() {
 	});
 
 
+	it("let a user mark a present offered in his list event when already offered", function() {
+		viewModel.togglePresentOffered(viewModel.presents()[2]);
+	expect(viewModel.presents()[2].offeredBy).toEqual('idOlivier');	
+	});
 });

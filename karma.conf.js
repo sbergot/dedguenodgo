@@ -14,13 +14,14 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+     'lib/*.js',
      '*.js' 
     ],
 
 
     // list of files to exclude
     exclude: [
-      
+      'Gruntfile.js'
     ],
 
 

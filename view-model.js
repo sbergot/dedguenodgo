@@ -59,17 +59,24 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.successMessage = ko.observable();
 	this.errorMessage = ko.observable();
 	this.undoAction = ko.observable();
-	this.loadingMessage = ko.observable();
+	this.loadingMessage = ko.observable(null);
 	
 	var self = this;
 	var throttledHasLoading = ko.computed(function() {
-		    return self.loadingMessage() != null;
+		return self.loadingMessage() !== null;
 	}).extend({ throttle: 400 });
 	//display null immediatly but wait a few ms before displaying non null
 	this.slowShowingLoadingMessage = ko.computed(function() {
 		var loadingMessage = self.loadingMessage();
 		var hasLoading = throttledHasLoading();
 		return hasLoading ? loadingMessage : null;
+	});
+
+	this.loggedInUser.subscribe(function() {	
+		self.discardConfirm();
+	});
+	this.selectedList.subscribe(function() {	
+		self.discardConfirm();
 	});
 }
 
@@ -122,7 +129,7 @@ ViewModel.prototype = {
 			if (p.to != selectedList) {
 				return false;
 			}
-			if (p.deletedBy != null && !self.displayPresentAsOffered(p)) {
+			if (p.deletedBy && !self.displayPresentAsOffered(p)) {
 				return false;
 			}
 			if (p.to == loggedInUser && p.createdBy != loggedInUser) {
@@ -136,7 +143,7 @@ ViewModel.prototype = {
 	/**Returns a string or null*/
 	displayPresentAsOffered: function(present) {
 		var loggedInUser = this.loggedInUser();
-		if (present.offeredBy == null) {
+		if (!present.offeredBy) {
 			return null;
 		}
 		if (present.to == loggedInUser && present.offeredBy != loggedInUser) {
@@ -160,6 +167,7 @@ ViewModel.prototype = {
 		return hasChanges;
 	},
 	editPresent: function(present) {
+		this.discardConfirm();
 		this.editedPresent(present);
 		this.edition.title(present.title);
 		this.edition.description(present.description);
@@ -175,14 +183,13 @@ ViewModel.prototype = {
 		this.editing(false);
 	},
 	_isCreating: function() {
-		return this.editedPresent() == null;
+		return this.editedPresent() === null;
 	},
 	editPopupText: function() {
 		return this._isCreating() ? 'Ajouter un cadeau' : 'Modifier ' + this.editedPresent().title;
 	},
 	_addPresent: function(present) {
 		this.presents(this.presents().concat([present]));
-		this.discardConfirm();
 		this.loadingMessage('Ajout de "' + present.title + '" en cours...');
 		var self = this;
 		this.addPresentCommand(present)
@@ -202,11 +209,11 @@ ViewModel.prototype = {
 				self.presents(presents);
 				self.successMessage('"' + newPresent.title + '" a bien été créé');
 				self.undoAction(function() {
-					self.deletePresent(newPresent);
+					self.deletePresent(newPresent, true);
 				});
 			});
 	},
-	_savePresent: function(oldPresent, newPresent) {
+	_savePresent: function(oldPresent, newPresent, hideUndo) {
 		var presents = this.presents();
 		var index = presents.indexOf(oldPresent);
 		if (index == -1) {
@@ -237,21 +244,24 @@ ViewModel.prototype = {
 				var index = presents.indexOf(newPresent);
 				presents[index] = savedPresent;
 				self.presents(presents);
-				self.successMessage('"' + savedPresent.title + '" a bien été modifié');
-				self.undoAction(function() {
-					self._savePresent(savedPresent, oldPresent);
-				});
+				if (!hideUndo) {
+					self.successMessage('"' + savedPresent.title + '" a bien été modifié');
+					self.undoAction(function() {
+						self._savePresent(savedPresent, oldPresent, true);
+					});
+				}
 			});
 	},
 	togglePresentOffered: function(present) {
+		this.discardConfirm();
 		var clone = $.extend({}, present);
-		if (!present.offeredBy) {
+		if (!this.displayPresentAsOffered(present)) {
 			clone.offeredBy = this.loggedInUser();
 			clone.offeredDate = new Date();
 		} else {
 			if (present.offeredBy != this.loggedInUser()) {
 				var offeredByName = this.users()[present.offeredBy].name;
-				var ok = this.confirm("Ce cadeau a \u00e9t\u00e9 offert par " + offeredByName + ". Voulez-vous le marquer comme non encore offert ?");
+				var ok = this.confirm("Ce cadeau a \u00e9t\u00e9 ray\u00e9 par " + offeredByName + ". Voulez-vous le d\u00e9-rayer ?");
 				if (!ok) {
 					return;
 				}
@@ -288,12 +298,14 @@ ViewModel.prototype = {
 		this.editing(false);
 	},
 	addPresent: function() {
+		this.discardConfirm();
 		this.editedPresent(null);
 		this.edition.title('');
 		this.edition.description('');
 		this.editing(true);
 	},
-	deletePresent: function(present) {
+	deletePresent: function(present, hideUndo) {
+		this.discardConfirm();
 		if (present.createdBy != this.loggedInUser()) {
 			var createdByName = this.users()[present.createdBy].name;
 			var ok = this.confirm('Ce cadeau a \u00e9t\u00e9 cr\u00e9\u00e9 par ' + createdByName + '. Supprimer ?');
@@ -303,7 +315,7 @@ ViewModel.prototype = {
 		}
 		var clone = $.extend({}, present);
 		clone.deletedBy = this.loggedInUser();
-		this._savePresent(present, clone);
+		this._savePresent(present, clone, hideUndo);
 	},
 	discardConfirm: function() {
 		this.successMessage(null);

@@ -3,11 +3,11 @@
 	<title>Dedguenodgo</title>
 	<meta charset="UTF-8">
 	<link href="favicon.ico" rel="icon" type="image/x-icon" />
-	<link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
-	<link rel="stylesheet" type="text/css" href="bootstrap-theme.min.css" />
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap-theme.min.css" />
 	<link rel="stylesheet" type="text/css" href="style.css" />
-	<script src="jquery.min.js"></script>
-	<script src="knockout-3.0.0.debug.js"></script>
+	<script src="lib/jquery.min.js"></script>
+	<script src="lib/knockout-3.0.0.debug.js"></script>
 	<script src="view-model.js"></script>
 	<script src="localstorage-model.js"></script>
 </head>
@@ -42,7 +42,7 @@
 		<li class="present list-group-item" data-bind="event: { dblclick: function(){$root.editPresent($data);} }, css: { offered: $root.displayPresentAsOffered($data) , deleted: deletedBy }">
 		<button class="btn btn-default" data-bind="visible: !deletedBy, click: function() { $root.deletePresent($data); }">Supprimer</button>
 		<button class="btn btn-default" data-bind="click: function() { $root.editPresent($data); }">Modifier</button>
-		<button class="btn btn-default" data-bind="click: function() { $root.togglePresentOffered($data); }, text: $data.offeredBy ? 'Dé-rayer' : 'Rayer', attr: { title: $data.offeredBy ? 'Marquer comme non offert': 'Marquer comme offert' }"></button>
+		<button class="btn btn-default" data-bind="click: function() { $root.togglePresentOffered($data); }, text: $root.displayPresentAsOffered($data) ? 'Dé-rayer' : 'Rayer', attr: { title: $root.displayPresentAsOffered($data) ? 'Marquer comme non offert': 'Marquer comme offert' }"></button>
 		<h4 class="list-group-item-heading">
 			<span class="title" data-bind="text:title"></span>
 			<span class="offered-by" data-bind="text: $root.displayPresentAsOffered($data) || ''"></span>
