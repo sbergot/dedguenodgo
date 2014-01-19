@@ -13,7 +13,7 @@
 	<script src="localstorage-model.js"></script>
 </head>
 <body>
-	<h1>Dedguenodgo <a class="pull-right" id="deconnection" href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a> </h1>
+	<h1>Dedguenodgo <a id="deconnection" href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a> </h1>
 	<!-- ko if:!loggedInUser() -->
 	<div class="container">
 		<div class="jumbotron">
@@ -38,6 +38,9 @@
 
 	<!-- ko if:loggedInUser() -->
 	<select id="list-select" class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select> 
+	<p class="jumbotron" data-bind="visible: displayedPresents().length == 0">
+		Cette liste est vide ! Vous pouvez ajouter des idées de cadeaux à l'aide du bouton ci-dessous
+	</p>
 	<ul class="list-group" data-bind="foreach: displayedPresents()">
 		<!-- the present -->
 		<li class="present list-group-item" data-bind="event: { dblclick: function(){$root.editPresent($data);} }, css: { offered: $root.displayPresentAsOffered($data) , deleted: deletedBy }">

@@ -1,3 +1,21 @@
+body {
+	background-color: #DDD;
+	background-image: url(background.svg);
+	color: #333;
+}
+h1 {
+	margin-top: 0;
+}
+#list-select {
+	background-color: #AAA;
+	background-color: rgba(100,100,100,0.5);
+	font-size: 1.6em;
+	height: 2em;
+}
+.list-group-item {
+	background-color: #DDD;
+	background-color: rgba(235,235,235, 0.5);
+}
 .modal {
 	display: block;
 	pointer-events: none;/*to allow clicking modal-backdrop*/
@@ -40,7 +58,7 @@
 }
 #deconnection {
 	font-size: 14px;
-}
-#list-select {
-	margin-bottom: 1em;
+	position: absolute;
+	top: 1em;
+	right: 1em;
 }
