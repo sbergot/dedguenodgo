@@ -25,7 +25,10 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.loggedInUserChoice.subscribe(function(value) {
 		localStorage.setItem('loggedInUserChoice', value);
 	});
-	this.loggedInUser = ko.observable(null);
+	this.loggedInUser = ko.observable(sessionStorage.getItem('loggedInUser'));
+	this.loggedInUser.subscribe(function(value) {
+		sessionStorage.setItem('loggedInUser', value);
+	});
 	this.selectedList = ko.observable('idElisa');
 	this.presents = ko.observable([{
 			id: "1",
