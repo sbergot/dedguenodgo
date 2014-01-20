@@ -32,7 +32,6 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.undoAction = ko.observable();
 	this.loadingMessage = ko.observable(null);
 
-	var self = this;
 	var throttledHasLoading = ko.computed(function() {
 		return self.loadingMessage() !== null;
 	}).extend({

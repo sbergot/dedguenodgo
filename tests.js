@@ -158,17 +158,20 @@ describe("The view model", function() {
 
 	it("hides deleted presents that are not offered", function() {
 		viewModel.loggedInUser("idElisa");
+		viewModel.selectedList('idOlivier');
 		expect(viewModel.displayedPresents().length).toEqual(3);
 		//delete non offered
 		viewModel.loggedInUser("idOlivier");
 		viewModel.deletePresent(viewModel.presents()[1]);
 		viewModel.loggedInUser("idElisa");
+		viewModel.selectedList('idOlivier');
 		expect(viewModel.displayedPresents().length).toEqual(2);
 
 		//delete offered
 		viewModel.loggedInUser("idOlivier");
 		viewModel.deletePresent(viewModel.presents()[2]);
 		viewModel.loggedInUser("idElisa");
+		viewModel.selectedList('idOlivier');
 		expect(viewModel.displayedPresents().length).toEqual(2);
 	});
 
