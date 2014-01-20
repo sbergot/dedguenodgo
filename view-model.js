@@ -7,51 +7,19 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.confirm = confirm;
 	this.addPresentCommand = addPresentCommand;
 	this.editPresentCommand = editPresentCommand;
-	this.users = ko.observable({
-		'idNicolas': {
-			id: 'idNicolas',
-			name: 'Nicolas'
-		},
-		'idOlivier': {
-			id: 'idOlivier',
-			name: 'Olivier'
-		},
-		'idElisa': {
-			id: 'idElisa',
-			name: 'Elisa'
-		},
-	});
+	this.users = ko.observable({});
 	this.loggedInUserChoice = ko.observable(localStorage.getItem('loggedInUserChoice'));
 	this.loggedInUserChoice.subscribe(function(value) {
 		localStorage.setItem('loggedInUserChoice', value);
 	});
 	this.loggedInUser = ko.observable(sessionStorage.getItem('loggedInUser'));
+	var self = this;
 	this.loggedInUser.subscribe(function(value) {
 		sessionStorage.setItem('loggedInUser', value);
+		self.selectedList(value);
 	});
-	this.selectedList = ko.observable('idElisa');
-	this.presents = ko.observable([{
-			id: "1",
-			title: "Des mugs",
-			description: "Des jolis mugs aux motifs africains",
-			to: "idElisa",
-			createdBy: "idElisa",
-			creationDate: new Date(),
-			offeredBy: "idOlivier",
-			offeredDate: new Date(),
-			deletedBy: null
-		}, {
-			id: "2",
-			title: "Le prix Goncourt",
-			description: "C'est le \"serment de josette\" de Gaston Serpette aux édition boiron",
-			to: "idElisa",
-			createdBy: "idElisa",
-			creationDate: new Date(),
-			offeredBy: null,
-			offeredDate: null,
-			deletedBy: null
-		}
-	]);
+	this.selectedList = ko.observable();
+	this.presents = ko.observable();
 	//present edition
 	this.editing = ko.observable(false);
 	this.editedPresent = ko.observable(null);
@@ -63,11 +31,13 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.errorMessage = ko.observable();
 	this.undoAction = ko.observable();
 	this.loadingMessage = ko.observable(null);
-	
+
 	var self = this;
 	var throttledHasLoading = ko.computed(function() {
 		return self.loadingMessage() !== null;
-	}).extend({ throttle: 400 });
+	}).extend({
+		throttle: 400
+	});
 	//display null immediatly but wait a few ms before displaying non null
 	this.slowShowingLoadingMessage = ko.computed(function() {
 		var loadingMessage = self.loadingMessage();
@@ -75,10 +45,10 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 		return hasLoading ? loadingMessage : null;
 	});
 
-	this.loggedInUser.subscribe(function() {	
+	this.loggedInUser.subscribe(function() {
 		self.discardConfirm();
 	});
-	this.selectedList.subscribe(function() {	
+	this.selectedList.subscribe(function() {
 		self.discardConfirm();
 	});
 }
@@ -223,7 +193,7 @@ ViewModel.prototype = {
 			throw new Error('present not found');
 		}
 		presents[index] = newPresent;
-//		this.presents([]); //force redisplay
+		//		this.presents([]); //force redisplay
 		this.presents(presents);
 		this.discardConfirm();
 		this.loadingMessage('Modification de "' + newPresent.title + '" en cours...');
@@ -240,7 +210,7 @@ ViewModel.prototype = {
 					throw new Error('present not found');
 				}
 				presents[index] = oldPresent;
-		//		this.presents([]); //force redisplay
+				//		this.presents([]); //force redisplay
 				self.presents(presents);
 			}).done(function(savedPresent) {
 				var presents = self.presents();

@@ -2,13 +2,16 @@ window.createLocalStorageModel = function() {
 	function load(id) {
 		try {
 			var json = localStorage.getItem(id);
-			if (!json) {return null;}
+			if (!json) {
+				return null;
+			}
 			return JSON.parse(json);
 		} catch (e) {
 			console.log(e);
 			return null;
 		}
 	}
+
 	function save(id, value) {
 		return localStorage.setItem(id, JSON.stringify(value));
 	}
@@ -16,15 +19,15 @@ window.createLocalStorageModel = function() {
 		save('users', {
 			'idNicolas': {
 				id: 'idNicolas',
-			name: 'Nicolas'
+				name: 'Nicolas'
 			},
 			'idOlivier': {
 				id: 'idOlivier',
-			name: 'Olivier'
+				name: 'Olivier'
 			},
 			'idElisa': {
 				id: 'idElisa',
-			name: 'Elisa'
+				name: 'Elisa'
 			},
 		});
 	}
@@ -49,8 +52,7 @@ window.createLocalStorageModel = function() {
 			offeredBy: null,
 			offeredDate: null,
 			deletedBy: null
-		}
-		]);
+		}]);
 	}
 
 	function makeFakeAsync(syncFunc) {
@@ -64,9 +66,12 @@ window.createLocalStorageModel = function() {
 			return dfd.promise();
 		};
 	}
+
 	function loadPresents() {
 		var presents = load('presents');
-		if (!presents) {return null;}
+		if (!presents) {
+			return null;
+		}
 		var dateProperties = ['creationDate', 'offeredDate'];
 		for (var i = 0; i < presents.length; i++) {
 			var p = presents[i];
@@ -85,7 +90,7 @@ window.createLocalStorageModel = function() {
 		for (var i = 0; i < presents.length; i++) {
 			ids[presents[i].id] = true;
 		}
-		while(!newPresent.id || ids[newPresent.id]) {
+		while (!newPresent.id || ids[newPresent.id]) {
 			newPresent.id = 'randomId' + Math.random();
 		}
 		presents.push(newPresent);
@@ -96,7 +101,7 @@ window.createLocalStorageModel = function() {
 		var presents = loadPresents();
 		var matching = [];
 		for (var i = 0; i < presents.length; i++) {
-			if(presents[i].id == oldPresent.id) {
+			if (presents[i].id == oldPresent.id) {
 				matching.push(i);
 			}
 		}
@@ -107,7 +112,23 @@ window.createLocalStorageModel = function() {
 		save('presents', presents);
 		return presents[matching[0]];
 	};
-	var viewModel = new ViewModel(function(t) {return confirm(t);}, makeFakeAsync(addPresent), makeFakeAsync(editPresent));
+	var viewModel = new ViewModel(function(t) {
+		return confirm(t);
+	}, makeFakeAsync(addPresent), makeFakeAsync(editPresent));
 	viewModel.presents(loadPresents());
+	viewModel.users({
+		'idNicolas': {
+			id: 'idNicolas',
+			name: 'Nicolas'
+		},
+		'idOlivier': {
+			id: 'idOlivier',
+			name: 'Olivier'
+		},
+		'idElisa': {
+			id: 'idElisa',
+			name: 'Elisa'
+		},
+	});
 	return viewModel;
 };
