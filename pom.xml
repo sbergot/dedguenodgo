@@ -131,6 +131,9 @@
 							<filtering>true</filtering>
 							<targetPath>WEB-INF</targetPath>
 						</resource>
+						<resource>
+							<directory>${basedir}/target/grunt-webapp</directory>
+						</resource>
 					</webResources>
 				</configuration>
 			</plugin>

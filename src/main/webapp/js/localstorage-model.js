@@ -1,4 +1,4 @@
-window.createLocalStorageModel = function() {
+window.createViewModel = function() {
 	function load(id) {
 		try {
 			var json = localStorage.getItem(id);

@@ -10,7 +10,7 @@
 	<script src="js/lib/jquery.min.js"></script>
 	<script src="js/lib/knockout-3.0.0.debug.js"></script>
 	<script src="js/view-model.js"></script>
-	<script src="js/localstorage-model.js"></script>
+	<script src="js/remote-model.js"></script>
 </head>
 <body>
 	<h1>Dedguenodgo <a id="deconnection" href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a> </h1>
@@ -95,7 +95,7 @@
 	<!-- /ko -->
 	<script>
 		$(document).ready(function() {
-			window.viewModel = createLocalStorageModel();
+			window.viewModel = createViewModel();
 			ko.applyBindings(window.viewModel);
 		});
 	</script>

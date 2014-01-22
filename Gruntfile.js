@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-text-replace');
 	grunt.loadNpmTasks('grunt-karma');
 
 	grunt.initConfig({
@@ -11,6 +12,16 @@ module.exports = function(grunt) {
 				'Gruntfile.js'
 			]
 		},
+		replace: {
+			demo: {
+				src: 'src/main/webapp/index.html',
+				dest: 'target/grunt-webapp/demo.html',
+				replacements: [{
+					from: 'remote-model.js',
+					to: 'localstorage-model.js'
+				}]
+			}
+		},
 		karma: {
 			unit: {
 				configFile: 'karma.conf.js',
@@ -20,6 +31,6 @@ module.exports = function(grunt) {
 	});
 
 
-	grunt.registerTask('default', ['jshint', 'karma']);
+	grunt.registerTask('default', ['jshint', 'replace', 'karma']);
 
 };
