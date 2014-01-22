@@ -5,7 +5,11 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		jshint: {
-			all: '*.js'
+			all: [
+				'src/main/webapp/js/*.js',
+				'src/test/js/*.js',
+				'Gruntfile.js'
+			]
 		},
 		karma: {
 			unit: {
