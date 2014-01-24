@@ -28,4 +28,6 @@ public class Present {
 		this.deletedBy = deletedBy;
 	}
 	
+	public Present() {
+	}
 }

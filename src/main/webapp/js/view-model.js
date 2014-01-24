@@ -255,8 +255,8 @@ ViewModel.prototype = {
 				to: this.selectedList(),
 				createdBy: this.loggedInUser(),
 				creationDate: new Date(),
-				givenBy: null,
-				givenDate: null,
+				offeredBy: null,
+				offeredDate: null,
 				deletedBy: null
 			};
 			this._addPresent(present);
