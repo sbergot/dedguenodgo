@@ -130,5 +130,5 @@ window.createViewModel = function() {
 			name: 'Elisa'
 		},
 	});
-	return viewModel;
+	return $.when(viewModel);
 };

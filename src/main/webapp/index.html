@@ -95,8 +95,10 @@
 	<!-- /ko -->
 	<script>
 		$(document).ready(function() {
-			window.viewModel = createViewModel();
-			ko.applyBindings(window.viewModel);
+			createViewModel().done(function(viewModel) {
+				window.viewModel = viewModel;
+				ko.applyBindings(window.viewModel);
+			});
 		});
 	</script>
 </body>
