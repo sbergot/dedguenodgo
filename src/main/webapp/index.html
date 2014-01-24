@@ -12,7 +12,7 @@
 	<script src="js/view-model.js"></script>
 	<script src="js/remote-model.js"></script>
 </head>
-<body>
+<body class="loading">
 	<h1>Dedguenodgo <a id="deconnection" href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a> </h1>
 	<!-- ko if:!loggedInUser() -->
 	<div class="container">
@@ -95,7 +95,11 @@
 	<!-- /ko -->
 	<script>
 		$(document).ready(function() {
-			createViewModel().done(function(viewModel) {
+			createViewModel().always(function() {
+				$("body").removeClass('loading');
+			}).fail(function(viewModel) {
+				$("body").addClass('error');
+			}).done(function(viewModel) {
 				window.viewModel = viewModel;
 				ko.applyBindings(window.viewModel);
 			});
