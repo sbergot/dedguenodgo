@@ -96,7 +96,11 @@
 	<!-- /ko -->
 	<script>
 		$(document).ready(function() {
-			createViewModel().always(function() {
+			var mockModelLoaded = !/demo/.test(location.search) ? $.when() : $.getScript('js/localstorage-model.js');
+			$.when(mockModelLoaded).pipe(function() {
+				return window.createViewModel();
+			})
+			.always(function() {
 				$("body").removeClass('loading');
 			}).fail(function(viewModel) {
 				$("body").addClass('error');
