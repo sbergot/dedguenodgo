@@ -14,7 +14,10 @@
 	<script src="js/remote-model.js"></script>
 </head>
 <body class="loading">
-	<h1>Dedguenodgo <a id="deconnection" href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a> </h1>
+	<h1>Dedguenodgo <div id="connected-user">
+			<span data-bind="text: !(loggedInUser()) ? '' : users()[loggedInUser()].name"></span><br/>
+			<a href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a>
+	</div> </h1>
 	<!-- ko if:!loggedInUser() -->
 	<div class="container">
 		<div class="jumbotron">

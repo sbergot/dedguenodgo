@@ -77,9 +77,10 @@ h1 {
 #command-execution > .loading {
 	font-style: italic;
 }
-#deconnection {
-	font-size: 14px;
+#connected-user {
+	text-align: right;
 	position: absolute;
-	top: 1em;
-	right: 1em;
+	top: 0.4em;
+	right: 0.4em;
+	font-size: 14px;
 }
