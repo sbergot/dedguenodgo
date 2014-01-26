@@ -1,9 +1,18 @@
 package oadam;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.joda.time.DateTime;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Parent;
+
+@Entity
+@JsonIgnoreProperties({"parent"})
 public class Present {
-	public Long id;
+	@Id public Long id;
+	@Parent public Key<Party> parent = Key.create(Party.class, Party.FAMILLE_AD.id);
 	public String title;
 	public String description;
 	public Long to;

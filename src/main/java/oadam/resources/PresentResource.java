@@ -1,6 +1,7 @@
 package oadam.resources;
 
-import java.util.Arrays;
+import static com.googlecode.objectify.ObjectifyService.ofy;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -12,28 +13,34 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.joda.time.DateTime;
-
+import oadam.Party;
 import oadam.Present;
-import oadam.User;
+
+import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
 
 @Path("present")
 public class PresentResource {
+	static {
+		JodaTimeTranslators.add(ObjectifyService.factory());
+		ObjectifyService.register(Party.class);
+		ObjectifyService.register(Present.class);
+	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Present> getPresents() {
-		return Arrays.asList(
-				new Present(10L, "Livre", "un livre sympa", User.olivier.id, User.olivier.id, new DateTime(), null, null, null),
-				new Present(10L, "Diamants", "des diamants de mocassa", User.elisa.id, User.olivier.id, new DateTime(), User.olivier.id, new DateTime(), null)
-		);
+		return ofy().load().type(Present.class).ancestor(Party.FAMILLE_AD).list();
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Present addPresent(Present added) {
-		added.id = Math.round(Math.random()*1e14);
+		if (added.id != null) {
+			throw new IllegalArgumentException("cannot specify an id when created. Received " + added.id);
+		}
+		ofy().save().entity(added).now();
 		return added;
 	}
 	
@@ -41,6 +48,10 @@ public class PresentResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Present editPresent(@PathParam("id") long id, Present edited) {
+		if (edited.id != id) {
+			throw new IllegalArgumentException("ids don't match. Received " + id + " and " + edited.id);
+		}
+		ofy().save().entity(edited).now();
 		return edited;
 	}
 	
