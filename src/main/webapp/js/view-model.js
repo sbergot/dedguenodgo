@@ -1,3 +1,16 @@
+function createStorageObservable(storage, propertyName) {
+	var storedValue = null;
+	try {
+		storedValue = JSON.parse(storage.getItem(propertyName));
+	} catch (e) {
+		console.warn('corrupted value for ' + propertyName, e);
+	}
+	var result = ko.observable(storedValue);
+	result.subscribe(function(value) {
+		storage.setItem(propertyName, JSON.stringify(value));
+	});
+	return result;
+}
 /**
  * @param confirm function(text): boolean    ie window.confirm
  * @param addPresentCommand function(present): JQueryPromise
@@ -8,17 +21,13 @@ function ViewModel(confirm, addPresentCommand, editPresentCommand) {
 	this.addPresentCommand = addPresentCommand;
 	this.editPresentCommand = editPresentCommand;
 	this.users = ko.observable({});
-	this.loggedInUserChoice = ko.observable(localStorage.getItem('loggedInUserChoice'));
-	this.loggedInUserChoice.subscribe(function(value) {
-		localStorage.setItem('loggedInUserChoice', value);
-	});
-	this.loggedInUser = ko.observable(sessionStorage.getItem('loggedInUser'));
+	this.loggedInUserChoice = createStorageObservable(localStorage, 'loggedInUserChoice');
+	this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
 	var self = this;
 	this.loggedInUser.subscribe(function(value) {
-		sessionStorage.setItem('loggedInUser', value);
 		self.selectedList(value);
 	});
-	this.selectedList = ko.observable();
+	this.selectedList = createStorageObservable(sessionStorage, 'selectedList');
 	this.presents = ko.observable();
 	//present edition
 	this.editing = ko.observable(false);
