@@ -36,6 +36,9 @@
 				<select class="form-control" data-bind="options: Object.keys(users()), value: loggedInUserChoice, optionsText:function(id) {return users()[id].name;}, optionsCaption: 'choisir...'"></select> 
 			</div>
 			<button class="btn btn-primary" type="submit"> Se connecter</button>
+			<span> --- </span>	
+			<button class="btn btn-xs btn-primary" data-bind="click:function() {addUser();}">Ajouter un utilisateur</button>
+			<button class="btn btn-xs btn-danger" data-bind="click:function() {deleteUser(loggedInUserChoice());}">Supprimer cet utilisateur</button>
 		</form>
 	</div>
 	<!-- /ko -->
