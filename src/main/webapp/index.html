@@ -15,7 +15,7 @@
 </head>
 <body class="loading">
 	<h1>Dedguenodgo <div id="connected-user">
-			<span data-bind="text: !(loggedInUser()) ? '' : users()[loggedInUser()].name"></span><br/>
+			<span data-bind="text: !(loggedInUser()) ? '' : getUserName(loggedInUser())"></span><br/>
 			<a href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a>
 	</div> </h1>
 	<!-- ko if:!loggedInUser() -->
@@ -33,7 +33,7 @@
 		<form class="form" data-bind="submit: function() {loggedInUser(loggedInUserChoice());}">
 			<div class="form-group">
 				<label>Qui êtes-vous ?</label>
-				<select class="form-control" data-bind="options: Object.keys(users()), value: loggedInUserChoice, optionsText:function(id) {return users()[id].name;}, optionsCaption: 'choisir...'"></select> 
+				<select class="form-control" data-bind="options: Object.keys(users()), value: loggedInUserChoice, optionsText:function(id) {return getUserName(id);}, optionsCaption: 'choisir...'"></select> 
 			</div>
 			<button class="btn btn-primary" type="submit"> Se connecter</button>
 			<span> --- </span>	
@@ -57,7 +57,7 @@
 		<h4 class="list-group-item-heading">
 			<span class="title" data-bind="text:title"></span>
 			<span class="offered-by" data-bind="text: $root.displayPresentAsOffered($data) || ''"></span>
-			<span class="deleted-by" data-bind="visible: deletedBy, text: !deletedBy ? '' : '(Ce cadeau a été supprimé par ' + $root.users()[deletedBy].name + ')'"></span>
+			<span class="deleted-by" data-bind="visible: deletedBy, text: !deletedBy ? '' : '(Ce cadeau a été supprimé par ' + $root.getUserName(deletedBy) + ')'"></span>
 		</h4>
 		<p class="list-group-item-text" data-bind="text:description"> </p>
 		</li>

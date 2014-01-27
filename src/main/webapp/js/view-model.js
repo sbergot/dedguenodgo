@@ -94,6 +94,10 @@ ViewModel.prototype = {
 			};
 		});
 	},
+	getUserName: function(userId) {
+		var user = this.users()[userId];
+		return !user ? 'utilisateur supprimé' : user.name;
+	},
 	_comparePresents: function(a, b) {
 		var aAsOffered = this.displayPresentAsOffered(a);
 		var bAsOffered = this.displayPresentAsOffered(b);
