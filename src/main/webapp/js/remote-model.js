@@ -41,9 +41,9 @@ window.createViewModel = function() {
 		}).pipe(formatFromServer);
 	};
 	
-	return $.when($.getJSON('resources/user'), $.getJSON('resources/present')).pipe(function(usersJQ, presentsJQ) {
-		var users = usersJQ[0];
-		var presents = presentsJQ[0].map(formatFromServer);
+	return $.getJSON('resources/users-and-presents').pipe(function(usersAndPresents) {
+		var users = usersAndPresents.users;
+		var presents = usersAndPresents.presents;
 		
 		var viewModel = new ViewModel(function(t) {
 			return confirm(t);
