@@ -1,5 +1,4 @@
-describe("The view model", function() {
-	var viewModel;
+describe("The view model", function() { var viewModel;
 	var throwIfConfirm, nextConfirmAnswer;
 	var addPresentCall, addPresentDfd;
 	var editPresentCall, editPresentDfd;
@@ -27,7 +26,11 @@ describe("The view model", function() {
 			editPresentDfd = $.Deferred();
 			return editPresentDfd.promise();
 		};
-		viewModel = new ViewModel(confirm, addPresentCommand, editPresentCommand);
+		viewModel = new ViewModel({
+			confirm: confirm,
+			addPresentCommand: addPresentCommand,
+			editPresentCommand: editPresentCommand
+		});
 		viewModel.users({
 			'idNicolas': {
 				id: 'idNicolas',
@@ -45,47 +48,46 @@ describe("The view model", function() {
 		viewModel.loggedInUser('idOlivier');
 		viewModel.selectedList('idOlivier');
 		viewModel.presents([{
-				id: "1",
-				title: "Gelatine rose",
-				description: "Une matière gluante et fluo",
-				to: "idElisa",
-				createdBy: "idElisa",
-				creationDate: new Date(),
-				offeredBy: "idOlivier",
-				givenDate: new Date(),
-				deleted: false
-			}, {
-				id: "2",
-				title: "Gelatine verte",
-				description: "Une matière gluante et fluo",
-				to: "idOlivier",
-				createdBy: "idOlivier",
-				creationDate: new Date(),
-				offeredBy: null,
-				givenDate: null,
-				deleted: false
-			}, {
-				id: "3",
-				title: "Gelatine jaune",
-				description: "Une matière gluante et fluo",
-				to: "idOlivier",
-				createdBy: "idOlivier",
-				creationDate: new Date(),
-				offeredBy: "idNicolas",
-				givenDate: new Date(),
-				deleted: false
-			}, {
-				id: "4",
-				title: "Gelatine rose",
-				description: "Une matière gluante et fluo",
-				to: "idOlivier",
-				createdBy: "idNicolas",
-				creationDate: new Date(),
-				offeredBy: "idNicolas",
-				givenDate: new Date(),
-				deleted: false
-			},
-		]);
+			id: "1",
+			title: "Gelatine rose",
+			description: "Une matière gluante et fluo",
+			to: "idElisa",
+			createdBy: "idElisa",
+			creationDate: new Date(),
+			offeredBy: "idOlivier",
+			givenDate: new Date(),
+			deleted: false
+		}, {
+			id: "2",
+			title: "Gelatine verte",
+			description: "Une matière gluante et fluo",
+			to: "idOlivier",
+			createdBy: "idOlivier",
+			creationDate: new Date(),
+			offeredBy: null,
+			givenDate: null,
+			deleted: false
+		}, {
+			id: "3",
+			title: "Gelatine jaune",
+			description: "Une matière gluante et fluo",
+			to: "idOlivier",
+			createdBy: "idOlivier",
+			creationDate: new Date(),
+			offeredBy: "idNicolas",
+			givenDate: new Date(),
+			deleted: false
+		}, {
+			id: "4",
+			title: "Gelatine rose",
+			description: "Une matière gluante et fluo",
+			to: "idOlivier",
+			createdBy: "idNicolas",
+			creationDate: new Date(),
+			offeredBy: "idNicolas",
+			givenDate: new Date(),
+			deleted: false
+		}, ]);
 	});
 
 	it("lists the users in the expected order", function() {
@@ -124,9 +126,11 @@ describe("The view model", function() {
 
 		//server call
 		expect(viewModel.loadingMessage()).not.toEqual(null);
-		addPresentDfd.resolve($.extend({}, last, {id: 'genratedId'}));
+		addPresentDfd.resolve($.extend({}, last, {
+			id: 'genratedId'
+		}));
 		expect(viewModel.presents()[nbPresentsBefore].title).toEqual('Gelatine grise');
-		
+
 	});
 
 	it("can edit an existing present", function() {
@@ -178,6 +182,6 @@ describe("The view model", function() {
 
 	it("let a user mark a present offered in his list event when already offered", function() {
 		viewModel.togglePresentOffered(viewModel.presents()[2]);
-	expect(viewModel.presents()[2].offeredBy).toEqual('idOlivier');	
+		expect(viewModel.presents()[2].offeredBy).toEqual('idOlivier');
 	});
 });

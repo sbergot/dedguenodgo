@@ -7,18 +7,18 @@ window.createViewModel = function() {
 		result.deletedBy = parseInt(result.deletedBy);
 		return result;
 	}
-	
+
 	function longToDate(long) {
 		return !long ? null : new Date(long);
 	}
-	
+
 	function formatFromServer(present) {
 		var result = $.extend({}, present);
 		result.creationDate = longToDate(result.creationDate);
 		result.offeredDate = longToDate(result.offeredDate);
 		return result;
 	}
-	
+
 	var addPresent = function(present) {
 		var converted = formatForServer(present);
 		delete converted.id;
@@ -40,15 +40,21 @@ window.createViewModel = function() {
 			dataType: "json"
 		}).pipe(formatFromServer);
 	};
-	
+
 	return $.getJSON('resources/users-and-presents').pipe(function(usersAndPresents) {
 		var users = usersAndPresents.users;
 		var presents = usersAndPresents.presents;
-		
-		var viewModel = new ViewModel(function(t) {
-			return confirm(t);
-		}, addPresent, editPresent);
-		
+
+		var viewModel = new ViewModel({
+			confirm: function(t) {
+				return confirm(t);
+			},
+			addPresentCommand: addPresent,
+			editPresentCommand: editPresent,
+			addUserCommand: addUser,
+			deleteUserCommand: deleteUser
+		});
+
 		viewModel.presents(presents);
 		viewModel.users(users);
 		return viewModel;

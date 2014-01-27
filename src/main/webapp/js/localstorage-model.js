@@ -112,9 +112,13 @@ window.createViewModel = function() {
 		save('presents', presents);
 		return presents[matching[0]];
 	};
-	var viewModel = new ViewModel(function(t) {
-		return confirm(t);
-	}, makeFakeAsync(addPresent), makeFakeAsync(editPresent));
+	var viewModel = new ViewModel({
+		confirm: function(t) {
+			return confirm(t);
+		},
+		addPresentCommand: makeFakeAsync(addPresent),
+		editPresentCommand: makeFakeAsync(editPresent)
+	});
 	viewModel.presents(loadPresents());
 	viewModel.users({
 		'idNicolas': {

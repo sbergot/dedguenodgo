@@ -12,14 +12,14 @@ function createStorageObservable(storage, propertyName) {
 	return result;
 }
 /**
- * @param confirm function(text): boolean    ie window.confirm
- * @param addPresentCommand function(present): JQueryPromise
+ * @param options.confirm function(text): boolean    ie window.confirm
+ * @param options.addPresentCommand function(present): JQueryPromise
  * */
 
-function ViewModel(confirm, addPresentCommand, editPresentCommand) {
-	this.confirm = confirm;
-	this.addPresentCommand = addPresentCommand;
-	this.editPresentCommand = editPresentCommand;
+function ViewModel(options) {
+	this.confirm = options.confirm;
+	this.addPresentCommand = options.addPresentCommand;
+	this.editPresentCommand = options.editPresentCommand;
 	this.users = ko.observable({});
 	this.loggedInUserChoice = createStorageObservable(localStorage, 'loggedInUserChoice');
 	this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
