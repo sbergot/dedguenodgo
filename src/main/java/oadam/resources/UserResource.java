@@ -11,6 +11,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -33,7 +34,9 @@ public class UserResource {
 		Map<Long, User> result = new HashMap<>();
 		List<User> asList = ofy().load().type(User.class).ancestor(Party.FAMILLE_AD).list();
 		for (User u: asList) {
-			result.put(u.id, u);
+			if (!u.deleted) {
+				result.put(u.id, u);
+			}
 		}
 		return result;
 	}
@@ -50,8 +53,11 @@ public class UserResource {
 	}
 	
 	@DELETE @Path("{id}")
-	public void deleteUser(String id) {
-		ofy().delete().key(Key.create(Key.create(Party.class, Party.FAMILLE_AD.id), User.class, id));
+	public void deleteUser(@PathParam("id") long id) {
+		Key<Party> parentKey = Key.create(Party.class, Party.FAMILLE_AD.id);
+		User user = ofy().load().key(Key.create(parentKey, User.class, id)).now();
+		user.deleted = true;
+		ofy().save().entity(user);
 	}
 	
 	

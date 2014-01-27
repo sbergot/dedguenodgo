@@ -18,8 +18,11 @@ function createStorageObservable(storage, propertyName) {
 
 function ViewModel(options) {
 	this.confirm = options.confirm;
+	this.prompt = options.prompt;
 	this.addPresentCommand = options.addPresentCommand;
 	this.editPresentCommand = options.editPresentCommand;
+	this.addUserCommand = options.addUserCommand;
+	this.deleteUserCommand = options.deleteUserCommand;
 	this.users = ko.observable({});
 	this.loggedInUserChoice = createStorageObservable(localStorage, 'loggedInUserChoice');
 	this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
@@ -306,5 +309,31 @@ ViewModel.prototype = {
 		this.successMessage(null);
 		this.errorMessage(null);
 		this.undoAction(null);
+	},
+	addUser: function() {
+		var name = this.prompt('Nom du nouvel utilisateur');
+		if (!name) {return;}
+		var ok = this.confirm('Cr\u00e9er l\'utilisateur ?');
+		if (!ok) {return;}
+		var self = this;
+		this.addUserCommand({name: name}).done(function(user) {
+			alert('utilisateur ajouté');
+			var clone = $.extend({}, self.users());		
+			clone[user.id] = user;
+			self.users(clone);
+		});
+	},
+	deleteUser: function(userId) {
+		var ok = this.confirm('Supprimer ' + this.getUserName(userId) + '?');
+		if (!ok) {return;}
+		ok = this.confirm('Supprimer supprimer ' + this.getUserName(userId) + '?');
+		if (!ok) {return;}
+		var self = this;
+		this.deleteUserCommand(userId).done(function() {
+			alert('Utilisateur supprimé');
+			var clone = $.extend({}, self.users());		
+			delete clone[userId];
+			self.users(clone);
+		});
 	}
 };

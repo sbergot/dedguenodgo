@@ -40,6 +40,23 @@ window.createViewModel = function() {
 			dataType: "json"
 		}).pipe(formatFromServer);
 	};
+	var addUser = function(user) {
+		return $.ajax({
+			url: 'resources/user',
+			contentType: 'application/json',
+			type: 'POST',
+			data: JSON.stringify(user),
+			dataType: "json"
+		});
+	};
+	var deleteUser = function(userId) {
+		return $.ajax({
+			url: 'resources/user/' + userId,
+			contentType: 'application/json',
+			type: 'DELETE',
+			dataType: "json"
+		});
+	};
 
 	return $.getJSON('resources/users-and-presents').pipe(function(usersAndPresents) {
 		var users = usersAndPresents.users;
@@ -48,6 +65,9 @@ window.createViewModel = function() {
 		var viewModel = new ViewModel({
 			confirm: function(t) {
 				return confirm(t);
+			},
+			prompt: function(t) {
+				return prompt(t);
 			},
 			addPresentCommand: addPresent,
 			editPresentCommand: editPresent,
