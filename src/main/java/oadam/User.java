@@ -11,13 +11,14 @@ import com.googlecode.objectify.annotation.Parent;
 @JsonIgnoreProperties({"parent"})
 public class User {
 	@Id public Long id;
-	@Parent public Key<Party> parent = Key.create(Party.class, Party.FAMILLE_AD.id);
+	@Parent public Key<Party> parent;
 	public String name;
 	public boolean deleted = false;
 	
-	public User(Long id, String name) {
+	public User(Long id, Key<Party> parent, String name) {
 		super();
 		this.id = id;
+		this.parent = parent;
 		this.name = name;
 	}
 	

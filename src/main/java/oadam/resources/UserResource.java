@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -13,10 +14,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import oadam.Party;
 import oadam.User;
+import oadam.security.SecurityFilter;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
@@ -30,9 +33,11 @@ public class UserResource {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<Long, User> getUsers() {
+	public Map<Long, User> getUsers(@Context HttpServletRequest request) {
+		String partyId = SecurityFilter.getPartyId(request);
+		Key<Party> ancestor = Key.create(Party.class, partyId);
 		Map<Long, User> result = new HashMap<>();
-		List<User> asList = ofy().load().type(User.class).ancestor(Party.FAMILLE_AD).list();
+		List<User> asList = ofy().load().type(User.class).ancestor(ancestor).list();
 		for (User u: asList) {
 			if (!u.deleted) {
 				result.put(u.id, u);
@@ -53,9 +58,10 @@ public class UserResource {
 	}
 	
 	@DELETE @Path("{id}")
-	public void deleteUser(@PathParam("id") long id) {
-		Key<Party> parentKey = Key.create(Party.class, Party.FAMILLE_AD.id);
-		User user = ofy().load().key(Key.create(parentKey, User.class, id)).now();
+	public void deleteUser(@Context HttpServletRequest request, @PathParam("id") long id) {
+		String partyId = SecurityFilter.getPartyId(request);
+		Key<Party> ancestor = Key.create(Party.class, partyId);
+		User user = ofy().load().key(Key.create(ancestor, User.class, id)).now();
 		user.deleted = true;
 		ofy().save().entity(user);
 	}

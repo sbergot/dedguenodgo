@@ -3,9 +3,11 @@ package oadam.resources;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import oadam.Present;
@@ -30,9 +32,9 @@ public class UsersAndPresentsResource {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public UsersAndPresents getUsersAndPresents() {
-		Map<Long, User> users = userResource.getUsers();
-		List<Present> presents = presentResource.getPresents();
+	public UsersAndPresents getUsersAndPresents(@Context HttpServletRequest request) {
+		Map<Long, User> users = userResource.getUsers(request);
+		List<Present> presents = presentResource.getPresents(request);
 		return new UsersAndPresents(users, presents);
 	}
 }

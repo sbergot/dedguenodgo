@@ -4,6 +4,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -11,11 +12,14 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import oadam.Party;
 import oadam.Present;
+import oadam.security.SecurityFilter;
 
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
 
@@ -29,8 +33,10 @@ public class PresentResource {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Present> getPresents() {
-		return ofy().load().type(Present.class).ancestor(Party.FAMILLE_AD).list();
+	public List<Present> getPresents(@Context HttpServletRequest request) {
+		String partyId = SecurityFilter.getPartyId(request);
+		Key<Party> ancestor = Key.create(Party.class, partyId);
+		return ofy().load().type(Present.class).ancestor(ancestor).list();
 	}
 	
 	@POST

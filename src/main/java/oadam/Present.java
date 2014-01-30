@@ -12,7 +12,7 @@ import com.googlecode.objectify.annotation.Parent;
 @JsonIgnoreProperties({"parent"})
 public class Present {
 	@Id public Long id;
-	@Parent public Key<Party> parent = Key.create(Party.class, Party.FAMILLE_AD.id);
+	@Parent public Key<Party> parent;
 	public String title;
 	public String description;
 	public Long to;
@@ -22,11 +22,12 @@ public class Present {
 	public DateTime offeredDate;
 	public Long deletedBy;
 	
-	public Present(Long id, String title, String description, Long to,
+	public Present(Long id, Key<Party> parent, String title, String description, Long to,
 			Long createdBy, DateTime creationDate, Long offeredBy,
 			DateTime offeredDate, Long deletedBy) {
 		super();
 		this.id = id;
+		this.parent = parent;
 		this.title = title;
 		this.description = description;
 		this.to = to;
