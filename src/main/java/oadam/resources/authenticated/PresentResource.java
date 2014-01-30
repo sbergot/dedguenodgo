@@ -42,10 +42,13 @@ public class PresentResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Present addPresent(Present added) {
+	public Present addPresent(@Context HttpServletRequest request, Present added) {
 		if (added.id != null) {
 			throw new IllegalArgumentException("cannot specify an id when created. Received " + added.id);
 		}
+		String partyId = SecurityFilter.getPartyId(request);
+		Key<Party> ancestor = Key.create(Party.class, partyId);
+		added.parent = ancestor;
 		ofy().save().entity(added).now();
 		return added;
 	}
@@ -53,10 +56,13 @@ public class PresentResource {
 	@PUT @Path("{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Present editPresent(@PathParam("id") long id, Present edited) {
+	public Present editPresent(@Context HttpServletRequest request, @PathParam("id") long id, Present edited) {
 		if (edited.id != id) {
 			throw new IllegalArgumentException("ids don't match. Received " + id + " and " + edited.id);
 		}
+		String partyId = SecurityFilter.getPartyId(request);
+		Key<Party> ancestor = Key.create(Party.class, partyId);
+		edited.parent = ancestor;
 		ofy().save().entity(edited).now();
 		return edited;
 	}

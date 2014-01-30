@@ -49,10 +49,13 @@ public class UserResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public User addUser(User added) {
+	public User addUser(@Context HttpServletRequest request, User added) {
 		if (added.id != null) {
 			throw new IllegalArgumentException("cannot specify an id when created. Received " + added.id);
 		}
+		String partyId = SecurityFilter.getPartyId(request);
+		Key<Party> ancestor = Key.create(Party.class, partyId);
+		added.parent = ancestor;
 		ofy().save().entity(added).now();
 		return added;
 	}
