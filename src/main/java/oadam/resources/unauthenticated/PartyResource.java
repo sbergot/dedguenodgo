@@ -1,4 +1,4 @@
-package oadam.resources;
+package oadam.resources.unauthenticated;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 

@@ -1,16 +1,14 @@
-package oadam.resources;
+package oadam.resources.authenticated;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -18,38 +16,33 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import oadam.Party;
-import oadam.User;
+import oadam.Present;
 import oadam.security.SecurityFilter;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
 
-@Path("user")
-public class UserResource {
+@Path("present")
+public class PresentResource {
 	static {
+		JodaTimeTranslators.add(ObjectifyService.factory());
 		ObjectifyService.register(Party.class);
-		ObjectifyService.register(User.class);
+		ObjectifyService.register(Present.class);
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<Long, User> getUsers(@Context HttpServletRequest request) {
+	public List<Present> getPresents(@Context HttpServletRequest request) {
 		String partyId = SecurityFilter.getPartyId(request);
 		Key<Party> ancestor = Key.create(Party.class, partyId);
-		Map<Long, User> result = new HashMap<>();
-		List<User> asList = ofy().load().type(User.class).ancestor(ancestor).list();
-		for (User u: asList) {
-			if (!u.deleted) {
-				result.put(u.id, u);
-			}
-		}
-		return result;
+		return ofy().load().type(Present.class).ancestor(ancestor).list();
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public User addUser(User added) {
+	public Present addPresent(Present added) {
 		if (added.id != null) {
 			throw new IllegalArgumentException("cannot specify an id when created. Received " + added.id);
 		}
@@ -57,13 +50,15 @@ public class UserResource {
 		return added;
 	}
 	
-	@DELETE @Path("{id}")
-	public void deleteUser(@Context HttpServletRequest request, @PathParam("id") long id) {
-		String partyId = SecurityFilter.getPartyId(request);
-		Key<Party> ancestor = Key.create(Party.class, partyId);
-		User user = ofy().load().key(Key.create(ancestor, User.class, id)).now();
-		user.deleted = true;
-		ofy().save().entity(user);
+	@PUT @Path("{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Present editPresent(@PathParam("id") long id, Present edited) {
+		if (edited.id != id) {
+			throw new IllegalArgumentException("ids don't match. Received " + id + " and " + edited.id);
+		}
+		ofy().save().entity(edited).now();
+		return edited;
 	}
 	
 	

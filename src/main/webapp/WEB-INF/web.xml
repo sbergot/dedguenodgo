@@ -5,11 +5,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 	<servlet>
-		<servlet-name>Jersey Web Application</servlet-name>
+		<servlet-name>authenticated-jersey</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>oadam.resources</param-value>
+			<param-value>oadam.resources.authenticated</param-value>
 		</init-param>
 		<init-param>
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
@@ -17,19 +17,36 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-<!-- 	<filter> -->
-<!-- 		<filter-name>authentication</filter-name> -->
-<!-- 		<filter-class>oadam.security.SecurityFilter</filter-class> -->
-<!-- 	</filter> -->
-
+	<filter>
+		<filter-name>authentication</filter-name>
+		<filter-class>oadam.security.SecurityFilter</filter-class>
+	</filter>
 	<servlet-mapping>
-		<servlet-name>Jersey Web Application</servlet-name>
-		<url-pattern>/resources/*</url-pattern>
+		<servlet-name>authenticated-jersey</servlet-name>
+		<url-pattern>/authenticated-resources/*</url-pattern>
 	</servlet-mapping>
-<!-- 	<filter-mapping> -->
-<!-- 		<filter-name>authentication</filter-name> -->
-<!-- 		<url-pattern>/resources/*</url-pattern> -->
-<!-- 	</filter-mapping> -->
+	<filter-mapping>
+		<filter-name>authentication</filter-name>
+		<url-pattern>/authenticated-resources/*</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>unauthenticated-jersey</servlet-name>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>oadam.resources.unauthenticated</param-value>
+		</init-param>
+		<init-param>
+			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>unauthenticated-jersey</servlet-name>
+		<url-pattern>/unauthenticated-resources/*</url-pattern>
+	</servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

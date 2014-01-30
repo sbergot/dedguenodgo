@@ -1,4 +1,4 @@
-package oadam.resources;
+package oadam.resources.authenticated;
 
 import java.util.List;
 import java.util.Map;

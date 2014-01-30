@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import oadam.Party;
-import oadam.resources.PartyResource;
+import oadam.resources.unauthenticated.PartyResource;
 
 import com.sun.jersey.core.util.Base64;
 

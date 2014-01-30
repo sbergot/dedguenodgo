@@ -23,7 +23,7 @@ window.createViewModel = function() {
 		var converted = formatForServer(present);
 		delete converted.id;
 		return $.ajax({
-			url: 'resources/present',
+			url: 'authenticated-resources/present',
 			contentType: 'application/json',
 			type: 'POST',
 			data: JSON.stringify(converted),
@@ -33,7 +33,7 @@ window.createViewModel = function() {
 	var editPresent = function(oldPresent, newPresent) {
 		var converted = formatForServer(newPresent);
 		return $.ajax({
-			url: 'resources/present/' + oldPresent.id,
+			url: 'authenticated-resources/present/' + oldPresent.id,
 			contentType: 'application/json',
 			type: 'PUT',
 			data: JSON.stringify(converted),
@@ -42,7 +42,7 @@ window.createViewModel = function() {
 	};
 	var addUser = function(user) {
 		return $.ajax({
-			url: 'resources/user',
+			url: 'authenticated-resources/user',
 			contentType: 'application/json',
 			type: 'POST',
 			data: JSON.stringify(user),
@@ -51,14 +51,14 @@ window.createViewModel = function() {
 	};
 	var deleteUser = function(userId) {
 		return $.ajax({
-			url: 'resources/user/' + userId,
+			url: 'authenticated-resources/user/' + userId,
 			contentType: 'application/json',
 			type: 'DELETE',
 			dataType: "json"
 		});
 	};
 
-	return $.getJSON('resources/users-and-presents').pipe(function(usersAndPresents) {
+	return $.getJSON('authenticated-resources/users-and-presents').pipe(function(usersAndPresents) {
 		var users = usersAndPresents.users;
 		var presents = usersAndPresents.presents;
 
