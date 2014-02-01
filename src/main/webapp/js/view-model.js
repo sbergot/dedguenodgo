@@ -11,18 +11,12 @@ function createStorageObservable(storage, propertyName) {
 	});
 	return result;
 }
-/**
- * @param options.confirm function(text): boolean    ie window.confirm
- * @param options.addPresentCommand function(present): JQueryPromise
- * */
 
 function ViewModel(options) {
 	this.confirm = options.confirm;
 	this.prompt = options.prompt;
-	this.addPresentCommand = options.addPresentCommand;
-	this.editPresentCommand = options.editPresentCommand;
-	this.addUserCommand = options.addUserCommand;
-	this.deleteUserCommand = options.deleteUserCommand;
+	this.server = options.server;
+
 	this.users = ko.observable({});
 	this.loggedInUserChoice = createStorageObservable(localStorage, 'loggedInUserChoice');
 	this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
@@ -31,7 +25,7 @@ function ViewModel(options) {
 		self.selectedList(value);
 	});
 	this.selectedList = createStorageObservable(sessionStorage, 'selectedList');
-	this.presents = ko.observable();
+	this.presents = ko.observable([]);
 	//present edition
 	this.editing = ko.observable(false);
 	this.editedPresent = ko.observable(null);
@@ -43,6 +37,9 @@ function ViewModel(options) {
 	this.errorMessage = ko.observable();
 	this.undoAction = ko.observable();
 	this.loadingMessage = ko.observable(null);
+	
+	this.initLoading = ko.observable();
+	this.initError = ko.observable();
 
 	var throttledHasLoading = ko.computed(function() {
 		return self.loadingMessage() !== null;
@@ -61,6 +58,16 @@ function ViewModel(options) {
 	});
 	this.selectedList.subscribe(function() {
 		self.discardConfirm();
+	});
+
+	this.initLoading(true);
+	this.server.getUsersAndPresents().always(function() {
+		self.initLoading(false);
+	}).fail(function() {
+		self.initError(true);
+	}).done(function(pAndU) {
+		self.users(pAndU.users);
+		self.presents(pAndU.presents);
 	});
 }
 
@@ -180,7 +187,7 @@ ViewModel.prototype = {
 		this.presents(this.presents().concat([present]));
 		this.loadingMessage('Ajout de "' + present.title + '" en cours...');
 		var self = this;
-		this.addPresentCommand(present)
+		this.server.addPresent(present)
 			.always(function() {
 				self.loadingMessage(null);
 			})
@@ -213,7 +220,7 @@ ViewModel.prototype = {
 		this.discardConfirm();
 		this.loadingMessage('Modification de "' + newPresent.title + '" en cours...');
 		var self = this;
-		this.editPresentCommand(oldPresent, newPresent)
+		this.server.editPresent(oldPresent, newPresent)
 			.always(function() {
 				self.loadingMessage(null);
 			})
@@ -316,7 +323,7 @@ ViewModel.prototype = {
 		var ok = this.confirm('Cr\u00e9er l\'utilisateur ?');
 		if (!ok) {return;}
 		var self = this;
-		this.addUserCommand({name: name}).done(function(user) {
+		this.server.addUser({name: name}).done(function(user) {
 			alert('utilisateur ajouté');
 			var clone = $.extend({}, self.users());		
 			clone[user.id] = user;
@@ -329,7 +336,7 @@ ViewModel.prototype = {
 		ok = this.confirm('Supprimer supprimer ' + this.getUserName(userId) + '?');
 		if (!ok) {return;}
 		var self = this;
-		this.deleteUserCommand(userId).done(function() {
+		this.server.deleteUser(userId).done(function() {
 			alert('Utilisateur supprimé');
 			var clone = $.extend({}, self.users());		
 			delete clone[userId];

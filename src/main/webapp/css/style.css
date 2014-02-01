@@ -3,25 +3,25 @@ body {
 	background-image: url(background.svg);
 	color: #333;
 }
-body.loading:after, body.error:after {
+#loading,  #error {
 	content:'';
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 10000;
 }
-body.loading:after {
+#loading {
 	background: url(loading.gif) center center no-repeat white;
+	z-index: 10001;
 }
-body.error:after {
+#error {
 	background: #A00;
 	color: black;
-	content: 'ERROR';
 	text-align: center;
 	padding-top: 3em;
 	font-size: 40px;
+	z-index: 10000;
 }
 h1 {
 	margin-top: 0;

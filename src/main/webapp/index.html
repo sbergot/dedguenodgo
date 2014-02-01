@@ -13,7 +13,9 @@
 	<script src="js/view-model.js"></script>
 	<script src="js/remote-model.js"></script>
 </head>
-<body class="loading">
+<body>
+	<div id="loading" data-bind="visible: initLoading"></div>
+	<div id="error" data-bind="visible: initError">ERROR</div>
 	<h1>Dedguenodgo <div id="connected-user">
 			<span data-bind="text: !(loggedInUser()) ? '' : getUserName(loggedInUser())"></span><br/>
 			<a href="#" data-bind="visible: loggedInUser, click: function() {loggedInUser(null)}">déconnexion</a>
@@ -102,16 +104,20 @@
 	<!-- /ko -->
 	<script>
 		$(document).ready(function() {
-			var mockModelLoaded = !/demo/.test(location.search) ? $.when() : $.getScript('js/localstorage-model.js');
-			$.when(mockModelLoaded).pipe(function() {
-				return window.createViewModel();
-			})
-			.always(function() {
-				$("body").removeClass('loading');
-			}).fail(function(viewModel) {
-				$("body").addClass('error');
-			}).done(function(viewModel) {
-				window.viewModel = viewModel;
+			var mockServerLoaded = !/demo/.test(location.search) ? $.when() : $.getScript('js/localstorage-model.js');
+			$.when(mockServerLoaded).fail(function(viewModel) {
+				$("body").html('error').css('color', 'red');
+			}).done(function() {
+				window.server = new Server();
+				window.viewModel = new ViewModel({
+					server: server,
+					confirm: function(t) {
+						return confirm(t);
+					},
+					prompt: function(t) {
+						return prompt(t);
+					}
+				});
 				ko.applyBindings(window.viewModel);
 			});
 		});

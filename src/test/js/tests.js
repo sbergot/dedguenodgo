@@ -1,4 +1,5 @@
-describe("The view model", function() { var viewModel;
+describe("The view model", function() {
+	var viewModel;
 	var throwIfConfirm, nextConfirmAnswer;
 	var addPresentCall, addPresentDfd;
 	var editPresentCall, editPresentDfd;
@@ -26,68 +27,76 @@ describe("The view model", function() { var viewModel;
 			editPresentDfd = $.Deferred();
 			return editPresentDfd.promise();
 		};
+		var getUsersAndPresents = function() {
+			return $.when({
+				presents: [{
+					id: "1",
+					title: "Gelatine rose",
+					description: "Une matière gluante et fluo",
+					to: "idElisa",
+					createdBy: "idElisa",
+					creationDate: new Date(),
+					offeredBy: "idOlivier",
+					givenDate: new Date(),
+					deleted: false
+				}, {
+					id: "2",
+					title: "Gelatine verte",
+					description: "Une matière gluante et fluo",
+					to: "idOlivier",
+					createdBy: "idOlivier",
+					creationDate: new Date(),
+					offeredBy: null,
+					givenDate: null,
+					deleted: false
+				}, {
+					id: "3",
+					title: "Gelatine jaune",
+					description: "Une matière gluante et fluo",
+					to: "idOlivier",
+					createdBy: "idOlivier",
+					creationDate: new Date(),
+					offeredBy: "idNicolas",
+					givenDate: new Date(),
+					deleted: false
+				}, {
+					id: "4",
+					title: "Gelatine rose",
+					description: "Une matière gluante et fluo",
+					to: "idOlivier",
+					createdBy: "idNicolas",
+					creationDate: new Date(),
+					offeredBy: "idNicolas",
+					givenDate: new Date(),
+					deleted: false
+				}, ],
+				users: {
+					'idNicolas': {
+						id: 'idNicolas',
+						name: 'Nicolas'
+					},
+					'idOlivier': {
+						id: 'idOlivier',
+						name: 'Olivier'
+					},
+					'idElisa': {
+						id: 'idElisa',
+						name: 'Elisa'
+					},
+				}
+			});
+		};
 		viewModel = new ViewModel({
 			confirm: confirm,
-			addPresentCommand: addPresentCommand,
-			editPresentCommand: editPresentCommand
-		});
-		viewModel.users({
-			'idNicolas': {
-				id: 'idNicolas',
-				name: 'Nicolas'
-			},
-			'idOlivier': {
-				id: 'idOlivier',
-				name: 'Olivier'
-			},
-			'idElisa': {
-				id: 'idElisa',
-				name: 'Elisa'
-			},
+			server: {
+				addPresent: addPresentCommand,
+				editPresent: editPresentCommand,
+				getUsersAndPresents: getUsersAndPresents
+			}
 		});
 		viewModel.loggedInUser('idOlivier');
 		viewModel.selectedList('idOlivier');
-		viewModel.presents([{
-			id: "1",
-			title: "Gelatine rose",
-			description: "Une matière gluante et fluo",
-			to: "idElisa",
-			createdBy: "idElisa",
-			creationDate: new Date(),
-			offeredBy: "idOlivier",
-			givenDate: new Date(),
-			deleted: false
-		}, {
-			id: "2",
-			title: "Gelatine verte",
-			description: "Une matière gluante et fluo",
-			to: "idOlivier",
-			createdBy: "idOlivier",
-			creationDate: new Date(),
-			offeredBy: null,
-			givenDate: null,
-			deleted: false
-		}, {
-			id: "3",
-			title: "Gelatine jaune",
-			description: "Une matière gluante et fluo",
-			to: "idOlivier",
-			createdBy: "idOlivier",
-			creationDate: new Date(),
-			offeredBy: "idNicolas",
-			givenDate: new Date(),
-			deleted: false
-		}, {
-			id: "4",
-			title: "Gelatine rose",
-			description: "Une matière gluante et fluo",
-			to: "idOlivier",
-			createdBy: "idNicolas",
-			creationDate: new Date(),
-			offeredBy: "idNicolas",
-			givenDate: new Date(),
-			deleted: false
-		}, ]);
+		viewModel.presents();
 	});
 
 	it("lists the users in the expected order", function() {
