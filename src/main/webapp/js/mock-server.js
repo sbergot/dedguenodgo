@@ -56,7 +56,7 @@
 					return users[k];
 				});	
 			} else {
-				return MockFailedServerCall('wrong credentials');
+				return null;
 			}
 		},
 		_load: function(id) {

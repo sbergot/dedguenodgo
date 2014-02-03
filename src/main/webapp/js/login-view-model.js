@@ -70,6 +70,9 @@
 			}).fail(function() {
 				self.partyError(true);
 			}).done(function(users) {
+				if (!users) {
+					self.partyError(true);
+				}
 				self.users(users.sort(function(a, b) {
 					return a.name < b.name ? -1 : 1;
 				}));
