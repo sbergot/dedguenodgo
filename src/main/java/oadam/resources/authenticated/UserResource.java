@@ -35,6 +35,10 @@ public class UserResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Map<Long, User> getUsers(@Context HttpServletRequest request) {
 		String partyId = SecurityFilter.getPartyId(request);
+		return getUsers(partyId);
+	}
+
+	public Map<Long, User> getUsers(String partyId) {
 		Key<Party> ancestor = Key.create(Party.class, partyId);
 		Map<Long, User> result = new HashMap<>();
 		List<User> asList = ofy().load().type(User.class).ancestor(ancestor).list();

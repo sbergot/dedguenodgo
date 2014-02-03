@@ -65,22 +65,9 @@ public class SecurityFilter implements Filter {
 	}
 	
 	private static UsernamePassword getUserNamePassword(HttpServletRequest request) {
-		String auth = request.getHeader("Authorization");
-		if (auth == null) {
-			return null;
-		}
-		int indexOfSpace = auth.indexOf(' ');
-		if (indexOfSpace < 0) {
-			return null;
-		}
-		String afterSpace = auth.substring(indexOfSpace);
-		String[] credentials;
-		String joinedCredentials = Base64.base64Decode(afterSpace);
-		credentials = joinedCredentials.split(":");
-		if (credentials.length != 2) {
-			return null;
-		}
-		return new UsernamePassword(credentials[0], credentials[1]);
+		String partyId = request.getHeader("dedguenodgo-partyId");
+		String partyPassword = request.getHeader("dedguenodgo-partyPassword");
+		return new UsernamePassword(partyId, partyPassword);
 	}
 
 	private void sendError(HttpServletResponse response) throws IOException {

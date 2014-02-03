@@ -1,5 +1,10 @@
 (function() {
+	var MockFailedServerCall = function(message) {
+		this.message = message;
+	};
 	window.Server = function() {
+		this.login = null;
+
 		if (!this._load('users')) {
 			this._save('users', {
 				'idNicolas': {
@@ -41,6 +46,19 @@
 		}
 	};
 	window.Server.prototype = {
+		setLogin: function(login) {
+			this.login = login;
+		},
+		_getPartyUsers: function(credentials) {
+			if (credentials.id == 'demo' && credentials.password == 'demo') {
+				var users = this._loadUsers();
+				return Object.keys(users).map(function(k) {
+					return users[k];
+				});	
+			} else {
+				return MockFailedServerCall('wrong credentials');
+			}
+		},
 		_load: function(id) {
 			try {
 				var json = localStorage.getItem(id);
@@ -76,6 +94,22 @@
 			}
 			return presents;
 		},
+		_loadUsers: function() {
+			return this._load('users');
+		},
+		_addUser: function(user) {
+			var id = 'user' + Math.random();
+			user.id = id;
+			var users = this._loadUsers();
+			users[id] = user;
+			this._save('users', users);
+			return user;
+		},
+		_deleteUser: function(id) {
+			var users = this._loadUsers();
+			delete users[id];
+			this._save('users', users);
+		},
 		_addPresent: function(newPresent) {
 			var presents = this._loadPresents();
 			var ids = {};
@@ -106,25 +140,12 @@
 		},
 		_getUsersAndPresents: function() {
 			return {
-				users: {
-					'idNicolas': {
-						id: 'idNicolas',
-						name: 'Nicolas'
-					},
-					'idOlivier': {
-						id: 'idOlivier',
-						name: 'Olivier'
-					},
-					'idElisa': {
-						id: 'idElisa',
-						name: 'Elisa'
-					},
-				},
+				users: this._loadUsers(),
 				presents: this._loadPresents()
 			};
 		}
 	};
-	var functionNames = ['addPresent', 'editPresent', 'addUser', 'deleteUser', 'getUsersAndPresents'];
+	var functionNames = ['addPresent', 'editPresent', 'addUser', 'deleteUser', 'getUsersAndPresents', 'getPartyUsers'];
 	function makeAsync(syncFuncName) {
 		return function() {
 			var self = this;
@@ -132,7 +153,11 @@
 			var dfd = $.Deferred();
 			setTimeout(function() {
 				var result = self[syncFuncName].apply(self, args);
-				dfd.resolve(result);
+				if (result instanceof MockFailedServerCall) {
+					dfd.reject(result.message);
+				} else {
+					dfd.resolve(result);
+				}
 			}, Math.random() < 0.4 ? 2500 : 100);
 			return dfd.promise();
 		};

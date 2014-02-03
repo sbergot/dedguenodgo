@@ -18,6 +18,9 @@ public class PartyResource {
 	}
 	
 	public Party getParty(String id) {
+		if (id == null) {
+			throw new NullPointerException("received a null partyId");
+		}
 		return ofy().load().type(Party.class).id(id).now();
 	}
 	

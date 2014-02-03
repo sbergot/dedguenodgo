@@ -10,15 +10,21 @@ body {
 	left: 0;
 	right: 0;
 	bottom: 0;
+	text-align: center;
 }
 #loading {
 	background: url(loading.gif) center center no-repeat white;
 	z-index: 10001;
 }
+#loading-message {
+	position: absolute;
+	top: 65%;
+	left: 0;
+	right: 0;
+}
 #error {
 	background: #A00;
 	color: black;
-	text-align: center;
 	padding-top: 3em;
 	font-size: 40px;
 	z-index: 10000;

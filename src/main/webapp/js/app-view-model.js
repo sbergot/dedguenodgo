@@ -1,30 +1,17 @@
-function createStorageObservable(storage, propertyName) {
-	var storedValue = null;
-	try {
-		storedValue = JSON.parse(storage.getItem(propertyName));
-	} catch (e) {
-		console.warn('corrupted value for ' + propertyName, e);
-	}
-	var result = ko.observable(storedValue);
-	result.subscribe(function(value) {
-		storage.setItem(propertyName, JSON.stringify(value));
-	});
-	return result;
-}
-
-function ViewModel(options) {
+function AppViewModel(options) {
 	this.confirm = options.confirm;
 	this.prompt = options.prompt;
 	this.server = options.server;
+	this.logoutCallback = options.logoutCallback;
 
 	this.users = ko.observable({});
-	this.loggedInUserChoice = createStorageObservable(localStorage, 'loggedInUserChoice');
 	this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
 	var self = this;
+	this.selectedList = createStorageObservable(sessionStorage, 'selectedList');
+	//select own list by default
 	this.loggedInUser.subscribe(function(value) {
 		self.selectedList(value);
 	});
-	this.selectedList = createStorageObservable(sessionStorage, 'selectedList');
 	this.presents = ko.observable([]);
 	//present edition
 	this.editing = ko.observable(false);
@@ -59,20 +46,26 @@ function ViewModel(options) {
 	this.selectedList.subscribe(function() {
 		self.discardConfirm();
 	});
-
-	this.initLoading(true);
-	this.server.getUsersAndPresents().always(function() {
-		self.initLoading(false);
-	}).fail(function() {
-		self.initError(true);
-	}).done(function(pAndU) {
-		self.users(pAndU.users);
-		self.presents(pAndU.presents);
-	});
+	
+	if (options.initOnStartup) {
+		this.init();
+	}
 }
 
-ViewModel.prototype = {
+AppViewModel.prototype = {
 	nextId: 1,
+	init: function() {
+		var self = this;
+		this.initLoading(true);
+		this.server.getUsersAndPresents().always(function() {
+			self.initLoading(false);
+		}).fail(function() {
+			self.initError(true);
+		}).done(function(pAndU) {
+			self.users(pAndU.users);
+			self.presents(pAndU.presents);
+		});
+	},
 	vowels: {
 		a: true,
 		e: true,
@@ -96,7 +89,7 @@ ViewModel.prototype = {
 		});
 		return ids.map(function(id) {
 			var userName = users[id].name;
-			var beginByVowel = ViewModel.prototype.vowels[userName.slice(0, 1).toLowerCase()];
+			var beginByVowel = AppViewModel.prototype.vowels[userName.slice(0, 1).toLowerCase()];
 			var label = 'Liste ' + (beginByVowel ? "d'" : "de ") + userName;
 			return {
 				id: id,
@@ -108,12 +101,10 @@ ViewModel.prototype = {
 		var user = this.users()[userId];
 		return !user ? 'utilisateur supprimé' : user.name;
 	},
+	logout: function() {
+		this.logoutCallback();
+	},
 	_comparePresents: function(a, b) {
-		var aAsOffered = this.displayPresentAsOffered(a);
-		var bAsOffered = this.displayPresentAsOffered(b);
-		if (aAsOffered != bAsOffered) {
-			return aAsOffered ? 1 : -1;
-		}
 		return a.creationDate.getTime() - b.creationDate.getTime();
 	},
 	displayedPresents: function() {
@@ -144,8 +135,12 @@ ViewModel.prototype = {
 		if (present.to == loggedInUser && present.offeredBy != loggedInUser) {
 			return null;
 		}
-		var username = this.users()[present.offeredBy].name;
+		var username = this.getUserName(present.offeredBy);
 		return '(rayé par ' + username + ')';
+	},
+	/**Returns a string or null*/
+	displayPresentAsCreatedBy: function(present) {
+		return (present.to === present.createdBy) ? null : '(ajouté par ' + this.getUserName(present.createdBy) + ')';
 	},
 	isEditedPresentModified: function() {
 		var beforeModification = this._isCreating() ? {
@@ -255,7 +250,7 @@ ViewModel.prototype = {
 			clone.offeredDate = new Date();
 		} else {
 			if (present.offeredBy != this.loggedInUser()) {
-				var offeredByName = this.users()[present.offeredBy].name;
+				var offeredByName = this.getUserName(present.offeredBy);
 				var ok = this.confirm("Ce cadeau a \u00e9t\u00e9 ray\u00e9 par " + offeredByName + ". Voulez-vous le d\u00e9-rayer ?");
 				if (!ok) {
 					return;
@@ -302,7 +297,7 @@ ViewModel.prototype = {
 	deletePresent: function(present, hideUndo) {
 		this.discardConfirm();
 		if (present.createdBy != this.loggedInUser()) {
-			var createdByName = this.users()[present.createdBy].name;
+			var createdByName = this.getUserName(present.createdBy);
 			var ok = this.confirm('Ce cadeau a \u00e9t\u00e9 cr\u00e9\u00e9 par ' + createdByName + '. Supprimer ?');
 			if (!ok) {
 				return;
@@ -316,31 +311,5 @@ ViewModel.prototype = {
 		this.successMessage(null);
 		this.errorMessage(null);
 		this.undoAction(null);
-	},
-	addUser: function() {
-		var name = this.prompt('Nom du nouvel utilisateur');
-		if (!name) {return;}
-		var ok = this.confirm('Cr\u00e9er l\'utilisateur ?');
-		if (!ok) {return;}
-		var self = this;
-		this.server.addUser({name: name}).done(function(user) {
-			alert('utilisateur ajouté');
-			var clone = $.extend({}, self.users());		
-			clone[user.id] = user;
-			self.users(clone);
-		});
-	},
-	deleteUser: function(userId) {
-		var ok = this.confirm('Supprimer ' + this.getUserName(userId) + '?');
-		if (!ok) {return;}
-		ok = this.confirm('Supprimer supprimer ' + this.getUserName(userId) + '?');
-		if (!ok) {return;}
-		var self = this;
-		this.server.deleteUser(userId).done(function() {
-			alert('Utilisateur supprimé');
-			var clone = $.extend({}, self.users());		
-			delete clone[userId];
-			self.users(clone);
-		});
 	}
 };

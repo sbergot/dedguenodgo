@@ -86,7 +86,8 @@ describe("The view model", function() {
 				}
 			});
 		};
-		viewModel = new ViewModel({
+		viewModel = new AppViewModel({
+			initOnStartup: true,
 			confirm: confirm,
 			server: {
 				addPresent: addPresentCommand,
