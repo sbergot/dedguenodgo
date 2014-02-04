@@ -76,7 +76,7 @@
 				<form class="form" data-bind="visible: partyOk, submit: function() {$root.submitUser();}">
 					<div class="form-group">
 						<label>Utilisateur</label>
-						<select class="form-control" data-bind="visible: users(), options: users, value: user, optionsText:'name', optionsCaption: 'choisir...'"></select> 
+						<select class="form-control" data-bind="visible: users(), options: sortedUsers, value: user, optionsText:'name', optionsCaption: 'choisir...'"></select> 
 					</div>
 					<div class="form-group">
 						<button data-bind="enable: user" class="btn btn-primary" type="submit">Connexion</button>

@@ -1,5 +1,7 @@
 (function() {
 	window.LoginViewModel = function(options) {
+		var self = this;
+
 		this._server = options.server;
 		this._loginCallback = options.loginCallback;
 
@@ -7,10 +9,15 @@
 		this.partyPassword = createStorageObservable(sessionStorage, 'partyPassword');
 		this.user = ko.observable();
 		this.users = ko.observable(null);
+		this.sortedUsers = ko.computed(function() {
+			var unsorted = self.users(); 
+			return !unsorted ? null : unsorted.sort(function(a, b) {
+				return a.name < b.name ? -1 : 1;
+			});
+		});
 
 		this.partyLoading = ko.observable(false);
 		this.partyError = ko.observable(false);
-		var self = this;
 		this.partyOk = ko.computed(function() {
 			return self.users() !== null;
 		});
@@ -74,9 +81,7 @@
 					self.partyError(true);
 					return; 
 				}
-				self.users(users.sort(function(a, b) {
-					return a.name < b.name ? -1 : 1;
-				}));
+				self.users(users);
 				//needed for user edition commands
 				self._loginCallback({
 					partyId: self.partyId(),
