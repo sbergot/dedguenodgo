@@ -24,12 +24,13 @@
 
 	Server.prototype = {
 		addAuthorizationToAjaxOptions : function(ajaxOptions) {
-			if (this.login) {
-				ajaxOptions.headers = {
-						'dedguenodgo-partyId' : this.login.partyId,
-						'dedguenodgo-partyPassword' : this.login.partyPassword,
-				};
+			if (!this.login) {
+				console.warn('calling server but login has not been set');
 			}
+			ajaxOptions.headers = {
+					'dedguenodgo-partyId' : this.login.partyId,
+					'dedguenodgo-partyPassword' : this.login.partyPassword,
+			};
 		},
 		setLogin : function(login) {
 			this.login = login;

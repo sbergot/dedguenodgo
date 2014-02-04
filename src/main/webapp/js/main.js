@@ -42,6 +42,9 @@ $(document).ready(function() {
 	}, welcomeDiv[0]);
 
 	function onLogin(login) {
+		appViewModel.loggedInUser(!login ? null : login.userId);
+		server.setLogin(login);
+
 		if (!login || !login.userId) {
 			appDiv.hide();
 			loginDiv.show();
@@ -53,8 +56,6 @@ $(document).ready(function() {
 			loadingDiv.show();
 			errorDiv.hide();
 
-			appViewModel.loggedInUser(login.userId);
-			server.setLogin(login);
 
 			server.getUsersAndPresents().always(function() {
 				loadingDiv.hide();
