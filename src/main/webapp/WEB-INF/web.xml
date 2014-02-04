@@ -24,7 +24,7 @@
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
 			<param-value>true</param-value>
 		</init-param>
-		<load-on-startup>1</load-on-startup>
+		<!--<load-on-startup>1</load-on-startup>-->
 	</servlet>
 	<filter>
 		<filter-name>authentication</filter-name>
@@ -50,7 +50,7 @@
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
 			<param-value>true</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
+		<!--<load-on-startup>2</load-on-startup>-->
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>unauthenticated-jersey</servlet-name>
