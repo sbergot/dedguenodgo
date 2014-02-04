@@ -26,6 +26,7 @@
 		addAuthorizationToAjaxOptions : function(ajaxOptions) {
 			if (!this.login) {
 				console.warn('calling server but login has not been set');
+				return;
 			}
 			ajaxOptions.headers = {
 					'dedguenodgo-partyId' : this.login.partyId,
