@@ -8,6 +8,8 @@ $(document).ready(function() {
 			loginObservable(null);
 		}
 	});
+	//little hack to wake up appengine
+	server.wakeUp();
 	window.appViewModel = new AppViewModel({
 		server: window.server,
 		logoutCallback: function() {

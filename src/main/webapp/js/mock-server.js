@@ -49,6 +49,9 @@
 		setLogin: function(login) {
 			this.login = login;
 		},
+		wakeUp: function() {
+			return $.when('ok');
+		},
 		_getPartyUsers: function(credentials) {
 			if (credentials.id == 'demo' && credentials.password == 'demo') {
 				var users = this._loadUsers();
