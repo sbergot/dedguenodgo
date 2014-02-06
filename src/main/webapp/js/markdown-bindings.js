@@ -1,22 +1,22 @@
 ko.bindingHandlers.markdown = {
 	init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {},
 	update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-		var value = valueAccessor();
+		var value = ko.utils.unwrapObservable(valueAccessor());
 		element.innerHTML = markdown.toHTML(value);
 	}
 };
 ko.bindingHandlers.markdownEditor = {
 	init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-		if (!ko.isObservable(valueAccessor())) {
-			throw new Error('binding should be writable');
-		}
-		$(element).change(function() {
-			valueAccessor()($(element).val());
-		})
-			.markdown();
+		ko.bindingHandlers.value.init(element, valueAccessor, allBindings, viewModel, bindingContext);
+		$(element).markdown({
+			onFocus: function() {
+				//buttons call onFocus
+				//It is the only way I have found to notify the view model
+				$(element).change();
+			}
+		});
 	},
 	update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-		var value = ko.utils.unwrapObservable(valueAccessor());
-		$(element).val(value);
+		ko.bindingHandlers.value.update(element, valueAccessor, allBindings, viewModel, bindingContext);
 	}
 };
