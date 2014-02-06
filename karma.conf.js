@@ -14,6 +14,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+     'src/main/webapp/js/lib/jquery*.js',//jquery prerequisite for some bootstrap-markdown
      'src/main/webapp/js/lib/*.js',
      'src/main/webapp/js/*.js',
      'src/test/js/*.js'
