@@ -93,7 +93,12 @@
 				dataType : "json"
 			};
 			this.addAuthorizationToAjaxOptions(ajaxOptions);
-			return $.ajax(ajaxOptions);
+			return $.ajax(ajaxOptions).pipe(function(result) {
+				return {
+					users: result.users,
+					presents: result.presents.map(Server._formatFromServer)
+				};
+			});
 		},
 		getPartyUsers: function(credentials) {
 			return $.ajax({
