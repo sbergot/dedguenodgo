@@ -67,7 +67,7 @@ h1 {
 .present.deleted-by {
 	font-weight: bold;
 }
-.present a {
+.present > a {
 	float: right;
 	margin-left: 0.5em;
 	cursor: pointer;
