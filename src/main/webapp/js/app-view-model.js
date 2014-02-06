@@ -7,7 +7,7 @@ function AppViewModel(options) {
 	this.users = ko.observable({});
 	this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
 	var self = this;
-	this.selectedList = createStorageObservable(sessionStorage, 'selectedList');
+	this.selectedList = ko.observable();
 	//select own list by default
 	this.loggedInUser.subscribe(function(value) {
 		self.selectedList(value);

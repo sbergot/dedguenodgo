@@ -44,7 +44,6 @@ $(document).ready(function() {
 	}, welcomeDiv[0]);
 
 	function onLogin(login) {
-		appViewModel.loggedInUser(!login ? null : login.userId);
 		server.setLogin(login);
 
 		if (!login || !login.userId) {
@@ -68,6 +67,7 @@ $(document).ready(function() {
 				appDiv.show();
 				appViewModel.users(usersAndPresents.users);
 				appViewModel.presents(usersAndPresents.presents);
+				appViewModel.loggedInUser(login.userId);
 			});
 		}
 	}
