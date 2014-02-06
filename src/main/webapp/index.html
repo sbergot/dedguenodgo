@@ -10,6 +10,9 @@
 		<link rel="stylesheet" type="text/css" href="css/style.css" />
 		<script src="js/lib/jquery.min.js"></script>
 		<script src="js/lib/knockout-3.0.0.debug.js"></script>
+		<script src="js/lib/markdown.js"></script>
+		<script src="js/lib/bootstrap-markdown.js"></script>
+		<script src="js/markdown-bindings.js"></script>
 		<script src="js/utils.js"></script>
 		<script src="js/app-view-model.js"></script>
 		<script src="js/login-view-model.js"></script>
@@ -112,7 +115,7 @@
 					<span class="offered-by" data-bind="text: $root.displayPresentAsOffered($data) || ''"></span>
 					<span class="deleted-by" data-bind="visible: deletedBy, text: !deletedBy ? '' : '(Ce cadeau a été supprimé par ' + $root.getUserName(deletedBy) + ')'"></span>
 				</h4>
-				<p class="list-group-item-text" data-bind="text:description"> </p>
+				<p class="list-group-item-text" data-bind="markdown:description"> </p>
 				</li>
 			</ul>
 			<button class="btn btn-primary" data-bind="click: addPresent">Ajouter un cadeau</button>
@@ -133,7 +136,7 @@
 								</div>
 								<div class="form-group">
 									<label>Description</label>
-									<textarea class="form-control" data-bind="value:$root.edition.description"></textarea>
+									<textarea class="form-control" data-bind="markdownEditor:$root.edition.description"></textarea>
 								</div>
 							</form>
 						</div>
@@ -153,5 +156,6 @@
 				</div>
 			</div>
 		</div>
+		<footer>Développé avec amour par <a href="https://github.com/oadam/">oadam</a>. Icons by <a href="http://glyphicons.com/">Glyphicons</a>.</footer>
 	</body>
 </html>
