@@ -1,0 +1,33 @@
+<!doctype html>
+<head>
+	<title>Dedguenodgo - login</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="favicon.ico" rel="icon" type="image/x-icon" />
+	<link rel="stylesheet" type="text/css" href="css/lib/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/lib/bootstrap-theme.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+	<h1>Dedguenodgo - Connexion</h1>
+	<script src="js/lib/jquery.min.js"></script>
+	<script src="js/lib/knockout-3.0.0.debug.js"></script>
+	<script src="js/login.js"></script>
+	<script>
+		$(document).ready(function() {
+			var mockModelLoaded = !/demo/.test(location.search) ? $.when() : $.getScript('js/localstorage-model.js');
+			$.when(mockModelLoaded).pipe(function() {
+				return window.createViewModel();
+			})
+			.always(function() {
+				$("body").removeClass('loading');
+				}).fail(function(viewModel) {
+				$("body").addClass('error');
+				}).done(function(viewModel) {
+				window.viewModel = viewModel;
+				ko.applyBindings(window.viewModel);
+			});
+		});
+	</script>
+
+</body>

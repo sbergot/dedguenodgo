@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Dedguenodgo</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="favicon.ico" rel="icon" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="css/lib/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/lib/bootstrap-theme.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		<script src="js/lib/jquery.min.js"></script>
+		<script src="js/lib/knockout-3.0.0.debug.js"></script>
+		<script src="js/lib/markdown.js"></script>
+		<script src="js/lib/bootstrap-markdown.js"></script>
+		<script src="js/markdown-bindings.js"></script>
+		<script src="js/utils.js"></script>
+		<script src="js/app-view-model.js"></script>
+		<script src="js/login-view-model.js"></script>
+		<script src="js/server.js"></script>
+		<script src="js/main.js"></script>
+		<script>
+			//load mock server synchronously
+			if(/demo/.test(location.search)) {
+				$.ajax({
+					async: false,
+					url: 'js/mock-server.js',
+					dataType: 'script'
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<h1>Dedguenodgo </h1>
+		<div id="loading"><div id="loading-message">Le chargement peut durer 30 secondes...</div></div>
+		<div id="error">ERROR</div>
+		<div id="welcome" data-bind="visible: !welcomeHidden()">
+			<div class="modal-backdrop in" data-bind="click: hideWelcome"></div>
+			<div class="modal" style="display: block;">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true" data-bind="click: hideWelcome">&times;</button>
+							<h4 class="modal-title">Bienvenue sur dedguenodgo 2.0 !</h4>
+						</div>
+						<div class="modal-body">
+							<p>Ce site permet, à la manière d'un petit carnet en papier, de réaliser des listes de Noël. Vous pouvez ajouter des cadeaux et les rayer si vous comptez les offrir.<br/>Ce qui est nouveau c'est que dans votre propre liste on ne vous montre pas tout, le but étant de ne pas vous gacher la surprise.<p>
+				<h4>Exemples</h4>
+				<ul>
+					<li>Anne ajoute "nain de jardin" dans sa liste. Le lendemain Franck raye le cadeau pour dire qu'il va l'acheter. Tout le monde sauf Anne voit que le cadeau est rayé</li>
+					<li>Olivier trouve la liste d'Elisabeth trop vide donc il y ajoute "vernis à ongles mauve". Tout le monde sauf Elisabeth voit le cadeau dans la liste. Anne achète le cadeau et le raye. Tout le monde voit le cadeau rayé. Elisabeth ne voit toujours pas le cadeau.</li>
+				</ul>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" data-bind="click: hideWelcome">J'ai compris !</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="login">
+			<div class="container">
+				<h2>Connexion</h2>
+				<form class="form" data-bind="submit: function() {$root.submitParty();}">
+					<div class="form-group">
+						<label>Nom de l'évènement</label>
+						<input class="form-control" type="text" data-bind="value:partyId, valueUpdate: 'afterkeydown'"/>
+					</div>
+					<div class="form-group">
+						<label>Mot de passe de l'évènement</label>
+						<input class="form-control" type="password" data-bind="value:partyPassword, valueUpdate: 'afterkeydown'"/>
+					</div>
+					<div class="alert alert-info" data-bind="visible: partyLoading">Vérification de l'événement... (peut durer jusqu'à 30 secondes)</div>
+					<div class="alert alert-success" data-bind="visible: partyOk">Evénement vérifié !</div>
+					<div class="alert alert-danger" data-bind="visible: partyError">Identifiant/Mot de passe invalides</div>
+					<div class="form-group">
+						<button class="btn btn-primary" type="submit" data-bind="visible: !partyOk()">Connexion</button>
+					</div>
+				</form>
+				<form class="form" data-bind="visible: partyOk, submit: function() {$root.submitUser();}">
+					<div class="form-group">
+						<label>Utilisateur</label>
+						<select class="form-control" data-bind="visible: users(), options: sortedUsers, value: user, optionsText:'name', optionsCaption: 'choisir...'"></select> 
+					</div>
+					<div class="form-group">
+						<button data-bind="enable: user" class="btn btn-primary" type="submit">Connexion</button>
+						<span> --- </span>
+						<button class="btn btn-xs btn-primary" data-bind="click:function() {$root.addUser();}">Ajouter un utilisateur</button>
+						<button class="btn btn-xs btn-danger" data-bind="visible: user, click:function() {$root.deleteUser();}">Supprimer cet utilisateur</button>
+					</div>
+				</form>
+				<div class="alert alert-info" data-bind="visible: userActionLoading">Appel du serveur... (peut durer jusqu'à 30 secondes)</div>
+				<div class="alert alert-success" data-bind="visible: userActionOk">OK !</div>
+				<div class="alert alert-danger" data-bind="visible: userActionError">Une erreur s'est produite sur le serveur</div>
+			</div>
+		</div>
+
+		<div id="app">
+			<div id="connected-user">
+				<span data-bind="text: !(loggedInUser()) ? '' : getUserName(loggedInUser())"></span><br/>
+				<a href="#" data-bind="visible: loggedInUser, click: logout">déconnexion</a>
+			</div>
+			<select id="list-select" class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select> 
+			<p class="jumbotron" data-bind="visible: displayedPresents().length == 0">
+			Cette liste est vide ! Vous pouvez ajouter des idées de cadeaux à l'aide du bouton ci-dessous
+			</p>
+			<ul class="list-group" data-bind="foreach: displayedPresents()">
+				<!-- the present -->
+				<li class="present list-group-item" data-bind="event: { dblclick: function(){$root.editPresent($data);} }, css: { offered: $root.displayPresentAsOffered($data) , deleted: deletedBy }">
+				<a data-bind="visible: !deletedBy, click: function() { $root.deletePresent($data); }">Supprimer</a>
+				<a data-bind="visible: !deletedBy, click: function() { $root.editPresent($data); }">Modifier</a>
+				<a data-bind="visible: !deletedBy, click: function() { $root.togglePresentOffered($data); }, text: $root.displayPresentAsOffered($data) ? 'Dé-rayer' : 'Rayer', attr: { title: $root.displayPresentAsOffered($data) ? 'Marquer comme non offert': 'Marquer comme offert' }"></a>
+				<h4 class="list-group-item-heading">
+					<span class="title" data-bind="text:title"></span>
+					<span class="offered-by" data-bind="text: $root.displayPresentAsCreatedBy($data) || ''"></span>
+					<span class="offered-by" data-bind="text: $root.displayPresentAsOffered($data) || ''"></span>
+					<span class="deleted-by" data-bind="visible: deletedBy, text: !deletedBy ? '' : '(Ce cadeau a été supprimé par ' + $root.getUserName(deletedBy) + ')'"></span>
+				</h4>
+				<p class="list-group-item-text" data-bind="markdown:description"> </p>
+				</li>
+			</ul>
+			<button class="btn btn-primary" data-bind="click: addPresent">Ajouter un cadeau</button>
+			<!--present edition dialog -->
+			<div class="modal-backdrop in" data-bind="visible: editing, click: cancelEdition"></div>
+			<div class="modal" data-bind="visible: editing" style="display: block;">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true" data-bind="click: cancelEdition">&times;</button>
+							<h4 class="modal-title" data-bind="text: editPopupText()"></h4>
+						</div>
+						<div class="modal-body">
+							<form class="form" data-bind="submit: saveEditedPresent">
+								<div class="form-group">
+									<label>Titre</label>
+									<input class="form-control" type="text" data-bind="value:$root.edition.title, hasfocus: editing()"></input>
+								</div>
+								<div class="form-group">
+									<label>Description</label>
+									<textarea class="form-control" data-bind="markdownEditor:$root.edition.description, valueUpdate: 'afterkeydown'"></textarea>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal" data-bind="click: cancelEdition">Annuler</button>
+							<button type="button" class="btn btn-primary" data-bind="click: saveEditedPresent">Sauvegarder les changements</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--command execution panel-->
+			<div id="command-execution" data-bind="visible: slowShowingLoadingMessage() || successMessage() || undoAction()">
+				<div class="loading" data-bind="text: slowShowingLoadingMessage"></div>
+				<div class="confirm">
+					<button type="button" class="close" data-bind="visible: successMessage() || undoAction(), click: discardConfirm">&times;</button> <span data-bind="text: successMessage"></span> <a href="" data-bind="visible: undoAction, click: undoAction()">Annuler</a> 
+				</div>
+			</div>
+		</div>
+		<footer>Développé avec amour par <a href="https://github.com/oadam/">oadam</a>. Icons by <a href="http://glyphicons.com/">Glyphicons</a>.</footer>
+	</body>
+</html>
