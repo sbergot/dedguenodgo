@@ -5,27 +5,24 @@ import (
 )
 
 type Party struct {
-	id             string
-	hashedPassword []byte
-	passwordSalt   []byte
+	HashedPassword []byte
+	PasswordSalt   []byte
+	Presents       []Present
+	Users          []User
 }
 
 type Present struct {
-	id           long
-	parent       *datastore.Key
-	title        string
-	description  string
-	to           long
-	createdBy    long
-	creationDate time.Time
-	offeredBy    time.Time
-	offeredDate  time.Time
-	deletedBy    long
+	Title        string
+	Description  string `datastore:",noindex"`
+	To           long
+	CreatedBy    long
+	CreationDate time.Time
+	OfferedBy    time.Time
+	OfferedDate  time.Time
+	DeletedBy    long
 }
 
 type User struct {
-	id      long
-	parent  *datastore.Key
-	name    string
-	deleted bool
+	Name    string
+	Deleted bool
 }
