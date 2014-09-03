@@ -1,7 +1,8 @@
+package ressources
+
 import (
     "time"
-
-    "appengine/datastore"
+    //"appengine/datastore"
 )
 
 type Party struct {
@@ -14,15 +15,21 @@ type Party struct {
 type Present struct {
 	Title        string
 	Description  string `datastore:",noindex"`
-	To           long
-	CreatedBy    long
+	To           int64
+	CreatedBy    int64
 	CreationDate time.Time
 	OfferedBy    time.Time
 	OfferedDate  time.Time
-	DeletedBy    long
+	DeletedBy    int64
 }
 
 type User struct {
 	Name    string
 	Deleted bool
+}
+
+type Greeting struct {
+	Author  string
+	Content string
+	Date    time.Time
 }

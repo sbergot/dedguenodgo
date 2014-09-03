@@ -1,6 +1,7 @@
 package guestbook
 
 import (
+	"dedguenodgo/src/main/go/ressources"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -9,13 +10,8 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"appengine/user"
-)
 
-type Greeting struct {
-	Author  string
-	Content string
-	Date    time.Time
-}
+)
 
 func init() {
 	http.HandleFunc("/", root)
