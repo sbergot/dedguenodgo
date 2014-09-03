@@ -4,20 +4,20 @@
 		<title>Dedguenodgo</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href="favicon.ico" rel="icon" type="image/x-icon" />
-		<link rel="stylesheet" type="text/css" href="css/lib/bootstrap.min.css" />
-		<link rel="stylesheet" type="text/css" href="css/lib/bootstrap-theme.min.css" />
-		<link rel="stylesheet" type="text/css" href="css/style.css" />
-		<script src="js/lib/jquery.min.js"></script>
-		<script src="js/lib/knockout-3.0.0.debug.js"></script>
-		<script src="js/lib/markdown.js"></script>
-		<script src="js/lib/bootstrap-markdown.js"></script>
-		<script src="js/markdown-bindings.js"></script>
-		<script src="js/utils.js"></script>
-		<script src="js/app-view-model.js"></script>
-		<script src="js/login-view-model.js"></script>
-		<script src="js/server.js"></script>
-		<script src="js/main.js"></script>
+		<link href="static/favicon.ico" rel="icon" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="static/css/lib/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="static/css/lib/bootstrap-theme.min.css" />
+		<link rel="stylesheet" type="text/css" href="static/css/style.css" />
+		<script src="static/js/lib/jquery.min.js"></script>
+		<script src="static/js/lib/knockout-3.0.0.debug.js"></script>
+		<script src="static/js/lib/markdown.js"></script>
+		<script src="static/js/lib/bootstrap-markdown.js"></script>
+		<script src="static/js/markdown-bindings.js"></script>
+		<script src="static/js/utils.js"></script>
+		<script src="static/js/app-view-model.js"></script>
+		<script src="static/js/login-view-model.js"></script>
+		<script src="static/js/server.js"></script>
+		<script src="static/js/main.js"></script>
 		<script>
 			//load mock server synchronously
 			if(/demo/.test(location.search)) {
@@ -79,7 +79,7 @@
 				<form class="form" data-bind="visible: partyOk, submit: function() {$root.submitUser();}">
 					<div class="form-group">
 						<label>Utilisateur</label>
-						<select class="form-control" data-bind="visible: users(), options: sortedUsers, value: user, optionsText:'name', optionsCaption: 'choisir...'"></select> 
+						<select class="form-control" data-bind="visible: users(), options: sortedUsers, value: user, optionsText:'name', optionsCaption: 'choisir...'"></select>
 					</div>
 					<div class="form-group">
 						<button data-bind="enable: user" class="btn btn-primary" type="submit">Connexion</button>
@@ -99,7 +99,7 @@
 				<span data-bind="text: !(loggedInUser()) ? '' : getUserName(loggedInUser())"></span><br/>
 				<a href="#" data-bind="visible: loggedInUser, click: logout">déconnexion</a>
 			</div>
-			<select id="list-select" class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select> 
+			<select id="list-select" class="form-control input-large" data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'"></select>
 			<p class="jumbotron" data-bind="visible: displayedPresents().length == 0">
 			Cette liste est vide ! Vous pouvez ajouter des idées de cadeaux à l'aide du bouton ci-dessous
 			</p>
@@ -152,7 +152,7 @@
 			<div id="command-execution" data-bind="visible: slowShowingLoadingMessage() || successMessage() || undoAction()">
 				<div class="loading" data-bind="text: slowShowingLoadingMessage"></div>
 				<div class="confirm">
-					<button type="button" class="close" data-bind="visible: successMessage() || undoAction(), click: discardConfirm">&times;</button> <span data-bind="text: successMessage"></span> <a href="" data-bind="visible: undoAction, click: undoAction()">Annuler</a> 
+					<button type="button" class="close" data-bind="visible: successMessage() || undoAction(), click: discardConfirm">&times;</button> <span data-bind="text: successMessage"></span> <a href="" data-bind="visible: undoAction, click: undoAction()">Annuler</a>
 				</div>
 			</div>
 		</div>
