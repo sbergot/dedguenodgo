@@ -1,124 +1,202 @@
 package guestbook
 
 import (
-	"dedguenodgo/src/main/go/ressources"
-	"fmt"
-	"html/template"
+	//"fmt"
 	"net/http"
 	"time"
+	"regexp"
+	"strconv"
+	"encoding/json"
 
 	"appengine"
 	"appengine/datastore"
 	"appengine/user"
-
 )
 
+type Greeting struct {
+	Author  string
+	Content string
+	Date    time.Time
+}
+
+type Party struct {
+	HashedPassword []byte
+	PasswordSalt   []byte
+	Presents       []Present
+	Users          []User
+}
+
+type Present struct {
+	Title        string
+	Description  string `datastore:",noindex"`
+	To           int64
+	CreatedBy    int64
+	CreationDate time.Time
+	OfferedBy    time.Time
+	OfferedDate  time.Time
+	DeletedBy    int64
+}
+
+type User struct {
+	Name    string
+	Deleted bool
+}
+
+type handlerF func(http.ResponseWriter, *http.Request)
+
 func init() {
-	http.HandleFunc("/", root)
-	http.HandleFunc("/sign", sign)
-	http.HandleFunc("/welcome", welcome)
-	http.Handle("/static/", http.FileServer(http.Dir(".")))
+	http.Handle("/unauthenticated-resources/party/", GetPartyResource())
 }
 
-//func staticFiles(w http.ResponseWriter, r *http.Request) {
-//    http.FileServer(http.Dir("/static"))
+// web helpers
+
+type restHandlerF func(http.ResponseWriter, *http.Request, []string)
+
+type RestHandler struct {
+	Get restHandlerF
+	Post restHandlerF
+	Pattern *regexp.Regexp
+}
+
+func (t RestHandler) getHandler(r *http.Request) restHandlerF {
+	var h restHandlerF
+	switch r.Method {
+	case "GET":
+		h := t.Get
+	case "POST":
+		h := t.Post
+	}
+	if h == nil {
+		h := func(w http.ResponseWriter, r *http.Request, m []string) {
+			http.Error(w, "405 Method not allowed", http.StatusMethodNotAllowed)
+		}
+	}
+	return h
+}
+
+func (t RestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var matches = t.Pattern.FindStringSubmatch(r.URL.Path)
+	var h = t.getHandler(r)
+	h(w, r, matches)
+}
+
+func LoginRequired(handler handlerF) handlerF {
+	var foo = 0
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		c := appengine.NewContext(r)
+		u := user.Current(c)
+		if u == nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+		}
+		handler(w, r)
+	}
+}
+
+// resources
+
+func GetIdFromMatches(m []string) int {
+	if len(m) < 2 {
+		return 0
+	} else {
+		id, err := strconv.Atoi(m[1])
+		if err != nil {
+			return 0
+		} else {
+			return id
+		}
+	}
+}
+
+func GetPartyResource() RestHandler {
+	var res = RestHandler{
+		Get: func(w http.ResponseWriter, r *http.Request, m []string) {
+			c := appengine.NewContext(r)
+			var id = GetIdFromMatches(m)
+			if id == 0 {
+				http.NotFound(w, r)
+				return
+			}
+			var party *Party
+			datastore.Get(c, datastore.NewKey(c, "Party", "", int64(id), nil), party)
+			partyJson, _ := json.Marshal(party)
+			w.Write(partyJson)
+		},
+		Post: func(w http.ResponseWriter, r *http.Request, m []string) {
+			c := appengine.NewContext(r)
+			var id = GetIdFromMatches(m)
+			var party *Party
+			err := json.NewDecoder(r.Body).Decode(party)
+			if err != nil {
+				http.NotFound(w, r) // todo change code
+				return
+			}
+			datastore.Put(c, datastore.NewKey(c, "Party", "", 0, nil), party)
+		},
+		Pattern: regexp.MustCompile("/unauthenticated-resources/party/(.*)"),
+	}
+	return res
+}
+
+
+// old code from tutorial
+
+
+//func welcome(w http.ResponseWriter, r *http.Request) {
+//	w.Header().Set("Content-type", "text/html; charset=utf-8")
+//	c := appengine.NewContext(r)
+//	u := user.Current(c)
+//	if u == nil {
+//		url, _ := user.LoginURL(c, "/")
+//		fmt.Fprintf(w, `<a href="%s">Sign in or register</a>`, url)
+//		return
+//	}
+//	url, _ := user.LogoutURL(c, "/")
+//	fmt.Fprintf(w, `Welcome, %s! (<a href="%s">sign out</a>)`, u, url)
 //}
 //
-//func LoginRequired(handler Handler) Handler {
-//
-//    var res struct {
-//        ServeHTTP(ResponseWriter, *Request)
-//    }
-//    res.ServeHTTP = func(w ResponseWriter, r *Request) {
-//        u := user.Current(c)
-//        if u == nil {
-//            url, _ := user.LoginURL(c, "/")
-//            fmt.Fprintf(w, `<a href="%s">Sign in or register</a>`, url)
-//            return
-//        }
-//        handler(w, r)
-//    }
-//    return res
+//// guestbookKey returns the key used for all guestbook entries.
+//func guestbookKey(c appengine.Context) *datastore.Key {
+//	// The string "default_guestbook" here could be varied to have multiple guestbooks.
+//	return datastore.NewKey(c, "Guestbook", "default_guestbook", 0, nil)
 //}
-
-func welcome(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "text/html; charset=utf-8")
-	c := appengine.NewContext(r)
-	u := user.Current(c)
-	if u == nil {
-		url, _ := user.LoginURL(c, "/")
-		fmt.Fprintf(w, `<a href="%s">Sign in or register</a>`, url)
-		return
-	}
-	url, _ := user.LogoutURL(c, "/")
-	fmt.Fprintf(w, `Welcome, %s! (<a href="%s">sign out</a>)`, u, url)
-}
-
-// guestbookKey returns the key used for all guestbook entries.
-func guestbookKey(c appengine.Context) *datastore.Key {
-	// The string "default_guestbook" here could be varied to have multiple guestbooks.
-	return datastore.NewKey(c, "Guestbook", "default_guestbook", 0, nil)
-}
-
-func root(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
-	// Ancestor queries, as shown here, are strongly consistent with the High
-	// Replication Datastore. Queries that span entity groups are eventually
-	// consistent. If we omitted the .Ancestor from this query there would be
-	// a slight chance that Greeting that had just been written would not
-	// show up in a query.
-	q := datastore.NewQuery("Greeting").Ancestor(guestbookKey(c)).Order("-Date").Limit(10)
-	greetings := make([]Greeting, 0, 10)
-	if _, err := q.GetAll(c, &greetings); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := guestbookTemplate.Execute(w, greetings); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-var guestbookTemplate = template.Must(template.New("book").Parse(`
-<html>
-  <head>
-    <title>Go Guestbook</title>
-  </head>
-  <body>
-    {{range .}}
-      {{with .Author}}
-        <p><b>{{.}}</b> wrote:</p>
-      {{else}}
-        <p>An anonymous person wrote:</p>
-      {{end}}
-      <pre>{{.Content}}</pre>
-    {{end}}
-    <form action="/sign" method="post">
-      <div><textarea name="content" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Sign Guestbook"></div>
-    </form>
-    <a href="/welcome">welcome!</a>
-  </body>
-</html>
-`))
-
-func sign(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
-	g := Greeting{
-		Content: r.FormValue("content"),
-		Date:    time.Now(),
-	}
-	if u := user.Current(c); u != nil {
-		g.Author = u.String()
-	}
-	// We set the same parent key on every Greeting entity to ensure each Greeting
-	// is in the same entity group. Queries across the single entity group
-	// will be consistent. However, the write rate to a single entity group
-	// should be limited to ~1/second.
-	key := datastore.NewIncompleteKey(c, "Greeting", guestbookKey(c))
-	_, err := datastore.Put(c, key, &g)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Redirect(w, r, "/", http.StatusFound)
-}
+//
+//func root(w http.ResponseWriter, r *http.Request) {
+//	c := appengine.NewContext(r)
+//	// Ancestor queries, as shown here, are strongly consistent with the High
+//	// Replication Datastore. Queries that span entity groups are eventually
+//	// consistent. If we omitted the .Ancestor from this query there would be
+//	// a slight chance that Greeting that had just been written would not
+//	// show up in a query.
+//	q := datastore.NewQuery("Greeting").Ancestor(guestbookKey(c)).Order("-Date").Limit(10)
+//	greetings := make([]Greeting, 0, 10)
+//	if _, err := q.GetAll(c, &greetings); err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//	if err := guestbookTemplate.Execute(w, greetings); err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+//	}
+//}
+//
+//func sign(w http.ResponseWriter, r *http.Request) {
+//	c := appengine.NewContext(r)
+//	g := Greeting{
+//		Content: r.FormValue("content"),
+//		Date:    time.Now(),
+//	}
+//	if u := user.Current(c); u != nil {
+//		g.Author = u.String()
+//	}
+//	// We set the same parent key on every Greeting entity to ensure each Greeting
+//	// is in the same entity group. Queries across the single entity group
+//	// will be consistent. However, the write rate to a single entity group
+//	// should be limited to ~1/second.
+//	key := datastore.NewIncompleteKey(c, "Greeting", guestbookKey(c))
+//	_, err := datastore.Put(c, key, &g)
+//	if err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//	http.Redirect(w, r, "/", http.StatusFound)
+//}

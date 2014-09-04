@@ -7,7 +7,13 @@ handlers:
 - url: /
   static_files: src/main/webapp/index.html
   upload: src/main/webapp/index.html
+- url: /login
+  static_files: src/main/webapp/login.html
+  upload: src/main/webapp/login.html
+- url: /add-party
+  static_files: src/main/webapp/add-party.html
+  upload: src/main/webapp/add-party.html
 - url: /static
-  static_dir: src/main/webapp/static
+  static_dir: src/main/webapp
 - url: /.*
   script: _go_app
