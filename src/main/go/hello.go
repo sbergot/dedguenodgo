@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strconv"
 	"encoding/json"
+	"io"
+	"crypto/md5"
 
 	"appengine"
 	"appengine/datastore"
@@ -45,6 +47,7 @@ type User struct {
 type handlerF func(http.ResponseWriter, *http.Request)
 
 func init() {
+	http.Handle("/unauthenticated-resources/party", GetPartyResource())
 	http.Handle("/unauthenticated-resources/party/", GetPartyResource())
 }
 
@@ -62,12 +65,12 @@ func (t RestHandler) getHandler(r *http.Request) restHandlerF {
 	var h restHandlerF
 	switch r.Method {
 	case "GET":
-		h := t.Get
+		h = t.Get
 	case "POST":
-		h := t.Post
+		h = t.Post
 	}
 	if h == nil {
-		h := func(w http.ResponseWriter, r *http.Request, m []string) {
+		h = func(w http.ResponseWriter, r *http.Request, m []string) {
 			http.Error(w, "405 Method not allowed", http.StatusMethodNotAllowed)
 		}
 	}
@@ -81,8 +84,6 @@ func (t RestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginRequired(handler handlerF) handlerF {
-	var foo = 0
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := appengine.NewContext(r)
 		u := user.Current(c)
@@ -112,26 +113,57 @@ func GetPartyResource() RestHandler {
 	var res = RestHandler{
 		Get: func(w http.ResponseWriter, r *http.Request, m []string) {
 			c := appengine.NewContext(r)
-			var id = GetIdFromMatches(m)
-			if id == 0 {
-				http.NotFound(w, r)
+			var id = m[1]
+			//if id == 0 {
+			//	http.NotFound(w, r)
+			//	return
+			//}
+			c.Infof(id)
+			var party = new(Party)
+			err := datastore.Get(
+				c,
+				datastore.NewKey(
+					c,
+					"Party",
+					id,
+					0,
+					nil),
+				party)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			var party *Party
-			datastore.Get(c, datastore.NewKey(c, "Party", "", int64(id), nil), party)
 			partyJson, _ := json.Marshal(party)
 			w.Write(partyJson)
 		},
 		Post: func(w http.ResponseWriter, r *http.Request, m []string) {
 			c := appengine.NewContext(r)
-			var id = GetIdFromMatches(m)
-			var party *Party
-			err := json.NewDecoder(r.Body).Decode(party)
+			//var party *Party
+			//err := json.NewDecoder(r.Body).Decode(party)
+			//if err != nil {
+			//	http.NotFound(w, r) // todo change code
+			//	return
+			//}
+			var h = md5.New()
+			io.WriteString(h, r.FormValue("partyPassword"))
+			var party = Party{
+				HashedPassword: h.Sum(nil),
+			}
+			c.Infof("putting")
+			_, err := datastore.Put(
+				c,
+				datastore.NewKey(
+					c,
+					"Party",
+					r.FormValue("partyName"),
+					0,
+					nil),
+				&party)
 			if err != nil {
-				http.NotFound(w, r) // todo change code
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			datastore.Put(c, datastore.NewKey(c, "Party", "", 0, nil), party)
+			http.Redirect(w, r, "/", http.StatusFound)
 		},
 		Pattern: regexp.MustCompile("/unauthenticated-resources/party/(.*)"),
 	}
