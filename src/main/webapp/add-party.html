@@ -7,6 +7,21 @@
 <link rel="stylesheet" type="text/css" href="static/css/lib/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css"
 	href="static/css/lib/bootstrap-theme.min.css" />
+<script src="static/js/lib/jquery.min.js"></script>
+<script src="static/js/lib/jquery.serialize-object.js"></script>
+<script>
+  $(function() {
+  $("form").submit(function(event) {
+  event.preventDefault();
+  $.ajax("/unauthenticated-resources/party",
+  {
+  contentType : "application/json",
+  data : $("form").serializeJSON(),
+  type : "POST"
+  })
+  });
+  });
+</script>
 </head>
 <body>
 	<form action="../unauthenticated-resources/party" method="POST" class="form">
@@ -24,4 +39,6 @@
 		</div>
 		<button type="submit">Create</button>
 	</form>
+    <script>
+    </script>
 </body>
