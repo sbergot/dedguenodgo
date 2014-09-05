@@ -56,26 +56,35 @@ type User struct {
 type handlerF func(http.ResponseWriter, *http.Request)
 
 func init() {
-	//http.Handle("/unauthenticated-resources/party", GetPartyResource())
-	//http.Handle("/unauthenticated-resources/party/", GetPartyResource())
 	gorest.RegisterService(new(UnauthenticatedService))
+	gorest.RegisterService(new(AuthenticatedService))
 	http.Handle("/",gorest.Handle())
 }
 
-//Service Definition
 type UnauthenticatedService struct {
 	gorest.RestService         `root:"/unauthenticated-resources/"
                                 consumes:"application/json" produces:"application/json"`
-    postParty  gorest.EndPoint `method:"POST" path:"/party/" postdata:"PartyForm"`
-    getParty   gorest.EndPoint `method:"GET" path:"/party/{name:string}" output:"Party"`
+	postParty  gorest.EndPoint `method:"POST" path:"/party/"              postdata:"PartyForm"`
+	getParty   gorest.EndPoint `method:"GET"  path:"/party/{name:string}" output:"Party"`
 }
 
-func (rs *UnauthenticatedService) GAEContext() appengine.Context {
+type AuthenticatedService struct {
+	gorest.RestService         `root:"/authenticated-resources/"
+                                consumes:"application/json" produces:"application/json"`
+	putPresent          gorest.EndPoint `method:"PUT"    path:"/present/{id:int}"   postData:"Present"`
+	postPresent         gorest.EndPoint `method:"POST"   path:"/present"            postData:"Present"`
+	postUser            gorest.EndPoint `method:"POST"   path:"/user"               postData:"User"`
+	deleteUser          gorest.EndPoint `method:"DELETE" path:"/user/{id:int}"`
+	getUsersandPresents gorest.EndPoint `method:"GET"    path:"/users-and-presents" output:"PresentsUsers"`
+	getPartyUsers       gorest.EndPoint `method:"GET"    path:"/party-users"        output:"[]User"`
+}
+
+func GAEContext(rs gorest.RestService) appengine.Context {
 	return appengine.NewContext(rs.Context.Request())
 }
 
 func(serv UnauthenticatedService) PostParty(posted PartyForm) {
-	var c = serv.GAEContext()
+	var c = GAEContext(serv.RestService)
 	var h = md5.New()
 	io.WriteString(h, posted.PartyPassword)
 	var party = Party{
@@ -92,7 +101,7 @@ func(serv UnauthenticatedService) PostParty(posted PartyForm) {
 }
 
 func(serv UnauthenticatedService) GetParty(id string) Party {
-	var c = serv.GAEContext()
+	var c = GAEContext(serv.RestService)
 	c.Infof(id)
 	var party = new(Party)
 	err := datastore.Get(
@@ -104,4 +113,17 @@ func(serv UnauthenticatedService) GetParty(id string) Party {
 		return *party
 	}
 	return *party
+}
+
+func(serv AuthenticatedService) PutPresent(present Present, id int) {
+}
+func(serv AuthenticatedService) PostPresent(present Present) {
+}
+func(serv AuthenticatedService) PostUser(user User) {
+}
+func(serv AuthenticatedService) DeleteUser(id int) {
+}
+func(serv AuthenticatedService) GetUsersandPresents() PresentsUsers {
+}
+func(serv AuthenticatedService) GetPartyUsers() []User {
 }
