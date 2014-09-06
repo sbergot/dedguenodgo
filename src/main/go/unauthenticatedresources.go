@@ -21,6 +21,20 @@ type UnauthenticatedService struct {
                                 output:"Party"`
 }
 
+func getAdminPasswordKey(c appengine.Context) *datastore.Key {
+	return datastore.NewKey(c, "AdminPassword", "adminPassword", 0, nil)
+}
+
+func checkAdminPassword(password string) bool {
+	var c = GAEContext(serv.RestService)
+	var password Password
+	var key = getAdminPasswordKey(c)
+	err := datastore.Get(c, key, &password)
+	if err != nil {
+
+	}
+}
+
 func(serv UnauthenticatedService) PostParty(posted PartyForm) {
 	var c = GAEContext(serv.RestService)
 	var h = md5.New()

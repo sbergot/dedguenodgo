@@ -16,11 +16,15 @@ type PartyForm struct {
 	PartyPassword string
 }
 
+type Password struct {
+	Hash []byte
+	Salt []byte
+}
+
 type Party struct {
-	HashedPassword []byte
-	PasswordSalt   []byte
-	Presents       []Present
-	Users          []User
+	Password Password
+	Presents []Present
+	Users    []User
 }
 
 type Present struct {
