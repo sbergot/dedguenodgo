@@ -23,6 +23,13 @@
 	};
 
 	Server.prototype = {
+		getPartyUri: function() {
+			if (!this.login) {
+				console.warn('calling server but login has not been set');
+				return;
+			}
+			return 'authenticated-resources/party/' + this.login.partyId
+		},
 		addAuthorizationToAjaxOptions: function(ajaxOptions) {
 			if (!this.login) {
 				console.warn('calling server but login has not been set');
@@ -43,7 +50,7 @@
 			var converted = Server._formatForServer(present);
 			delete converted.id;
 			var ajaxOptions = {
-				url: 'authenticated-resources/present',
+				url: this.getPartyUri() + '/present',
 				contentType: 'application/json',
 				type: 'POST',
 				data: JSON.stringify(converted),
@@ -55,7 +62,7 @@
 		editPresent: function(oldPresent, newPresent) {
 			var converted = Server._formatForServer(newPresent);
 			var ajaxOptions = {
-				url: 'authenticated-resources/present/' + oldPresent.id,
+				url: this.getPartyUri() + '/present/' + oldPresent.id,
 				contentType: 'application/json',
 				type: 'PUT',
 				data: JSON.stringify(converted),
@@ -66,7 +73,7 @@
 		},
 		addUser: function(user) {
 			var ajaxOptions = {
-				url: 'authenticated-resources/user',
+				url: this.getPartyUri() + '/user',
 				contentType: 'application/json',
 				type: 'POST',
 				data: JSON.stringify(user),
@@ -77,7 +84,7 @@
 		},
 		deleteUser: function(userId) {
 			var ajaxOptions = {
-				url: 'authenticated-resources/user/' + userId,
+				url: this.getPartyUri() + '/user/' + userId,
 				contentType: 'application/json',
 				type: 'DELETE',
 				dataType: "json"
@@ -87,7 +94,7 @@
 		},
 		getUsersAndPresents: function() {
 			var ajaxOptions = {
-				url: 'authenticated-resources/users-and-presents',
+				url: this.getPartyUri() + '/users-and-presents',
 				contentType: 'application/json',
 				type: 'GET',
 				dataType: "json"

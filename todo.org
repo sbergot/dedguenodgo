@@ -1,0 +1,3 @@
+* manage party login
+* manage party parentship in datastore put/get
+* create party queries

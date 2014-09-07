@@ -8,9 +8,9 @@ import (
 )
 
 type AuthenticatedService struct {
-	gorest.RestService         `root:"/authenticated-resources/"
-                                consumes:"application/json"
-                                produces:"application/json"`
+	gorest.RestService `root:"/authenticated-resources/party/{party:string}/"
+                        consumes:"application/json"
+                        produces:"application/json"`
 	putPresent          gorest.EndPoint `method:"PUT"
                                          path:"/present/{id:int}"
                                          postdata:"Present"`
@@ -36,10 +36,7 @@ func(serv AuthenticatedService) PutPresent(present Present, id int) {
 		c,
 		datastore.NewKey(c, "Present", "", int64(id), nil),
 		&present)
-	if err != nil {
-		serv.ResponseBuilder().SetResponseCode(http.StatusInternalServerError)
-		return
-	}
+	CheckError(serv.RestService, err, "", 500)
 }
 func(serv AuthenticatedService) PostPresent(present Present) {
 	var c = GAEContext(serv.RestService)

@@ -45,8 +45,9 @@ func(serv UnauthenticatedService) PostParty(posted PartyForm) {
 	var c = GAEContext(serv.RestService)
 	if !checkAdminPassword(serv, posted.AdminPassword) {
 		serv.ResponseBuilder().
-			SetResponseCode(http.403).
+			SetResponseCode(403).
 			Overide(true)
+		return
 	}
 	var password Password
 	password.MakeFrom(posted.PartyPassword)
