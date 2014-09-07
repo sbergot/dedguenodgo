@@ -43,8 +43,13 @@ func checkAdminPassword(serv UnauthenticatedService, inp string) bool {
 
 func(serv UnauthenticatedService) PostParty(posted PartyForm) {
 	var c = GAEContext(serv.RestService)
+	if !checkAdminPassword(serv, posted.AdminPassword) {
+		serv.ResponseBuilder().
+			SetResponseCode(http.403).
+			Overide(true)
+	}
 	var password Password
-	password.MakeFrom(posted.AdminPassword)
+	password.MakeFrom(posted.PartyPassword)
 	var party = Party{Password: password}
 	_, err := datastore.Put(
 		c,
