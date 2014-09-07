@@ -2,9 +2,8 @@ package dedguenodgo
 
 import (
 	"net/http"
-	"io"
-	"crypto/md5"
 
+	"appengine"
 	"appengine/datastore"
 	"code.google.com/p/gorest"
 )
@@ -25,30 +24,36 @@ func getAdminPasswordKey(c appengine.Context) *datastore.Key {
 	return datastore.NewKey(c, "AdminPassword", "adminPassword", 0, nil)
 }
 
-func checkAdminPassword(password string) bool {
+func checkAdminPassword(serv UnauthenticatedService, inp string) bool {
 	var c = GAEContext(serv.RestService)
 	var password Password
 	var key = getAdminPasswordKey(c)
 	err := datastore.Get(c, key, &password)
 	if err != nil {
-
+		// password doesn't exist. We need to create one
+		password.MakeFrom(inp)
+		_, err := datastore.Put(c, key, &password)
+		if err != nil {
+			panic(err.Error())
+		}
+		return true
 	}
+	return password.Check(inp)
 }
 
 func(serv UnauthenticatedService) PostParty(posted PartyForm) {
 	var c = GAEContext(serv.RestService)
-	var h = md5.New()
-	io.WriteString(h, posted.PartyPassword)
-	var party = Party{
-		HashedPassword: h.Sum(nil),
-	}
+	var password Password
+	password.MakeFrom(posted.AdminPassword)
+	var party = Party{Password: password}
 	_, err := datastore.Put(
 		c,
 		datastore.NewKey(c, "Party", posted.PartyName, 0, nil),
 		&party)
 	if err != nil {
-		serv.ResponseBuilder().SetResponseCode(http.StatusInternalServerError).Overide(true)
-		return
+		serv.ResponseBuilder().
+			SetResponseCode(http.StatusInternalServerError).
+			Overide(true)
 	}
 }
 
@@ -61,7 +66,9 @@ func(serv UnauthenticatedService) GetParty(id string) Party {
 		datastore.NewKey(c, "Party", id, 0, nil),
 		party)
 	if err != nil {
-		serv.ResponseBuilder().SetResponseCode(404)
+		serv.ResponseBuilder().
+			SetResponseCode(404).
+			Overide(true)
 		return *party
 	}
 	return *party

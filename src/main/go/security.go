@@ -1,23 +1,30 @@
 package dedguenodgo
 
 import (
-	"net/http"
 	"io"
 	"crypto/md5"
-
-	"appengine/datastore"
-	"code.google.com/p/gorest"
+	"crypto/rand"
+	"bytes"
 )
 
 func hash(inp string, salt []byte) []byte {
 	var h = md5.New()
-	io.Write(h, salt)
+	h.Write(salt)
 	io.WriteString(h, inp)
 	return h.Sum(nil)
 }
 
-func (pw *Password) Check(inp string) {
-	return (pw.Hash == hash(inp, pw.Salt))
+func generateRandomSalt() []byte {
+	var salt = make([]byte, 16)
+	_, err := rand.Read(salt)
+	if err != nil {
+		panic(err.Error())
+	}
+	return salt
+}
+
+func (pw *Password) Check(inp string) bool {
+	return bytes.Equal(pw.Hash, hash(inp, pw.Salt))
 }
 
 func (pw *Password) MakeFrom(inp string) {
