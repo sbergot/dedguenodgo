@@ -24,7 +24,7 @@ function AppViewModel(options) {
 	this.errorMessage = ko.observable();
 	this.undoAction = ko.observable();
 	this.loadingMessage = ko.observable(null);
-	
+
 	this.initLoading = ko.observable();
 	this.initError = ko.observable();
 
@@ -46,7 +46,7 @@ function AppViewModel(options) {
 	this.selectedList.subscribe(function() {
 		self.discardConfirm();
 	});
-	
+
 	if (options.initOnStartup) {
 		this.init();
 	}
@@ -57,7 +57,7 @@ AppViewModel.prototype = {
 	init: function() {
 		var self = this;
 		this.initLoading(true);
-		this.server.getUsersAndPresents().always(function() {
+		return this.server.getUsersAndPresents().always(function() {
 			self.initLoading(false);
 		}).fail(function() {
 			self.initError(true);
@@ -193,13 +193,11 @@ AppViewModel.prototype = {
 				presents.splice(index, 1);
 				self.presents(presents);
 			}).done(function(newPresent) {
-				var presents = self.presents();
-				var index = presents.indexOf(present);
-				presents[index] = newPresent;
-				self.presents(presents);
-				self.successMessage('"' + newPresent.title + '" a bien été créé');
-				self.undoAction(function() {
-					self.deletePresent(newPresent, true);
+				self.init().done(function () {
+					self.successMessage('"' + newPresent.title + '" a bien été créé');
+					self.undoAction(function() {
+						self.deletePresent(newPresent, true);
+					});
 				});
 			});
 	},
@@ -230,16 +228,14 @@ AppViewModel.prototype = {
 				//		this.presents([]); //force redisplay
 				self.presents(presents);
 			}).done(function(savedPresent) {
-				var presents = self.presents();
-				var index = presents.indexOf(newPresent);
-				presents[index] = savedPresent;
-				self.presents(presents);
-				if (!hideUndo) {
-					self.successMessage('"' + savedPresent.title + '" a bien été modifié');
-					self.undoAction(function() {
-						self._savePresent(savedPresent, oldPresent, true);
-					});
-				}
+				self.init().done(function () {
+					if (!hideUndo) {
+						self.successMessage('"' + savedPresent.title + '" a bien été modifié');
+						self.undoAction(function() {
+							self._savePresent(savedPresent, oldPresent, true);
+						});
+					}
+				});
 			});
 	},
 	togglePresentOffered: function(present) {

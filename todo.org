@@ -1,5 +1,9 @@
 * DONE manage party login
 * DONE manage party parentship in datastore put/get
 * DONE create party queries
-* TODO delete user
-* TODO fix login
+* DONE delete user
+* DONE fix login
+* TODO fix undo
+* TODO fix utilisateur supprimé
+* TODO fix present visibility
+* TODO fix present offeredby
