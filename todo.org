@@ -6,4 +6,4 @@
 * DONE fix utilisateur supprimé
 * DONE fix present visibility
 * DONE fix present offeredby
-* TODO fix undo
+* TODO fix undo ($.grep in _savepresent appviewmodel line 211)

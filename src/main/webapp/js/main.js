@@ -9,7 +9,7 @@ $(document).ready(function() {
 		}
 	});
 	//little hack to wake up appengine
-	server.wakeUp();
+	//server.wakeUp();
 	window.appViewModel = new AppViewModel({
 		server: window.server,
 		logoutCallback: function() {

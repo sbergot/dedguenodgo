@@ -234,12 +234,12 @@ AppViewModel.prototype = {
 				presents[index] = oldPresent;
 				//		this.presents([]); //force redisplay
 				self.presents(presents);
-			}).done(function(savedPresent) {
+			}).done(function() {
 				self.init().done(function () {
 					if (!hideUndo) {
-						self.successMessage('"' + savedPresent.title + '" a bien été modifié');
+						self.successMessage('"' + newPresent.title + '" a bien été modifié');
 						self.undoAction(function() {
-							self._savePresent(savedPresent, oldPresent, true);
+							self._savePresent(newPresent, oldPresent, true);
 						});
 					}
 				});
