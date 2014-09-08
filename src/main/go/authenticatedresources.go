@@ -1,6 +1,7 @@
 package dedguenodgo
 
 import (
+	//"fmt"
 	"appengine"
 	"appengine/datastore"
 	"code.google.com/p/gorest"
@@ -106,7 +107,7 @@ func(serv AuthenticatedService) GetUsersandPresents(partyId string) PresentsUser
 
 	var pquery = datastore.NewQuery("Present").Ancestor(getPartyKey(c, partyId))
 	var presents = make([]Present, 0)
-	_, err = pquery.GetAll(c, &presents)
+	pkeys, err := pquery.GetAll(c, &presents)
 	if err != nil {
 		ReturnError(serv.RestService, "", 500)
 		return PresentsUsers{}
@@ -117,6 +118,13 @@ func(serv AuthenticatedService) GetUsersandPresents(partyId string) PresentsUser
 		var user = users[i]
 		user.Id = id
 		users[i] = user
+	}
+
+	for i, _ := range presents {
+		var id = pkeys[i].IntID()
+		var present = presents[i]
+		present.Id = id
+		presents[i] = present
 	}
 
 	return PresentsUsers{

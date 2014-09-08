@@ -2,13 +2,8 @@ package dedguenodgo
 
 import (
 	"time"
+	"appengine/datastore"
 )
-
-type Greeting struct {
-	Author  string
-	Content string
-	Date    time.Time
-}
 
 type PartyForm struct {
 	AdminPassword string
@@ -26,15 +21,47 @@ type Party struct {
 }
 
 type Present struct {
-	Title        string
-	Description  string `datastore:",noindex"`
-	To           int64
-	CreatedBy    int64
-	CreationDate time.Time
-	OfferedBy    time.Time
-	OfferedDate  time.Time
-	DeletedBy    int64
+	Id           int64      `datastore:"-" json:"id"`
+	Title        string     `json:"title"`
+	Description  string     `json:"description" datastore:",noindex"`
+	To           int64      `json:"to"`
+	CreatedBy    int64      `json:"createdBy"`
+	CreationDate time.Time  `json:"creationDate"`
+	OfferedBy    *int64     `json:"offeredBy" datastore:"-"`
+	OfferedDate  *time.Time `json:"offeredDate" datastore:"-"`
+	OfferedBy_   int64      `json:"-"`
+	OfferedDate_ time.Time  `json:"-"`
+	DeletedBy    *int64     `json:"deletedBy" datastore:"-"`
+	DeletedBy_   int64      `json:"-"`
 }
+
+func (x *Present) Load(c <-chan datastore.Property) error {
+	if err := datastore.LoadStruct(x, c); err != nil {
+		return err
+	}
+	var minTime time.Time
+	x.OfferedDate = &x.OfferedDate_
+	if *x.OfferedDate == minTime { x.OfferedDate = nil }
+	x.OfferedBy = &x.OfferedBy_
+	if *x.OfferedBy == 0 { x.OfferedBy = nil }
+	x.DeletedBy = &x.DeletedBy_
+	if *x.DeletedBy == 0 { x.DeletedBy = nil }
+	return nil
+}
+
+func (x *Present) Save(c chan<- datastore.Property) error {
+	if x.OfferedDate != nil {
+		x.OfferedDate_ = *x.OfferedDate
+	}
+	if x.OfferedBy != nil {
+		x.OfferedBy_ = *x.OfferedBy
+	}
+	if x.DeletedBy != nil {
+		x.DeletedBy_ = *x.DeletedBy
+	}
+	return datastore.SaveStruct(x, c)
+}
+
 
 type User struct {
 	Id      int64  `datastore:"-" json:"id"`
