@@ -97,19 +97,26 @@ func(serv AuthenticatedService) GetUsersandPresents(partyId string) PresentsUser
 	var c = GAEContext(serv.RestService)
 
 	var uquery = datastore.NewQuery("User").Ancestor(getPartyKey(c, partyId))
-	var users []User
-	_, err := uquery.GetAll(c, &users)
+	var users = make([]User, 0)
+	ukeys, err := uquery.GetAll(c, &users)
 	if err != nil {
 		ReturnError(serv.RestService, "", 500)
 		return PresentsUsers{}
 	}
 
 	var pquery = datastore.NewQuery("Present").Ancestor(getPartyKey(c, partyId))
-	var presents []Present
+	var presents = make([]Present, 0)
 	_, err = pquery.GetAll(c, &presents)
 	if err != nil {
 		ReturnError(serv.RestService, "", 500)
 		return PresentsUsers{}
+	}
+
+	for i, _ := range users {
+		var id = ukeys[i].IntID()
+		var user = users[i]
+		user.Id = id
+		users[i] = user
 	}
 
 	return PresentsUsers{
@@ -123,11 +130,18 @@ func(serv AuthenticatedService) GetPartyUsers(partyId string) []User {
 	var c = GAEContext(serv.RestService)
 
 	var query = datastore.NewQuery("User").Ancestor(getPartyKey(c, partyId))
-	var users []User
-	_, err := query.GetAll(c, &users)
+	var users = make([]User, 0)
+	ukeys, err := query.GetAll(c, &users)
 	if err != nil {
 		ReturnError(serv.RestService, "", 500)
 		return *new([]User)
+	}
+
+	for i, _ := range users {
+		var id = ukeys[i].IntID()
+		var user = users[i]
+		user.Id = id
+		users[i] = user
 	}
 
 	return users

@@ -37,11 +37,12 @@ type Present struct {
 }
 
 type User struct {
+	Id      int64  `datastore:"-" json:"id"`
 	Name    string `json:"name"`
 	Deleted bool   `json:"deleted"`
 }
 
 type PresentsUsers struct {
-	Presents []Present
-	Users    []User
+	Presents []Present `json:"presents"`
+	Users    []Username `json:"username"`
 }
