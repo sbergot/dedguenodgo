@@ -44,5 +44,5 @@ type User struct {
 
 type PresentsUsers struct {
 	Presents []Present `json:"presents"`
-	Users    []Username `json:"username"`
+	Users    []User    `json:"users"`
 }

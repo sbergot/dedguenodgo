@@ -11,7 +11,7 @@ type AuthenticatedService struct {
                         consumes:"application/json"
                         produces:"application/json"`
 	putPresent          gorest.EndPoint `method:"PUT"
-                                         path:"/present/{id:int}"
+                                         path:"/present/{id:int64}"
                                          postdata:"Present"`
 	postPresent         gorest.EndPoint `method:"POST"
                                          path:"/present"
@@ -20,7 +20,7 @@ type AuthenticatedService struct {
                                          path:"/user"
                                          postdata:"User"`
 	deleteUser          gorest.EndPoint `method:"DELETE"
-                                         path:"/user/{id:int}"`
+                                         path:"/user/{id:int64}"`
 	getUsersandPresents gorest.EndPoint `method:"GET"
                                          path:"/users-and-presents"
                                          output:"PresentsUsers"`
@@ -53,7 +53,7 @@ func isLogged(rs gorest.RestService, partyId string) bool {
 	return true
 }
 
-func(serv AuthenticatedService) PutPresent(present Present, partyId string, id int) {
+func(serv AuthenticatedService) PutPresent(present Present, partyId string, id int64) {
 	if !isLogged(serv.RestService, partyId) { return }
 	var c = GAEContext(serv.RestService)
 	_, err := datastore.Put(
@@ -83,7 +83,7 @@ func(serv AuthenticatedService) PostUser(user User, partyId string) {
 	CheckError(serv.RestService, err, "", 500)
 }
 
-func(serv AuthenticatedService) DeleteUser(partyId string, id int) {
+func(serv AuthenticatedService) DeleteUser(partyId string, id int64) {
 	if !isLogged(serv.RestService, partyId) { return }
 	var c = GAEContext(serv.RestService)
 	err := datastore.Delete(
