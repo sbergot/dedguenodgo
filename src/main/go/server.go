@@ -24,10 +24,10 @@ func ReturnError(rs gorest.RestService, message string, code int) {
 		Overide(true)
 }
 
-func CheckError(rs gorest.RestService, err Error, message string, code int) {
+func CheckError(rs gorest.RestService, err error, message string, code int) {
 	if err == nil { return }
 	var msg = message
-	if msg = "" {
+	if msg == "" {
 		msg = err.Error()
 	}
 	ReturnError(rs, msg, code)

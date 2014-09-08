@@ -23,8 +23,6 @@ type Password struct {
 
 type Party struct {
 	Password Password
-	Presents []Present
-	Users    []User
 }
 
 type Present struct {
