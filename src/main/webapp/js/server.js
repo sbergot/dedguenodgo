@@ -109,7 +109,7 @@
 		},
 		getPartyUsers: function(credentials) {
 			return $.ajax({
-				url: 'unauthenticated-resources/party-users',
+				url: 'unauthenticated-resources/party/' + credentials.id + '/users',
 				contentType: 'application/json',
 				type: 'GET',
 				dataType: "json",

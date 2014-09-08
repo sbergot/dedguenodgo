@@ -37,11 +37,11 @@ type Present struct {
 }
 
 type User struct {
-	Name    string
-	Deleted bool
+	Name    string `json:"name"`
+	Deleted bool   `json:"deleted"`
 }
 
 type PresentsUsers struct {
 	Presents []Present
-	Users    map[int]User
+	Users    []User
 }

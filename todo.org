@@ -1,3 +1,5 @@
-* manage party login
-* manage party parentship in datastore put/get
-* create party queries
+* DONE manage party login
+* DONE manage party parentship in datastore put/get
+* DONE create party queries
+* TODO delete user
+* TODO fix login

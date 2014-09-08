@@ -1,8 +1,7 @@
 package dedguenodgo
 
 import (
-	"net/http"
-
+	//"fmt"
 	"appengine"
 	"appengine/datastore"
 	"code.google.com/p/gorest"
@@ -12,12 +11,15 @@ type UnauthenticatedService struct {
 	gorest.RestService         `root:"/unauthenticated-resources/"
                                 consumes:"application/json"
                                 produces:"application/json"`
-	postParty  gorest.EndPoint `method:"POST"
-                                path:"/party/"
-                                postdata:"PartyForm"`
-	getParty   gorest.EndPoint `method:"GET"
-                                path:"/party/{name:string}"
-                                output:"Party"`
+	postParty     gorest.EndPoint `method:"POST"
+                                   path:"/party/"
+                                   postdata:"PartyForm"`
+	getParty      gorest.EndPoint `method:"GET"
+                                   path:"/party/{name:string}"
+                                   output:"Party"`
+	getUPartyUsers gorest.EndPoint `method:"GET"
+                                   path:"/party/{name:string}/users"
+                                   output:"[]User"`
 }
 
 func getAdminPasswordKey(c appengine.Context) *datastore.Key {
@@ -56,11 +58,20 @@ func(serv UnauthenticatedService) PostParty(posted PartyForm) {
 		c,
 		datastore.NewKey(c, "Party", posted.PartyName, 0, nil),
 		&party)
-	if err != nil {
-		serv.ResponseBuilder().
-			SetResponseCode(http.StatusInternalServerError).
-			Overide(true)
-	}
+//	if err != nil {
+//		ReturnError(serv.RestService, "", 500)
+//		return
+//	}
+//
+//	var user = User{
+//		Name: "dummy",
+//		Deleted: false,
+//	}
+//	_, err= datastore.Put(
+//		c,
+//		datastore.NewKey(c, "User", "", 0, getPartyKey(c, posted.PartyName)),
+//		&user)
+	CheckError(serv.RestService, err, "", 500)
 }
 
 func(serv UnauthenticatedService) GetParty(id string) Party {
@@ -71,11 +82,24 @@ func(serv UnauthenticatedService) GetParty(id string) Party {
 		c,
 		datastore.NewKey(c, "Party", id, 0, nil),
 		party)
-	if err != nil {
-		serv.ResponseBuilder().
-			SetResponseCode(404).
-			Overide(true)
-		return *party
-	}
+	CheckError(serv.RestService, err, "", 404)
 	return *party
+}
+
+func(serv UnauthenticatedService) GetUPartyUsers(partyId string) []User {
+	//if !isLogged(serv.RestService, partyId) { return userMap }
+	var c = GAEContext(serv.RestService)
+
+	var query = datastore.NewQuery("User").Ancestor(getPartyKey(c, partyId))
+	var users []User
+	_, err := query.GetAll(c, &users)
+	if err != nil {
+		ReturnError(serv.RestService, "", 500)
+		return users
+	}
+	if len(users) == 0 {
+		users = append(users, User{Name:"", Deleted:false})
+	}
+
+	return users
 }

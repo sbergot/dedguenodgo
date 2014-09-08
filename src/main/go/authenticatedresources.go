@@ -68,7 +68,7 @@ func(serv AuthenticatedService) PostPresent(present Present, partyId string) {
 	var c = GAEContext(serv.RestService)
 	_, err := datastore.Put(
 		c,
-		datastore.NewKey(c, "Present", "", 0, nil),
+		datastore.NewKey(c, "Present", "", 0, getPartyKey(c, partyId)),
 		&present)
 	CheckError(serv.RestService, err, "", 500)
 }
@@ -78,7 +78,7 @@ func(serv AuthenticatedService) PostUser(user User, partyId string) {
 	var c = GAEContext(serv.RestService)
 	_, err := datastore.Put(
 		c,
-		datastore.NewKey(c, "User", "", 0, nil),
+		datastore.NewKey(c, "User", "", 0, getPartyKey(c, partyId)),
 		&user)
 	CheckError(serv.RestService, err, "", 500)
 }
@@ -88,7 +88,7 @@ func(serv AuthenticatedService) DeleteUser(partyId string, id int) {
 	var c = GAEContext(serv.RestService)
 	err := datastore.Delete(
 		c,
-		datastore.NewKey(c, "User", "", int64(id), nil))
+		datastore.NewKey(c, "User", "", int64(id), getPartyKey(c, partyId)))
 	CheckError(serv.RestService, err, "", 500)
 }
 
@@ -98,7 +98,7 @@ func(serv AuthenticatedService) GetUsersandPresents(partyId string) PresentsUser
 
 	var uquery = datastore.NewQuery("User").Ancestor(getPartyKey(c, partyId))
 	var users []User
-	ukeys, err := uquery.GetAll(c, &users)
+	_, err := uquery.GetAll(c, &users)
 	if err != nil {
 		ReturnError(serv.RestService, "", 500)
 		return PresentsUsers{}
@@ -112,15 +112,9 @@ func(serv AuthenticatedService) GetUsersandPresents(partyId string) PresentsUser
 		return PresentsUsers{}
 	}
 
-	var userMap map[int]User
-	for i, key := range ukeys {
-		var id = int(key.IntID())
-		userMap[id] = users[i]
-	}
-
 	return PresentsUsers{
 		Presents: presents,
-		Users: userMap,
+		Users: users,
 	}
 }
 
