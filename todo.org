@@ -3,7 +3,7 @@
 * DONE create party queries
 * DONE delete user
 * DONE fix login
+* DONE fix utilisateur supprimé
+* DONE fix present visibility
+* DONE fix present offeredby
 * TODO fix undo
-* TODO fix utilisateur supprimé
-* TODO fix present visibility
-* TODO fix present offeredby

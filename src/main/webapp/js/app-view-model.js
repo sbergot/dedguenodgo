@@ -62,7 +62,14 @@ AppViewModel.prototype = {
 		}).fail(function() {
 			self.initError(true);
 		}).done(function(pAndU) {
-			self.users(pAndU.users);
+			var users = pAndU.users;
+			var userLength = Object.keys(users).length
+			var userMap = {};
+			for (var i = 0; i < userLength; ++i) {
+				var user = users[i];
+				userMap[user.id] = user;
+			}
+			self.users(userMap);
 			self.presents(pAndU.presents);
 		});
 	},
