@@ -34,7 +34,7 @@
 
     there is a "manage parties" button, which allows to create new
     parties, add/remove members by checking/unchecking boxes and
-    archive.
+    archive parties.
 
     when a party is archived, it is no longer displayed in the drop
     down, and gifts linked to it are also hidden.
