@@ -4,7 +4,7 @@
 ** DONE create party queries
 ** DONE delete user
 ** DONE fix login
-** DONE fix utilisateur supprimé
+** DONE fix utilisateur supprimÃ©
 ** DONE fix present visibility
 ** DONE fix present offeredby
 ** DONE fix undo
@@ -20,7 +20,7 @@
      (even from outside the current group)
 **** a gift is offered at some party
 *** proposal
-    one the user is logged in, there are two drop down menus:
+    once the user is logged in, there are two drop down menus:
     - one for the party selection
     - one for the user selection
 
