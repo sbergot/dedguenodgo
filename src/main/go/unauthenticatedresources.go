@@ -69,6 +69,13 @@ func(serv UnauthenticatedService) GetParty(id string) Party {
 func GetAllPartyUsers(rs gorest.RestService, partyId string) []User {
 	var c = GAEContext(rs)
 
+	var req = rs.Context.Request()
+	req.ParseForm()
+	var password = req.Form.Get("password")
+	if !checkPartyCredentials(rs, partyId, password) {
+		ReturnError(rs, "you must be logged to access this ressource", 403)
+		return *new([]User)
+	}
 	var users = make([]User, 0)
 	err := GetAll(rs, &users, getPartyKey(c, partyId))
 	if err != nil {

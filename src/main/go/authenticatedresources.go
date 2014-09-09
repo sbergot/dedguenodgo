@@ -34,7 +34,10 @@ func getPartyKey(c appengine.Context, partyId string) *datastore.Key {
 	return datastore.NewKey(c, "Party", partyId, 0, nil)
 }
 
-func isLogged(rs gorest.RestService, partyId string) bool {
+func checkPartyCredentials(
+	rs gorest.RestService,
+	partyId string,
+	partyPassword string) bool {
 	var c = GAEContext(rs)
 	var party Party
 	err := datastore.Get(c, getPartyKey(c, partyId), &party)
@@ -42,16 +45,19 @@ func isLogged(rs gorest.RestService, partyId string) bool {
 		ReturnError(rs, "", 404)
 		return false
 	}
+	if !party.Password.Check(partyPassword) {
+		ReturnError(rs, "wrong password", 403)
+		return false
+	}
+	return true
+}
+func isLogged(rs gorest.RestService, partyId string) bool {
 	var password = rs.Context.Request().Header.Get("dedguenodgo-partyPassword")
 	if password == "" {
 		ReturnError(rs, "you must be logged to access this ressource", 403)
 		return false
 	}
-	if !party.Password.Check(password) {
-		ReturnError(rs, "wrong password", 403)
-		return false
-	}
-	return true
+	return checkPartyCredentials(rs, partyId, password)
 }
 
 func(serv AuthenticatedService) PutPresent(present Present, partyId string, id int64) {
