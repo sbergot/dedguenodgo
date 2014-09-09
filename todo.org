@@ -1,9 +1,43 @@
-* DONE manage party login
-* DONE manage party parentship in datastore put/get
-* DONE create party queries
-* DONE delete user
-* DONE fix login
-* DONE fix utilisateur supprimé
-* DONE fix present visibility
-* DONE fix present offeredby
-* TODO fix undo ($.grep in _savepresent appviewmodel line 211)
+* TODO recreate application with go
+** DONE manage party login
+** DONE manage party parentship in datastore put/get
+** DONE create party queries
+** DONE delete user
+** DONE fix login
+** DONE fix utilisateur supprimé
+** DONE fix present visibility
+** DONE fix present offeredby
+** DONE fix undo
+** TODO improve server code quality
+
+* feature change
+** one login per user
+** use session cookie for security
+** party/group modification
+*** requirements
+**** a user should only see a sublist of other users (ie christmas for familly x)
+**** a user should see all gifts to another member of the group from any user
+     (even from outside the current group)
+**** a gift is offered at some party
+*** proposal
+    one the user is logged in, there are two drop down menus:
+    - one for the party selection
+    - one for the user selection
+
+    the party drop down only shows the one where the user is a member
+
+    the user drop down only shows the member of the selected party
+
+    the list shows all gifts made to this user, even from members
+    outside the party
+
+
+    there is a "manage parties" button, which allows to create new
+    parties, add/remove members by checking/unchecking boxes and
+    archive.
+
+    when a party is archived, it is no longer displayed in the drop
+    down, and gifts linked to it are also hidden.
+
+    note: I think anyone should be able to edit anything, but we could
+    also limit this feature to special "admin" users

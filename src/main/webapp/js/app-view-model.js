@@ -199,9 +199,12 @@ AppViewModel.prototype = {
 				var index = presents.indexOf(present);
 				presents.splice(index, 1);
 				self.presents(presents);
-			}).done(function(newPresent) {
+			}).done(function() {
 				self.init().done(function () {
-					self.successMessage('"' + newPresent.title + '" a bien été créé');
+					self.successMessage('"' + present.title + '" a bien été créé');
+					// we should be looking for the index, but it was created by the server
+					// so we look for the title
+					var newPresent = self.presents().find(function(e) { return e.title === present.title })
 					self.undoAction(function() {
 						self.deletePresent(newPresent, true);
 					});
@@ -210,7 +213,7 @@ AppViewModel.prototype = {
 	},
 	_savePresent: function(oldPresent, newPresent, hideUndo) {
 		var presents = this.presents();
-		var index = presents.indexOf(oldPresent);
+		var index = presents.findIndex(function(e) { return e.id === oldPresent.id });
 		if (index == -1) {
 			throw new Error('present not found');
 		}
