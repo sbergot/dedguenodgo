@@ -41,3 +41,16 @@
 
     note: I think anyone should be able to edit anything, but we could
     also limit this feature to special "admin" users
+
+*** tasks
+**** UI
+***** TODO new user form
+***** TODO party drop down
+***** TODO manage parties
+***** TODO update login screen
+**** server
+***** TODO fetch visible parties
+***** TODO party management resources
+***** TODO fetch visible users
+**** mix
+***** TODO manage session cookie
