@@ -21,7 +21,7 @@ type Party struct {
 }
 
 type Present struct {
-	Id           int64      `datastore:"-" json:"id"`
+	Id           int64      `datastore:"-" json:"id" entity:"Id"`
 	Title        string     `json:"title"`
 	Description  string     `json:"description" datastore:",noindex"`
 	To           int64      `json:"to"`
@@ -64,7 +64,7 @@ func (x *Present) Save(c chan<- datastore.Property) error {
 
 
 type User struct {
-	Id      int64  `datastore:"-" json:"id"`
+	Id      int64  `datastore:"-" json:"id" entity:"Id"`
 	Name    string `json:"name"`
 	Deleted bool   `json:"deleted"`
 }

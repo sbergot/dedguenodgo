@@ -10,7 +10,7 @@
 		this.user = ko.observable();
 		this.users = ko.observable(null);
 		this.sortedUsers = ko.computed(function() {
-			var unsorted = self.users(); 
+			var unsorted = self.users();
 			return !unsorted ? null : unsorted.sort(function(a, b) {
 				return a.name < b.name ? -1 : 1;
 			});
@@ -79,7 +79,7 @@
 			}).done(function(users) {
 				if (!users) {
 					self.partyError(true);
-					return; 
+					return;
 				}
 				self.users(users);
 				//needed for user edition commands
@@ -121,7 +121,7 @@
 				self.userActionError(true);
 			}).done(function(user) {
 				self.userActionOk(true);
-				self.users(self.users().concat([user]));
+				self.submitParty();
 			});
 		},
 		deleteUser: function() {

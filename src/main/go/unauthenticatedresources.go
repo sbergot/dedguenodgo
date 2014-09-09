@@ -44,34 +44,14 @@ func checkAdminPassword(serv UnauthenticatedService, inp string) bool {
 }
 
 func(serv UnauthenticatedService) PostParty(posted PartyForm) {
-	var c = GAEContext(serv.RestService)
 	if !checkAdminPassword(serv, posted.AdminPassword) {
-		serv.ResponseBuilder().
-			SetResponseCode(403).
-			Overide(true)
+		ReturnError(serv.RestService, "", 403)
 		return
 	}
 	var password Password
 	password.MakeFrom(posted.PartyPassword)
 	var party = Party{Password: password}
-	_, err := datastore.Put(
-		c,
-		datastore.NewKey(c, "Party", posted.PartyName, 0, nil),
-		&party)
-//	if err != nil {
-//		ReturnError(serv.RestService, "", 500)
-//		return
-//	}
-//
-//	var user = User{
-//		Name: "dummy",
-//		Deleted: false,
-//	}
-//	_, err= datastore.Put(
-//		c,
-//		datastore.NewKey(c, "User", "", 0, getPartyKey(c, posted.PartyName)),
-//		&user)
-	CheckError(serv.RestService, err, "", 500)
+	PutWithKey(serv.RestService, &party, nil, "", 500, posted.PartyName, 0)
 }
 
 func(serv UnauthenticatedService) GetParty(id string) Party {
@@ -86,23 +66,19 @@ func(serv UnauthenticatedService) GetParty(id string) Party {
 	return *party
 }
 
-func(serv UnauthenticatedService) GetUPartyUsers(partyId string) []User {
-	//if !isLogged(serv.RestService, partyId) { return userMap }
-	var c = GAEContext(serv.RestService)
+func GetAllPartyUsers(rs gorest.RestService, partyId string) []User {
+	var c = GAEContext(rs)
 
-	var query = datastore.NewQuery("User").Ancestor(getPartyKey(c, partyId))
 	var users = make([]User, 0)
-	ukeys, err := query.GetAll(c, &users)
+	err := GetAll(rs, &users, getPartyKey(c, partyId))
 	if err != nil {
-		ReturnError(serv.RestService, "", 500)
-		return users
-	}
-	for i, _ := range users {
-		var id = ukeys[i].IntID()
-		var user = users[i]
-		user.Id = id
-		users[i] = user
+		ReturnError(rs, "", 500)
+		return *new([]User)
 	}
 
 	return users
+}
+
+func(serv UnauthenticatedService) GetUPartyUsers(partyId string) []User {
+	return GetAllPartyUsers(serv.RestService, partyId)
 }
