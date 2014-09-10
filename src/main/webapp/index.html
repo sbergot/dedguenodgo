@@ -61,32 +61,20 @@
 		<div id="login">
 			<div class="container">
 				<h2>Connexion</h2>
-				<form class="form" data-bind="submit: function() {$root.submitParty();}">
+				<form class="form" data-bind="submit: function() {$root.submitUser();}">
 					<div class="form-group">
-						<label>Nom de l'évènement</label>
-						<input class="form-control" type="text" data-bind="value:partyId, valueUpdate: 'afterkeydown'"/>
+						<label>Nom de l'utilisateur</label>
+						<input class="form-control" type="text" data-bind="value:userId, valueUpdate: 'afterkeydown'"/>
 					</div>
 					<div class="form-group">
-						<label>Mot de passe de l'évènement</label>
-						<input class="form-control" type="password" data-bind="value:partyPassword, valueUpdate: 'afterkeydown'"/>
+						<label>Mot de passe de l'utilisateur</label>
+						<input class="form-control" type="password" data-bind="value:userPassword, valueUpdate: 'afterkeydown'"/>
 					</div>
-					<div class="alert alert-info" data-bind="visible: partyLoading">Vérification de l'événement... (peut durer jusqu'à 30 secondes)</div>
-					<div class="alert alert-success" data-bind="visible: partyOk">Evénement vérifié !</div>
-					<div class="alert alert-danger" data-bind="visible: partyError">Identifiant/Mot de passe invalides</div>
+					<div class="alert alert-info" data-bind="visible: userLoading">Vérification de l'événement... (peut durer jusqu'à 30 secondes)</div>
+					<div class="alert alert-success" data-bind="visible: userOk">Utilisateur vérifié !</div>
+					<div class="alert alert-danger" data-bind="visible: userError">Identifiant/Mot de passe invalides</div>
 					<div class="form-group">
-						<button class="btn btn-primary" type="submit" data-bind="visible: !partyOk()">Connexion</button>
-					</div>
-				</form>
-				<form class="form" data-bind="visible: partyOk, submit: function() {$root.submitUser();}">
-					<div class="form-group">
-						<label>Utilisateur</label>
-						<select class="form-control" data-bind="visible: users(), options: sortedUsers, value: user, optionsText:'name', optionsCaption: 'choisir...'"></select>
-					</div>
-					<div class="form-group">
-						<button data-bind="enable: user" class="btn btn-primary" type="submit">Connexion</button>
-						<span> --- </span>
-						<button class="btn btn-xs btn-primary" data-bind="click:function() {$root.addUser();}">Ajouter un utilisateur</button>
-						<button class="btn btn-xs btn-danger" data-bind="visible: user, click:function() {$root.deleteUser();}">Supprimer cet utilisateur</button>
+						<button class="btn btn-primary" type="submit" data-bind="visible: !userOk()">Connexion</button>
 					</div>
 				</form>
 				<div class="alert alert-info" data-bind="visible: userActionLoading">Appel du serveur... (peut durer jusqu'à 30 secondes)</div>

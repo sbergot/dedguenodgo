@@ -11,9 +11,9 @@ type UnauthenticatedService struct {
 	gorest.RestService         `root:"/unauthenticated-resources/"
                                 consumes:"application/json"
                                 produces:"application/json"`
-	postParty     gorest.EndPoint `method:"POST"
-                                   path:"/party/"
-                                   postdata:"PartyForm"`
+	postUser      gorest.EndPoint `method:"POST"
+                                   path:"/user/"
+                                   postdata:"UserForm"`
 	getParty      gorest.EndPoint `method:"GET"
                                    path:"/party/{name:string}"
                                    output:"Party"`
@@ -43,15 +43,20 @@ func checkAdminPassword(serv UnauthenticatedService, inp string) bool {
 	return password.Check(inp)
 }
 
-func(serv UnauthenticatedService) PostParty(posted PartyForm) {
+func(serv UnauthenticatedService) PostUser(posted UserForm) {
 	if !checkAdminPassword(serv, posted.AdminPassword) {
 		ReturnError(serv.RestService, "", 403)
 		return
 	}
 	var password Password
-	password.MakeFrom(posted.PartyPassword)
-	var party = Party{Password: password}
-	PutWithKey(serv.RestService, &party, nil, "", 500, posted.PartyName, 0)
+	password.MakeFrom(posted.UserPassword)
+	var user = User{
+		Name: posted.UserName,
+		Deleted: false,
+		Mail: posted.UserMail,
+		Password: password,
+	}
+	PutWithKey(serv.RestService, &user, nil, posted.UserName, 0)
 }
 
 func(serv UnauthenticatedService) GetParty(id string) Party {

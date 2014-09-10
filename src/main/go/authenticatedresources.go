@@ -36,46 +36,46 @@ func getPartyKey(c appengine.Context, partyId string) *datastore.Key {
 
 func checkPartyCredentials(
 	rs gorest.RestService,
-	partyId string,
-	partyPassword string) bool {
+	userId string,
+	userPassword string) bool {
 	var c = GAEContext(rs)
-	var party Party
-	err := datastore.Get(c, getPartyKey(c, partyId), &party)
+	var user User
+	err := datastore.Get(c, getPartyKey(c, userId), &user)
 	if err != nil {
 		ReturnError(rs, "", 404)
 		return false
 	}
-	if !party.Password.Check(partyPassword) {
+	if !user.Password.Check(userPassword) {
 		ReturnError(rs, "wrong password", 403)
 		return false
 	}
 	return true
 }
-func isLogged(rs gorest.RestService, partyId string) bool {
+func isLogged(rs gorest.RestService, userId string) bool {
 	var password = rs.Context.Request().Header.Get("dedguenodgo-partyPassword")
 	if password == "" {
 		ReturnError(rs, "you must be logged to access this ressource", 403)
 		return false
 	}
-	return checkPartyCredentials(rs, partyId, password)
+	return checkPartyCredentials(rs, userId, password)
 }
 
 func(serv AuthenticatedService) PutPresent(present Present, partyId string, id int64) {
 	if !isLogged(serv.RestService, partyId) { return }
 	var c = GAEContext(serv.RestService)
-	PutWithKey(serv.RestService, &present, getPartyKey(c, partyId), "", 500, "", id)
+	PutWithKey(serv.RestService, &present, getPartyKey(c, partyId), "", id)
 }
 
 func(serv AuthenticatedService) PostPresent(present Present, partyId string) {
 	if !isLogged(serv.RestService, partyId) { return }
 	var c = GAEContext(serv.RestService)
-	Put(serv.RestService, &present, getPartyKey(c, partyId), "", 500)
+	Put(serv.RestService, &present, getPartyKey(c, partyId))
 }
 
 func(serv AuthenticatedService) PostUser(user User, partyId string) {
 	if !isLogged(serv.RestService, partyId) { return }
 	var c = GAEContext(serv.RestService)
-	Put(serv.RestService, &user, getPartyKey(c, partyId), "", 500)
+	Put(serv.RestService, &user, getPartyKey(c, partyId))
 }
 
 func(serv AuthenticatedService) DeleteUser(partyId string, id int64) {

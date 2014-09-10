@@ -5,24 +5,20 @@ import (
 	"appengine/datastore"
 )
 
-type PartyForm struct {
-	AdminPassword string
-	PartyName     string
-	PartyPassword string
-}
-
 type Password struct {
 	Hash []byte
 	Salt []byte
 }
 
 type Party struct {
-	Password Password
+	Id    int64   `datastore:"-" json:"id" entity:"Id"`
+	Title string
 }
 
 type Present struct {
 	Id           int64      `datastore:"-" json:"id" entity:"Id"`
 	Title        string     `json:"title"`
+	Party        Party      `json:"party"`
 	Description  string     `json:"description" datastore:",noindex"`
 	To           int64      `json:"to"`
 	CreatedBy    int64      `json:"createdBy"`
@@ -63,10 +59,18 @@ func (x *Present) Save(c chan<- datastore.Property) error {
 }
 
 
+type UserForm struct {
+	AdminPassword string
+	UserName      string
+	UserPassword  string
+	UserMail      string
+}
+
 type User struct {
-	Id      int64  `datastore:"-" json:"id" entity:"Id"`
 	Name    string `json:"name"`
 	Deleted bool   `json:"deleted"`
+	Mail    string `json:"mail"`
+	Password       `json:"-"`
 }
 
 type PresentsUsers struct {

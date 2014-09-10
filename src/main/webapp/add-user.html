@@ -1,0 +1,54 @@
+<!doctype html>
+<head>
+<title>Dedguenodgo add party</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="static/favicon.ico" rel="icon" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" href="static/css/lib/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+    href="static/css/lib/bootstrap-theme.min.css" />
+<script src="static/js/lib/jquery.min.js"></script>
+<script src="static/js/lib/jquery.serialize-object.js"></script>
+<script>
+  $(function() {
+  $("form").submit(function(event) {
+  event.preventDefault();
+  $.ajax("/unauthenticated-resources/user",
+  {
+  contentType : "application/json",
+  data : $("form").serializeJSON(),
+  type : "POST"
+  }).fail(function () {
+  $("#msg").text("creation failed");
+  }).done(function () {
+  $("#msg").text("User created");
+  $("form")[0].reset()
+  });
+  })
+  });
+</script>
+</head>
+<body>
+    <form action="../unauthenticated-resources/party" method="POST" class="form">
+        <div class="form-group">
+            <label for="admin-password">Admin password</label>
+            <input class="form-control" type="password" id="admin-password" name="adminPassword" />
+        </div>
+        <div class="form-group">
+            <label for="user-name">User name</label>
+            <input class="form-control" type="text" id="user-name" name="userName" />
+        </div>
+        <div class="form-group">
+            <label for="user-password">User password</label>
+            <input class="form-control" type="password" id="user-password" name="userPassword" />
+        </div>
+        <div class="form-group">
+            <label for="user-mail">User mail</label>
+            <input class="form-control" type="text" id="user-mail" name="userMail" />
+        </div>
+        <button type="submit">Create</button>
+    </form>
+    <div id="msg"/>
+    <script>
+    </script>
+</body>

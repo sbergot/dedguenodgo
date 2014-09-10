@@ -6,16 +6,14 @@ import (
 	"code.google.com/p/gorest"
 )
 
-func Put(rs gorest.RestService, e interface{}, parent *datastore.Key, errMsg string, errCode int) {
-	PutWithKey(rs, e, parent, errMsg, errCode, "", 0)
+func Put(rs gorest.RestService, e interface{}, parent *datastore.Key) {
+	PutWithKey(rs, e, parent, "", 0)
 }
 
 func PutWithKey(
 	rs gorest.RestService,
 	e interface{},
 	parent *datastore.Key,
-	errMsg string,
-	errCode int,
 	skey string,
 	ikey int64) {
 	// e is a pointer to a serializable value

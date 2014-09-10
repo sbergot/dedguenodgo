@@ -1,4 +1,4 @@
-application: helloworld
+application: teak-listener-691
 version: 1
 runtime: go
 api_version: go1
@@ -10,8 +10,8 @@ handlers:
 - url: /login
   static_files: src/main/webapp/login.html
   upload: src/main/webapp/login.html
-- url: /add-party
-  static_files: src/main/webapp/add-party.html
+- url: /add-user
+  static_files: src/main/webapp/add-user.html
   upload: src/main/webapp/add-party.html
 - url: /static
   static_dir: src/main/webapp
