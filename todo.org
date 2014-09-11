@@ -51,6 +51,10 @@
 **** server
 ***** TODO fetch visible parties
 ***** TODO party management resources
+****** TODO post new party at top level
+****** TODO adding/removing a user to/from a party
+       in a transaction, also add/remove the party under the user
 ***** TODO fetch visible users
+***** TODO fetch presents under user
 **** mix
 ***** TODO manage session cookie
