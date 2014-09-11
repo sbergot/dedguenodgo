@@ -9,7 +9,7 @@ import (
 
 func init() {
 	gorest.RegisterService(new(UnauthenticatedService))
-	gorest.RegisterService(new(AuthenticatedService))
+	gorest.RegisterService(new(UserService))
 	http.Handle("/",gorest.Handle())
 }
 

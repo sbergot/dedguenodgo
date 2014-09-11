@@ -7,7 +7,19 @@ import (
 	"code.google.com/p/gorest"
 )
 
-type AuthenticatedService struct {
+type PartyService struct {
+	gorest.RestService `root:"/authenticated-resources/"
+                        consumes:"application/json"
+                        produces:"application/json"`
+	postParty           gorest.EndPoint `method:"POST"
+                                         path:"/party"
+                                         postdata:"Party"`
+	getUsers            gorest.EndPoint `method:"GET"
+                                         path:"/users"
+                                         output:"[]User"`
+}
+
+type UserService struct {
 	gorest.RestService `root:"/authenticated-resources/user/{user:string}/"
                         consumes:"application/json"
                         produces:"application/json"`
@@ -59,19 +71,19 @@ func isLogged(rs gorest.RestService, userId string) bool {
 	return checkUserCredentials(rs, userId, password)
 }
 
-func(serv AuthenticatedService) PutPresent(present Present, userId string, id int64) {
+func(serv UserService) PutPresent(present Present, userId string, id int64) {
 	if !isLogged(serv.RestService, userId) { return }
 	var c = GAEContext(serv.RestService)
 	PutWithKey(serv.RestService, &present, getUserKey(c, userId), "", id)
 }
 
-func(serv AuthenticatedService) PostPresent(present Present, userId string) {
+func(serv UserService) PostPresent(present Present, userId string) {
 	if !isLogged(serv.RestService, userId) { return }
 	var c = GAEContext(serv.RestService)
 	Put(serv.RestService, &present, getUserKey(c, userId))
 }
 
-func(serv AuthenticatedService) GetUsersandPresents(userId string) PartiesPresentsUsers {
+func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
 	if !isLogged(serv.RestService, userId) { return PartiesPresentsUsers{} }
 	var c = GAEContext(serv.RestService)
 
@@ -109,7 +121,7 @@ func(serv AuthenticatedService) GetUsersandPresents(userId string) PartiesPresen
 	return res
 }
 
-func(serv AuthenticatedService) GetPartyUsers(userId string, partyId int64) []User {
+func(serv UserService) GetPartyUsers(userId string, partyId int64) []User {
 	if !isLogged(serv.RestService, userId) { return *new([]User) }
 	var c = GAEContext(serv.RestService)
 	var users = make([]User, 0)

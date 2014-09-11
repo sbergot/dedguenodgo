@@ -47,6 +47,9 @@
 ***** DONE update login screen
 ***** TODO provide user list on user form
 ***** TODO manage parties
+****** TODO manage party div with party list/ create party
+****** TODO manage user button
+       modal window with a list of users with checkboxes & ok/cancel buttons
 ***** TODO party drop down
 **** server
 ***** TODO fetch visible parties
@@ -54,7 +57,8 @@
 ****** TODO post new party at top level
 ****** TODO adding/removing a user to/from a party
        in a transaction, also add/remove the party under the user
-***** TODO fetch visible users
-***** TODO fetch presents under user
+***** TODO fetch visible users for party
+***** TODO fetch presents for user
+***** TODO fetch all users ever
 **** mix
 ***** TODO manage session cookie
