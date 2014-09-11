@@ -5,8 +5,8 @@
 		this._server = options.server;
 		this._loginCallback = options.loginCallback;
 
-		this.partyId = createStorageObservable(localStorage, 'partyId');
-		this.partyPassword = createStorageObservable(sessionStorage, 'partyPassword');
+		this.userId = createStorageObservable(localStorage, 'userId');
+		this.userPassword = createStorageObservable(sessionStorage, 'userPassword');
 		this.user = ko.observable();
 		this.users = ko.observable(null);
 		this.sortedUsers = ko.computed(function() {
@@ -16,19 +16,19 @@
 			});
 		});
 
-		this.partyLoading = ko.observable(false);
-		this.partyError = ko.observable(false);
-		this.partyOk = ko.computed(function() {
+		this.userLoading = ko.observable(false);
+		this.userError = ko.observable(false);
+		this.userOk = ko.computed(function() {
 			return self.users() !== null;
 		});
 		this.userActionLoading = ko.observable(false);
 		this.userActionError = ko.observable(false);
 		this.userActionOk = ko.observable(false);
 
-		this.partyId.subscribe(function() {
+		this.userId.subscribe(function() {
 			self.users(null);
 		});
-		this.partyPassword.subscribe(function() {
+		this.userPassword.subscribe(function() {
 			self.users(null);
 		});
 		//hide userAction result when selecting a new user
@@ -65,89 +65,14 @@
 	};
 
 	window.LoginViewModel.prototype = {
-		submitParty: function() {
-			var self = this;
-			this.partyLoading(true);
-			this.partyError(false);
-			this._server.getPartyUsers({
-				id: this.partyId(),
-				password: this.partyPassword()
-			}).always(function() {
-				self.partyLoading(false);
-			}).fail(function() {
-				self.partyError(true);
-			}).done(function(users) {
-				if (!users) {
-					self.partyError(true);
-					return;
-				}
-				self.users(users);
-				//needed for user edition commands
-				self._loginCallback({
-					partyId: self.partyId(),
-					partyPassword: self.partyPassword()
-				});
-			});
-		},
 		submitUser: function() {
-			if (!this.user()) {
-				return;
-			}
-			this._loginCallback({
-				partyId: this.partyId(),
-				partyPassword: this.partyPassword(),
-				userId: this.user().id
-			});
-		},
-		addUser: function() {
-			var name = prompt('Nom du nouvel utilisateur');
-			if (!name) {
-				return;
-			}
-			var ok = confirm('Cr\u00e9er l\'utilisateur "' + name + '"?');
-			if (!ok) {
-				return;
-			}
 			var self = this;
-			this.userActionError(false);
-			this.userActionOk(false);
-			this.userActionLoading(true);
-			this._server.addUser({
-				name: name
-			}).always(function() {
-				self.userActionLoading(false);
-			}).fail(function(error) {
-				console.error(error);
-				self.userActionError(true);
-			}).done(function(user) {
-				self.userActionOk(true);
-				self.submitParty();
-			});
-		},
-		deleteUser: function() {
-			var user = this.user();
-			var ok = confirm('Supprimer ' + user.name + '?');
-			if (!ok) {
-				return;
-			}
-			ok = confirm('Cette suppression de "' + user.name + '" sera irréversible !');
-			if (!ok) {
-				return;
-			}
-			var self = this;
-			this.userActionError(false);
-			this.userActionOk(false);
-			this.userActionLoading(true);
-			this._server.deleteUser(user.id).always(function() {
-				self.userActionLoading(false);
-			}).fail(function(error) {
-				console.error(error);
-				self.userActionError(true);
-			}).done(function() {
-				self.userActionOk(true);
-				self.users(self.users().filter(function(u) {
-					return u != user;
-				}));
+			this.userLoading(true);
+			this.userError(false);
+				//needed for user edition commands
+			self._loginCallback({
+				userId: self.userId(),
+				userPassword: self.userPassword()
 			});
 		}
 	};

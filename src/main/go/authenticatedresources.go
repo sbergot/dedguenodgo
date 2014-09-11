@@ -8,7 +8,7 @@ import (
 )
 
 type AuthenticatedService struct {
-	gorest.RestService `root:"/authenticated-resources/party/{party:string}/"
+	gorest.RestService `root:"/authenticated-resources/user/{user:string}/"
                         consumes:"application/json"
                         produces:"application/json"`
 	putPresent          gorest.EndPoint `method:"PUT"
@@ -17,30 +17,29 @@ type AuthenticatedService struct {
 	postPresent         gorest.EndPoint `method:"POST"
                                          path:"/present"
                                          postdata:"Present"`
-	postUser            gorest.EndPoint `method:"POST"
-                                         path:"/user"
-                                         postdata:"User"`
-	deleteUser          gorest.EndPoint `method:"DELETE"
-                                         path:"/user/{id:int64}"`
 	getUsersandPresents gorest.EndPoint `method:"GET"
-                                         path:"/users-and-presents"
-                                         output:"PresentsUsers"`
+                                         path:"/parties-and-users-and-presents"
+                                         output:"PartiesPresentsUsers"`
 	getPartyUsers       gorest.EndPoint `method:"GET"
-                                         path:"/party-users"
+                                         path:"/party/{party:int64}/user"
                                          output:"[]User"`
 }
 
-func getPartyKey(c appengine.Context, partyId string) *datastore.Key {
-	return datastore.NewKey(c, "Party", partyId, 0, nil)
+func getPartyKey(c appengine.Context, partyId int64) *datastore.Key {
+	return datastore.NewKey(c, "Party", "", partyId, nil)
 }
 
-func checkPartyCredentials(
+func getUserKey(c appengine.Context, userId string) *datastore.Key {
+	return datastore.NewKey(c, "User", userId, 0, nil)
+}
+
+func checkUserCredentials(
 	rs gorest.RestService,
 	userId string,
 	userPassword string) bool {
 	var c = GAEContext(rs)
 	var user User
-	err := datastore.Get(c, getPartyKey(c, userId), &user)
+	err := datastore.Get(c, getUserKey(c, userId), &user)
 	if err != nil {
 		ReturnError(rs, "", 404)
 		return false
@@ -52,66 +51,72 @@ func checkPartyCredentials(
 	return true
 }
 func isLogged(rs gorest.RestService, userId string) bool {
-	var password = rs.Context.Request().Header.Get("dedguenodgo-partyPassword")
+	var password = rs.Context.Request().Header.Get("dedguenodgo-userPassword")
 	if password == "" {
 		ReturnError(rs, "you must be logged to access this ressource", 403)
 		return false
 	}
-	return checkPartyCredentials(rs, userId, password)
+	return checkUserCredentials(rs, userId, password)
 }
 
-func(serv AuthenticatedService) PutPresent(present Present, partyId string, id int64) {
-	if !isLogged(serv.RestService, partyId) { return }
+func(serv AuthenticatedService) PutPresent(present Present, userId string, id int64) {
+	if !isLogged(serv.RestService, userId) { return }
 	var c = GAEContext(serv.RestService)
-	PutWithKey(serv.RestService, &present, getPartyKey(c, partyId), "", id)
+	PutWithKey(serv.RestService, &present, getUserKey(c, userId), "", id)
 }
 
-func(serv AuthenticatedService) PostPresent(present Present, partyId string) {
-	if !isLogged(serv.RestService, partyId) { return }
+func(serv AuthenticatedService) PostPresent(present Present, userId string) {
+	if !isLogged(serv.RestService, userId) { return }
 	var c = GAEContext(serv.RestService)
-	Put(serv.RestService, &present, getPartyKey(c, partyId))
+	Put(serv.RestService, &present, getUserKey(c, userId))
 }
 
-func(serv AuthenticatedService) PostUser(user User, partyId string) {
-	if !isLogged(serv.RestService, partyId) { return }
+func(serv AuthenticatedService) GetUsersandPresents(userId string) PartiesPresentsUsers {
+	if !isLogged(serv.RestService, userId) { return PartiesPresentsUsers{} }
 	var c = GAEContext(serv.RestService)
-	Put(serv.RestService, &user, getPartyKey(c, partyId))
+
+	var parties = make([]Party, 0)
+	err := GetAll(serv.RestService, &parties, getUserKey(c, userId))
+	if err != nil {
+		ReturnError(serv.RestService, err.Error(), 500)
+		return PartiesPresentsUsers{}
+	}
+
+	var presents = make([]Present, 0)
+	err = GetAll(serv.RestService, &presents, getUserKey(c, userId))
+	if err != nil {
+		ReturnError(serv.RestService, err.Error(), 500)
+		return PartiesPresentsUsers{}
+	}
+
+	var res = PartiesPresentsUsers{
+		Parties: parties,
+		Presents: presents,
+	}
+
+	if len(parties) == 0 {
+		return res
+	}
+
+	var partyId = parties[0].Id
+	var users = make([]User, 0)
+	err = GetAll(serv.RestService, &users, getPartyKey(c, partyId))
+	if err != nil {
+		ReturnError(serv.RestService, err.Error(), 500)
+		return PartiesPresentsUsers{}
+	}
+	res.Users = users
+	return res
 }
 
-func(serv AuthenticatedService) DeleteUser(partyId string, id int64) {
-	if !isLogged(serv.RestService, partyId) { return }
+func(serv AuthenticatedService) GetPartyUsers(userId string, partyId int64) []User {
+	if !isLogged(serv.RestService, userId) { return *new([]User) }
 	var c = GAEContext(serv.RestService)
-	err := datastore.Delete(
-		c,
-		datastore.NewKey(c, "User", "", id, getPartyKey(c, partyId)))
-	CheckError(serv.RestService, err, "", 500)
-}
-
-func(serv AuthenticatedService) GetUsersandPresents(partyId string) PresentsUsers {
-	if !isLogged(serv.RestService, partyId) { return PresentsUsers{} }
-	var c = GAEContext(serv.RestService)
-
 	var users = make([]User, 0)
 	err := GetAll(serv.RestService, &users, getPartyKey(c, partyId))
 	if err != nil {
 		ReturnError(serv.RestService, err.Error(), 500)
-		return PresentsUsers{}
+		return *new([]User)
 	}
-
-	var presents = make([]Present, 0)
-	err = GetAll(serv.RestService, &presents, getPartyKey(c, partyId))
-	if err != nil {
-		ReturnError(serv.RestService, err.Error(), 500)
-		return PresentsUsers{}
-	}
-
-	return PresentsUsers{
-		Presents: presents,
-		Users: users,
-	}
-}
-
-func(serv AuthenticatedService) GetPartyUsers(partyId string) []User {
-	if !isLogged(serv.RestService, partyId) { return *new([]User) }
-	return GetAllPartyUsers(serv.RestService, partyId)
+	return users
 }

@@ -31,8 +31,8 @@ $(document).ready(function() {
 	var appDiv = $('#app');
 	var welcomeDiv = $('#welcome');
 	var loginDiv = $('#login');
-	var loadingDiv = $('#loading'); 
-	var errorDiv = $('#error'); 
+	var loadingDiv = $('#loading');
+	var errorDiv = $('#error');
 
 	ko.applyBindings(window.appViewModel, appDiv[0]);
 	ko.applyBindings(window.loginViewModel, loginDiv[0]);
@@ -58,7 +58,7 @@ $(document).ready(function() {
 			errorDiv.hide();
 
 
-			server.getUsersAndPresents().always(function() {
+			server.getPartiesAndUsersAndPresents().always(function() {
 				loadingDiv.hide();
 			}).fail(function(e) {
 				errorDiv.show();

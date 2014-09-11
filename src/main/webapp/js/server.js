@@ -23,12 +23,12 @@
 	};
 
 	Server.prototype = {
-		getPartyUri: function() {
+		getUserUri: function() {
 			if (!this.login) {
 				console.warn('calling server but login has not been set');
 				return;
 			}
-			return 'authenticated-resources/party/' + this.login.partyId
+			return 'authenticated-resources/user/' + this.login.userId
 		},
 		addAuthorizationToAjaxOptions: function(ajaxOptions) {
 			if (!this.login) {
@@ -36,8 +36,8 @@
 				return;
 			}
 			ajaxOptions.headers = {
-				'dedguenodgo-partyId': this.login.partyId,
-				'dedguenodgo-partyPassword': this.login.partyPassword,
+				'dedguenodgo-userId': this.login.userId,
+				'dedguenodgo-userPassword': this.login.userPassword,
 			};
 		},
 		setLogin: function(login) {
@@ -50,7 +50,7 @@
 			var converted = Server._formatForServer(present);
 			delete converted.id;
 			var ajaxOptions = {
-				url: this.getPartyUri() + '/present',
+				url: this.getUserUri() + '/present',
 				contentType: 'application/json',
 				type: 'POST',
 				data: JSON.stringify(converted),
@@ -62,7 +62,7 @@
 		editPresent: function(oldPresent, newPresent) {
 			var converted = Server._formatForServer(newPresent);
 			var ajaxOptions = {
-				url: this.getPartyUri() + '/present/' + oldPresent.id,
+				url: this.getUserUri() + '/present/' + oldPresent.id,
 				contentType: 'application/json',
 				type: 'PUT',
 				data: JSON.stringify(converted),
@@ -71,30 +71,9 @@
 			this.addAuthorizationToAjaxOptions(ajaxOptions);
 			return $.ajax(ajaxOptions).pipe(Server._formatFromServer);
 		},
-		addUser: function(user) {
+		getPartiesAndUsersAndPresents: function() {
 			var ajaxOptions = {
-				url: this.getPartyUri() + '/user',
-				contentType: 'application/json',
-				type: 'POST',
-				data: JSON.stringify(user),
-				dataType: "json"
-			};
-			this.addAuthorizationToAjaxOptions(ajaxOptions);
-			return $.ajax(ajaxOptions);
-		},
-		deleteUser: function(userId) {
-			var ajaxOptions = {
-				url: this.getPartyUri() + '/user/' + userId,
-				contentType: 'application/json',
-				type: 'DELETE',
-				dataType: "json"
-			};
-			this.addAuthorizationToAjaxOptions(ajaxOptions);
-			return $.ajax(ajaxOptions);
-		},
-		getUsersAndPresents: function() {
-			var ajaxOptions = {
-				url: this.getPartyUri() + '/users-and-presents',
+				url: this.getUserUri() + '/parties-and-users-and-presents',
 				contentType: 'application/json',
 				type: 'GET',
 				dataType: "json"
@@ -103,18 +82,10 @@
 			return $.ajax(ajaxOptions).pipe(function(result) {
 				return {
 					users: result.users,
+					parties: result.parties,
 					presents: result.presents.map(Server._formatFromServer)
 				};
 			});
 		},
-		getPartyUsers: function(credentials) {
-			return $.ajax({
-				url: 'unauthenticated-resources/party/' + credentials.id + '/users',
-				contentType: 'application/json',
-				type: 'GET',
-				dataType: "json",
-				data: credentials
-			});
-		}
 	};
 })();

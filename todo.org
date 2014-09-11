@@ -1,4 +1,4 @@
-* TODO recreate application with go
+* DONE recreate application with go
 ** DONE manage party login
 ** DONE manage party parentship in datastore put/get
 ** DONE create party queries
@@ -8,11 +8,10 @@
 ** DONE fix present visibility
 ** DONE fix present offeredby
 ** DONE fix undo
-** TODO improve server code quality
-
+** DONE improve server code quality
 * feature change
-** one login per user
-** use session cookie for security
+** DONE one login per user
+** TODO use session cookie for security
 ** party/group modification
 *** requirements
 **** a user should only see a sublist of other users (ie christmas for familly x)
@@ -44,10 +43,11 @@
 
 *** tasks
 **** UI
-***** TODO new user form
-***** TODO party drop down
+***** DONE new user form
+***** DONE update login screen
+***** TODO provide user list on user form
 ***** TODO manage parties
-***** TODO update login screen
+***** TODO party drop down
 **** server
 ***** TODO fetch visible parties
 ***** TODO party management resources
