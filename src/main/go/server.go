@@ -2,6 +2,7 @@ package dedguenodgo
 
 import (
 	"net/http"
+	"strings"
 
 	"appengine"
 	"code.google.com/p/gorest"
@@ -10,7 +11,19 @@ import (
 func init() {
 	gorest.RegisterService(new(UnauthenticatedService))
 	gorest.RegisterService(new(UserService))
-	http.Handle("/",gorest.Handle())
+	http.Handle("/",checkLog(gorest.Handle()))
+}
+
+
+func checkLog(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var mustBeLogged = !strings.HasPrefix(r.URL.Path, "/unauthenticated-resources/")
+		if mustBeLogged {
+			w.Write([]byte("mustBeLogged"))
+		} else {
+			w.Write([]byte("mustNotBeLogged"))
+		}
+	}
 }
 
 func GAEContext(rs gorest.RestService) appengine.Context {
