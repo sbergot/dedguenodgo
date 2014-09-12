@@ -12,10 +12,6 @@
     };
     Server._formatForServer = function(present) {
         var result = $.extend({}, present);
-        result.to = parseInt(result.to);
-        result.createdBy = parseInt(result.createdBy);
-        result.offeredBy = parseInt(result.offeredBy);
-        result.deletedBy = parseInt(result.deletedBy);
         return result;
     };
     Server._longToDate = function(long) {

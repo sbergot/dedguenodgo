@@ -35,7 +35,10 @@ func GetAll(rs gorest.RestService, elements interface{}, parent *datastore.Key) 
 	// elements is a pointer to a list of serializable values
 	var t = reflect.TypeOf(elements).Elem().Elem()
 
-	var query = datastore.NewQuery(t.Name()).Ancestor(parent)
+	var query = datastore.NewQuery(t.Name())
+	if parent != nil {
+		query = query.Ancestor(parent)
+	}
 	keys, err := query.GetAll(c, elements)
 	if err != nil {
 		return err

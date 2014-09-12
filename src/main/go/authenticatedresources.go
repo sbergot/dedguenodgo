@@ -72,24 +72,18 @@ func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
 		return PartiesPresentsUsers{}
 	}
 
-	var res = PartiesPresentsUsers{
-		Parties: parties,
-		Presents: presents,
-	}
-
-	if len(parties) == 0 {
-		return res
-	}
-
-	var partyId = parties[0].Id
 	var users = make([]User, 0)
-	err = GetAll(serv.RestService, &users, getPartyKey(c, partyId))
+	err = GetAll(serv.RestService, &users, nil)
 	if err != nil {
 		ReturnError(serv.RestService, err.Error(), 500)
 		return PartiesPresentsUsers{}
 	}
-	res.Users = users
-	return res
+
+	return PartiesPresentsUsers{
+		Parties: parties,
+		Presents: presents,
+		Users: users,
+	}
 }
 
 func(serv UserService) GetPartyUsers(userId string, partyId int64) []User {

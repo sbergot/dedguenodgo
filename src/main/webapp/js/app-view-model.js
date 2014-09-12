@@ -59,19 +59,13 @@ AppViewModel.prototype = {
     init: function() {
         var self = this;
         this.initLoading(true);
-        return this.server.getUsersAndPresents().always(function() {
+        return this.server.getPartiesAndUsersAndPresents().always(function() {
             self.initLoading(false);
         }).fail(function() {
             self.initError(true);
         }).done(function(pAndU) {
-            var users = pAndU.users;
-            var userLength = Object.keys(users).length;
-            var userMap = {};
-            for (var i = 0; i < userLength; ++i) {
-                var user = users[i];
-                userMap[user.id] = user;
-            }
-            self.users(userMap);
+            self.parties(pAndU.parties);
+            self.users(entitiesToMap(pAndU.users, 'name'));
             self.presents(pAndU.presents);
         });
     },

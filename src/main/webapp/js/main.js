@@ -66,7 +66,7 @@ $(document).ready(function() {
             }).done(function(usersAndPresents) {
                 appDiv.show();
                 appViewModel.parties(usersAndPresents.parties);
-                appViewModel.users(entitiesToMap(usersAndPresents.users));
+                appViewModel.users(entitiesToMap(usersAndPresents.users, 'name'));
                 appViewModel.presents(usersAndPresents.presents);
                 appViewModel.loggedInUser(login.userId);
             });

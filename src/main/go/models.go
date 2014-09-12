@@ -20,15 +20,15 @@ type Present struct {
 	Title        string     `json:"title"`
 	Party        Party      `json:"party"`
 	Description  string     `json:"description" datastore:",noindex"`
-	To           int64      `json:"to"`
-	CreatedBy    int64      `json:"createdBy"`
+	To           string     `json:"to"`
+	CreatedBy    string     `json:"createdBy"`
 	CreationDate time.Time  `json:"creationDate"`
-	OfferedBy    *int64     `json:"offeredBy" datastore:"-"`
+	OfferedBy    *string    `json:"offeredBy" datastore:"-"`
 	OfferedDate  *time.Time `json:"offeredDate" datastore:"-"`
-	OfferedBy_   int64      `json:"-"`
+	OfferedBy_   string     `json:"-"`
 	OfferedDate_ time.Time  `json:"-"`
-	DeletedBy    *int64     `json:"deletedBy" datastore:"-"`
-	DeletedBy_   int64      `json:"-"`
+	DeletedBy    *string    `json:"deletedBy" datastore:"-"`
+	DeletedBy_   string     `json:"-"`
 }
 
 func (x *Present) Load(c <-chan datastore.Property) error {
@@ -39,9 +39,9 @@ func (x *Present) Load(c <-chan datastore.Property) error {
 	x.OfferedDate = &x.OfferedDate_
 	if *x.OfferedDate == minTime { x.OfferedDate = nil }
 	x.OfferedBy = &x.OfferedBy_
-	if *x.OfferedBy == 0 { x.OfferedBy = nil }
+	if *x.OfferedBy == "" { x.OfferedBy = nil }
 	x.DeletedBy = &x.DeletedBy_
-	if *x.DeletedBy == 0 { x.DeletedBy = nil }
+	if *x.DeletedBy == "" { x.DeletedBy = nil }
 	return nil
 }
 
