@@ -4,6 +4,8 @@ function AppViewModel(options) {
     this.server = options.server;
     this.logoutCallback = options.logoutCallback;
 
+    this.managing = ko.observable(false);
+    this.parties = ko.observableArray([]);
     this.users = ko.observable({});
     this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
     var self = this;
@@ -63,7 +65,7 @@ AppViewModel.prototype = {
             self.initError(true);
         }).done(function(pAndU) {
             var users = pAndU.users;
-            var userLength = Object.keys(users).length
+            var userLength = Object.keys(users).length;
             var userMap = {};
             for (var i = 0; i < userLength; ++i) {
                 var user = users[i];
@@ -204,7 +206,7 @@ AppViewModel.prototype = {
                     self.successMessage('"' + present.title + '" a bien été créé');
                     // we should be looking for the index, but it was created by the server
                     // so we look for the title
-                    var newPresent = self.presents().find(function(e) { return e.title === present.title })
+                    var newPresent = self.presents().find(function(e) { return e.title === present.title; });
                     self.undoAction(function() {
                         self.deletePresent(newPresent, true);
                     });
@@ -213,7 +215,7 @@ AppViewModel.prototype = {
     },
     _savePresent: function(oldPresent, newPresent, hideUndo) {
         var presents = this.presents();
-        var index = presents.findIndex(function(e) { return e.id === oldPresent.id });
+        var index = presents.findIndex(function(e) { return e.id === oldPresent.id; });
         if (index == -1) {
             throw new Error('present not found');
         }
@@ -317,5 +319,17 @@ AppViewModel.prototype = {
         this.successMessage(null);
         this.errorMessage(null);
         this.undoAction(null);
+    },
+    addParty: function() {
+        this.parties.push({title:"my party"})
+    },
+    cancelManagement: function() {
+        this.managing(false);
+    },
+    saveEditedParties: function() {
+        this.managing(false);
+    },
+    manageParties: function() {
+        this.managing(true);
     }
 };

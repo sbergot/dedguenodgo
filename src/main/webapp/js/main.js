@@ -65,14 +65,8 @@ $(document).ready(function() {
                 console.error(e);
             }).done(function(usersAndPresents) {
                 appDiv.show();
-                var users = usersAndPresents.users;
-                var userLength = Object.keys(users).length
-                var userMap = {};
-                for (var i = 0; i < userLength; ++i) {
-                    var user = users[i];
-                    userMap[user.id] = user;
-                }
-                appViewModel.users(userMap);
+                appViewModel.parties(usersAndPresents.parties);
+                appViewModel.users(entitiesToMap(usersAndPresents.users));
                 appViewModel.presents(usersAndPresents.presents);
                 appViewModel.loggedInUser(login.userId);
             });

@@ -28,7 +28,7 @@
                 console.warn('calling server but login has not been set');
                 return;
             }
-            return 'authenticated-resources/user/' + this.login.userId
+            return 'authenticated-resources/user/' + this.login.userId;
         },
         addAuthorizationToAjaxOptions: function(ajaxOptions) {
             if (!this.login) {

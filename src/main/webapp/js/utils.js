@@ -11,3 +11,14 @@ window.createStorageObservable = function(storage, propertyName) {
     });
     return result;
 };
+
+window.entitiesToMap = function(arr) {
+    if (!arr) { return {}; }
+    var res = {};
+    var len = arr.length;
+    for (var i = 0; i < len; i++) {
+        var item = arr[i];
+        res[item.id] = item;
+    }
+    return res;
+};
