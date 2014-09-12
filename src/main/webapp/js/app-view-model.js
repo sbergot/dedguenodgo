@@ -5,8 +5,10 @@ function AppViewModel(options) {
     this.logoutCallback = options.logoutCallback;
 
     this.managing = ko.observable(false);
+    this.selectedMParty = ko.observable(0);
     this.parties = ko.observableArray([]);
     this.users = ko.observable({});
+    this.mPartyUsers = ko.observable([]);
     this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
     var self = this;
     this.selectedList = ko.observable();
@@ -315,13 +317,34 @@ AppViewModel.prototype = {
         this.undoAction(null);
     },
     addParty: function() {
-        this.parties.push({title:"my party"})
+        var userMap = this.users();
+        var users = Object.keys(userMap).map(function(k){
+            return userMap[k];
+        });
+        this.parties.push({
+            title:ko.observable(),
+            selected:ko.observable(false),
+            users:ko.observable(users.map(function(e) {
+                return $.extend(e, {selected:ko.observable(false)});
+            }))
+        });
     },
     cancelManagement: function() {
         this.managing(false);
     },
     saveEditedParties: function() {
         this.managing(false);
+    },
+    selectMParty: function(i) {
+        var oldselection = this.selectedMParty();
+        this.parties()[oldselection].selected(false);
+        this.parties()[oldselection].users(this.mPartyUsers());
+        this.parties()[i].selected(true);
+        this.mPartyUsers(this.parties()[i].users())
+        this.selectedMParty(i);
+    },
+    removeParty: function(i) {
+        this.parties.remove(this.parties()[i]);
     },
     manageParties: function() {
         this.managing(true);

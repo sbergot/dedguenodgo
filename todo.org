@@ -47,9 +47,10 @@
 ***** DONE update login screen
 ***** TODO provide user list on user form
 ***** TODO manage parties
-****** TODO manage party div with party list/ create party
+****** DONE manage party div with party list/ create party
 ****** TODO manage user button
-       modal window with a list of users with checkboxes & ok/cancel buttons
+       list of users with checkboxes & ok/cancel buttons
+       should be done with computed/click event
 ***** TODO party drop down
 **** server
 ***** TODO fetch visible parties

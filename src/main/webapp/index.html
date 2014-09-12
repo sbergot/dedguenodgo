@@ -160,11 +160,32 @@
             </div>
             <div class="modal-body">
               <button class="btn btn-primary" data-bind="click: addParty">Ajouter un evennement</button>
-              <div class="list-party" data-bind="foreach: parties()">
-                <div class="well">
-                  <span data-bind="text: title"/>
-                </div>
-              </div>
+              <ul class="list-group" data-bind="foreach: parties()">
+                <li class="list-group-item"
+                    data-bind="click:$root.selectMParty.bind($root, $index()),
+                               css: { active: $data.selected() }">
+                  <div class="input-group">
+                    <input data-bind="value: title"
+                           class="form-control"
+                           placeholder="Titre"/>
+                    <span class="input-group-addon"
+                          data-bind="click:$root.removeParty.bind($root, $index())">
+                      X
+                    </span>
+                  </div>
+                </li>
+              </ul>
+              <ul class="list-group" data-bind="foreach: mPartyUsers">
+                <li class="list-group-item">
+                  <div class="input-group">
+                    <span class="input-group-addon">
+                      <input data-bind="value: selected"
+                             type="checkbox"/>
+                    </span>
+                    <span data-bind="text: name"/>
+                  </div>
+                </li>
+              </ul>
             </div>
             <div class="modal-footer">
               <button type="button"
@@ -174,7 +195,7 @@
                 Annuler
               </button>
               <button type="button"
-                      class="btn btn-primary"
+                      class="btn btn-primary btn-sm"
                       data-bind="click: saveEditedParties">
                 Sauvegarder les changements
               </button>
