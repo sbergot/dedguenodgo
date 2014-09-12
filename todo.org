@@ -11,7 +11,7 @@
 ** DONE improve server code quality
 * feature change
 ** DONE one login per user
-** TODO use session cookie for security
+** DONE use session cookie for security
 ** party/group modification
 *** requirements
 **** a user should only see a sublist of other users (ie christmas for familly x)
@@ -61,4 +61,4 @@
 ***** TODO fetch presents for user
 ***** TODO fetch all users ever
 **** mix
-***** TODO manage session cookie
+***** DONE manage session cookie

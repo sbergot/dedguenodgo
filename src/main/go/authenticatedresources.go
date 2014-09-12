@@ -45,46 +45,17 @@ func getUserKey(c appengine.Context, userId string) *datastore.Key {
 	return datastore.NewKey(c, "User", userId, 0, nil)
 }
 
-func checkUserCredentials(
-	rs gorest.RestService,
-	userId string,
-	userPassword string) bool {
-	var c = GAEContext(rs)
-	var user User
-	err := datastore.Get(c, getUserKey(c, userId), &user)
-	if err != nil {
-		ReturnError(rs, "", 404)
-		return false
-	}
-	if !user.Password.Check(userPassword) {
-		ReturnError(rs, "wrong password", 403)
-		return false
-	}
-	return true
-}
-func isLogged(rs gorest.RestService, userId string) bool {
-	var password = rs.Context.Request().Header.Get("dedguenodgo-userPassword")
-	if password == "" {
-		ReturnError(rs, "you must be logged to access this ressource", 403)
-		return false
-	}
-	return checkUserCredentials(rs, userId, password)
-}
-
 func(serv UserService) PutPresent(present Present, userId string, id int64) {
-	if !isLogged(serv.RestService, userId) { return }
 	var c = GAEContext(serv.RestService)
 	PutWithKey(serv.RestService, &present, getUserKey(c, userId), "", id)
 }
 
 func(serv UserService) PostPresent(present Present, userId string) {
-	if !isLogged(serv.RestService, userId) { return }
 	var c = GAEContext(serv.RestService)
 	Put(serv.RestService, &present, getUserKey(c, userId))
 }
 
 func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
-	if !isLogged(serv.RestService, userId) { return PartiesPresentsUsers{} }
 	var c = GAEContext(serv.RestService)
 
 	var parties = make([]Party, 0)
@@ -122,7 +93,6 @@ func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
 }
 
 func(serv UserService) GetPartyUsers(userId string, partyId int64) []User {
-	if !isLogged(serv.RestService, userId) { return *new([]User) }
 	var c = GAEContext(serv.RestService)
 	var users = make([]User, 0)
 	err := GetAll(serv.RestService, &users, getPartyKey(c, partyId))
