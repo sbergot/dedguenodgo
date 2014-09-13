@@ -68,6 +68,13 @@ AppViewModel.prototype = {
         }).done(function(pAndU) {
             self.parties(pAndU.parties);
             self.users(entitiesToMap(pAndU.users, 'name'));
+            var musers = pAndU.users.map(function(e) {
+                return {
+                    selected:ko.observable(false),
+                    name:e.name
+                };
+            });
+            self.mPartyUsers(musers);
             self.presents(pAndU.presents);
         });
     },
@@ -324,9 +331,12 @@ AppViewModel.prototype = {
         this.parties.push({
             title:ko.observable(),
             selected:ko.observable(false),
-            users:ko.observable(users.map(function(e) {
-                return $.extend(e, {selected:ko.observable(false)});
-            }))
+            users:users.map(function(e) {
+                return {
+                    selected:ko.observable(false),
+                    name:e.name
+                };
+            })
         });
     },
     cancelManagement: function() {
@@ -335,13 +345,18 @@ AppViewModel.prototype = {
     saveEditedParties: function() {
         this.managing(false);
     },
-    selectMParty: function(i) {
-        var oldselection = this.selectedMParty();
-        this.parties()[oldselection].selected(false);
-        this.parties()[oldselection].users(this.mPartyUsers());
-        this.parties()[i].selected(true);
-        this.mPartyUsers(this.parties()[i].users())
-        this.selectedMParty(i);
+    selectMParty: function(idx) {
+        var parties = this.parties();
+        var oldselection = parties[this.selectedMParty()];
+        var newselection = parties[idx];
+        var users = Object.keys(oldselection.users);
+        newselection.selected(true);
+        oldselection.selected(false);
+        for (var i = 0; i < users.length; i++) {
+            oldselection.users[i].selected(this.mPartyUsers()[i].selected())
+            this.mPartyUsers()[i].selected(newselection.users[i].selected())
+        }
+        this.selectedMParty(idx);
     },
     removeParty: function(i) {
         this.parties.remove(this.parties()[i]);

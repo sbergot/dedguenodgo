@@ -67,6 +67,13 @@ $(document).ready(function() {
                 appDiv.show();
                 appViewModel.parties(usersAndPresents.parties);
                 appViewModel.users(entitiesToMap(usersAndPresents.users, 'name'));
+                var musers = usersAndPresents.users.map(function(e) {
+                    return {
+                        selected:ko.observable(false),
+                        name:e.name
+                    };
+                });
+                appViewModel.mPartyUsers(musers);
                 appViewModel.presents(usersAndPresents.presents);
                 appViewModel.loggedInUser(login.userId);
             });
