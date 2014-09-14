@@ -90,6 +90,11 @@
         <a href="#" data-bind="visible: loggedInUser, click: logout">déconnexion</a>
       </div>
       <select
+         id="party-select"
+         class="form-control input-large"
+         data-bind="options: parties(), value: selectedParty, optionsValue: 'id', optionsText:'title'">
+      </select>
+      <select
          id="list-select"
          class="form-control input-large"
          data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'">
@@ -182,7 +187,7 @@
                       <input data-bind="checked: selected"
                              type="checkbox"/>
                     </span>
-                    <span data-bind="text: name"/>
+                    <span class="form-control" data-bind="text: name"/>
                   </div>
                 </li>
               </ul>
@@ -212,6 +217,7 @@
         </div>
       </div>
     </div>
-    <footer>Développé avec amour par <a href="https://github.com/oadam/">oadam</a>. Icons by <a href="http://glyphicons.com/">Glyphicons</a>.</footer>
+    <!--<footer>Développé avec amour par <a href="https://github.com/oadam/">oadam</a>. Icons by <a href="http://glyphicons.com/">Glyphicons</a>.</footer>
+        -->
   </body>
 </html>

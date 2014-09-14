@@ -7,6 +7,7 @@ function AppViewModel(options) {
     this.managing = ko.observable(false);
     this.selectedMParty = ko.observable(0);
     this.parties = ko.observableArray([]);
+    this.selectedParty = ko.observableArray([]);
     this.users = ko.observable({});
     this.mPartyUsers = ko.observable([]);
     this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');

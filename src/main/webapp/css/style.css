@@ -36,7 +36,7 @@ footer {
 h1 {
 	margin-top: 0;
 }
-#list-select {
+#list-select, #party-select {
 	background-color: #AAA;
 	background-color: rgba(100,100,100,0.5);
 	font-size: 1.6em;
