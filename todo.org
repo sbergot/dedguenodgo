@@ -58,15 +58,11 @@
       list of parties
       in each party:
           list of users
-***** TODO party management resources
-****** TODO post new party at top level
-****** TODO adding/removing a user to/from a party
-       in a transaction, also add/remove the party under the user
-***** TODO fetch visible users for party
+***** DONE party management resources
 ***** TODO fetch presents for user
 ***** TODO fetch all users ever
 **** mix
 ***** DONE manage session cookie
 **** bugs
-***** TODO the app requires the user to select another party to save the selected users
-***** TODO the map doesn't load the selected users
+***** DONE the app requires the user to select another party to save the selected users
+***** DONE the map doesn't load the selected users
