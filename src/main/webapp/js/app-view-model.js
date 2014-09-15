@@ -343,9 +343,11 @@ AppViewModel.prototype = {
     },
     cancelManagement: function() {
         this.managing(false);
+        this.getParties();
     },
     saveEditedParties: function() {
         this.managing(false);
+        this.selectMParty(-1);
         var obsParties = this.parties();
         var parties = obsParties.map(function(e) {
             return {
@@ -364,14 +366,15 @@ AppViewModel.prototype = {
             self.parties.removeAll();
             self.selectedMParty(-1);
             self.parties(r.map(function(p) {
-                var partyUsers = entitiesToMap(p.users);
+                var partyUsers = {}
+                p.users.forEach(function(u) { partyUsers[u] = true; });
                 return {
                     title : ko.observable(p.title),
                     selected : ko.observable(false),
                     users : users.map(function (u) {
                         return {
                             name : u,
-                            selected : ko.observable(p.users[u] !== undefined)
+                            selected : ko.observable(partyUsers[u] !== undefined)
                         };
                     })
                 };
@@ -382,13 +385,17 @@ AppViewModel.prototype = {
         var parties = this.parties();
         var oldSelect = this.selectedMParty();
         var oldselection = parties[oldSelect > -1 ? oldSelect : 0];
-        var newselection = parties[idx];
+        var newselection = parties[idx > -1 ? idx : 0];
         var users = Object.keys(oldselection.users);
-        newselection.selected(true);
         oldselection.selected(false);
+        newselection.selected(true);
         for (var i = 0; i < users.length; i++) {
-            oldselection.users[i].selected(this.mPartyUsers()[i].selected())
-            this.mPartyUsers()[i].selected(newselection.users[i].selected())
+            if (oldSelect > -1) {
+                oldselection.users[i].selected(this.mPartyUsers()[i].selected());
+            }
+            if (idx > -1) {
+                this.mPartyUsers()[i].selected(newselection.users[i].selected());
+            }
         }
         this.selectedMParty(idx);
     },
