@@ -12,6 +12,10 @@
     };
     Server._formatForServer = function(present) {
         var result = $.extend({}, present);
+        result.to = parseInt(result.to);
+        result.createdBy = result.createdBy;
+        result.offeredBy = result.offeredBy;
+        result.deletedBy = result.deletedBy;
         return result;
     };
     Server._longToDate = function(long) {
@@ -25,6 +29,13 @@
                 return;
             }
             return 'authenticated-resources/user/' + this.login.userId;
+        },
+        getPartyUri: function() {
+            if (!this.login) {
+                console.warn('calling server but login has not been set');
+                return;
+            }
+            return 'authenticated-resources/party';
         },
         addAuthorizationToAjaxOptions: function(ajaxOptions) {
             if (!this.login) {
@@ -81,6 +92,31 @@
                     parties: result.parties,
                     presents: result.presents.map(Server._formatFromServer)
                 };
+            });
+        },
+        saveParties: function(parties) {
+            var ajaxOptions = {
+                url: this.getPartyUri(),
+                contentType: 'application/json',
+                type: 'POST',
+                data: JSON.stringify(parties),
+                dataType: "json"
+            };
+            this.addAuthorizationToAjaxOptions(ajaxOptions);
+            return $.ajax(ajaxOptions).pipe(function(result) {
+                return result;
+            });
+        },
+        getParties: function(parties) {
+            var ajaxOptions = {
+                url: this.getPartyUri(),
+                contentType: 'application/json',
+                type: 'GET',
+                dataType: "json"
+            };
+            this.addAuthorizationToAjaxOptions(ajaxOptions);
+            return $.ajax(ajaxOptions).pipe(function(result) {
+                return result;
             });
         },
     };

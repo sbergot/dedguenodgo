@@ -5,7 +5,7 @@ function AppViewModel(options) {
     this.logoutCallback = options.logoutCallback;
 
     this.managing = ko.observable(false);
-    this.selectedMParty = ko.observable(0);
+    this.selectedMParty = ko.observable(-1);
     this.parties = ko.observableArray([]);
     this.selectedParty = ko.observableArray([]);
     this.users = ko.observable({});
@@ -77,6 +77,7 @@ AppViewModel.prototype = {
             });
             self.mPartyUsers(musers);
             self.presents(pAndU.presents);
+            self.getParties();
         });
     },
     vowels: {
@@ -345,10 +346,42 @@ AppViewModel.prototype = {
     },
     saveEditedParties: function() {
         this.managing(false);
+        var obsParties = this.parties();
+        var parties = obsParties.map(function(e) {
+            return {
+                title : e.title(),
+                users : e.users.filter(function(u) {
+                    return u.selected();
+                }).map(function(u) { return u.name; })
+            };
+        });
+        this.server.saveParties(parties);
+    },
+    getParties: function() {
+        var self = this;
+        self.server.getParties().done(function(r) {
+            var users = self.mPartyUsers().map(function(e) { return e.name; });
+            self.parties.removeAll();
+            self.selectedMParty(-1);
+            self.parties(r.map(function(p) {
+                var partyUsers = entitiesToMap(p.users);
+                return {
+                    title : ko.observable(p.title),
+                    selected : ko.observable(false),
+                    users : users.map(function (u) {
+                        return {
+                            name : u,
+                            selected : ko.observable(p.users[u] !== undefined)
+                        };
+                    })
+                };
+            }))
+        });
     },
     selectMParty: function(idx) {
         var parties = this.parties();
-        var oldselection = parties[this.selectedMParty()];
+        var oldSelect = this.selectedMParty();
+        var oldselection = parties[oldSelect > -1 ? oldSelect : 0];
         var newselection = parties[idx];
         var users = Object.keys(oldselection.users);
         newselection.selected(true);

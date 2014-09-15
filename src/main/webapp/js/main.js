@@ -76,6 +76,7 @@ $(document).ready(function() {
                 appViewModel.mPartyUsers(musers);
                 appViewModel.presents(usersAndPresents.presents);
                 appViewModel.loggedInUser(login.userId);
+                appViewModel.getParties();
             });
         }
     }

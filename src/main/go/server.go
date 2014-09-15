@@ -10,6 +10,7 @@ import (
 func init() {
 	gorest.RegisterService(new(UnauthenticatedService))
 	gorest.RegisterService(new(UserService))
+	gorest.RegisterService(new(PartyService))
 	http.Handle("/",LoginManager(gorest.Handle()))
 }
 

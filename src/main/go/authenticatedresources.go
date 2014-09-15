@@ -7,18 +7,6 @@ import (
 	"code.google.com/p/gorest"
 )
 
-type PartyService struct {
-	gorest.RestService `root:"/authenticated-resources/"
-                        consumes:"application/json"
-                        produces:"application/json"`
-	postParty           gorest.EndPoint `method:"POST"
-                                         path:"/party"
-                                         postdata:"Party"`
-	getUsers            gorest.EndPoint `method:"GET"
-                                         path:"/users"
-                                         output:"[]User"`
-}
-
 type UserService struct {
 	gorest.RestService `root:"/authenticated-resources/user/{user:string}/"
                         consumes:"application/json"
@@ -32,9 +20,6 @@ type UserService struct {
 	getUsersandPresents gorest.EndPoint `method:"GET"
                                          path:"/parties-and-users-and-presents"
                                          output:"PartiesPresentsUsers"`
-	getPartyUsers       gorest.EndPoint `method:"GET"
-                                         path:"/party/{party:int64}/user"
-                                         output:"[]User"`
 }
 
 func getPartyKey(c appengine.Context, partyId int64) *datastore.Key {
@@ -84,15 +69,4 @@ func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
 		Presents: presents,
 		Users: users,
 	}
-}
-
-func(serv UserService) GetPartyUsers(userId string, partyId int64) []User {
-	var c = GAEContext(serv.RestService)
-	var users = make([]User, 0)
-	err := GetAll(serv.RestService, &users, getPartyKey(c, partyId))
-	if err != nil {
-		ReturnError(serv.RestService, err.Error(), 500)
-		return *new([]User)
-	}
-	return users
 }

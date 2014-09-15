@@ -46,14 +46,18 @@
 ***** DONE new user form
 ***** DONE update login screen
 ***** TODO provide user list on user form
-***** TODO manage parties
+***** DONE manage parties
 ****** DONE manage party div with party list/ create party
-****** TODO manage user button
-       list of users with checkboxes & ok/cancel buttons
-       should be done with computed/click event
-***** TODO party drop down
+****** DONE manage user list
+***** DONE party drop down
+***** TODO show only viewable parties
+***** TODO show only users in party
 **** server
 ***** TODO fetch visible parties
+***** TODO post party conf
+      list of parties
+      in each party:
+          list of users
 ***** TODO party management resources
 ****** TODO post new party at top level
 ****** TODO adding/removing a user to/from a party
@@ -63,3 +67,6 @@
 ***** TODO fetch all users ever
 **** mix
 ***** DONE manage session cookie
+**** bugs
+***** TODO the app requires the user to select another party to save the selected users
+***** TODO the map doesn't load the selected users

@@ -58,7 +58,6 @@ func (x *Present) Save(c chan<- datastore.Property) error {
 	return datastore.SaveStruct(x, c)
 }
 
-
 type UserForm struct {
 	AdminPassword string
 	UserName      string
