@@ -82,7 +82,6 @@ AppViewModel.prototype = {
         }).fail(function() {
             self.initError(true);
         }).done(function(pAndU) {
-            self.parties(pAndU.parties);
             self.users(entitiesToMap(pAndU.users, 'name'));
             var musers = pAndU.users.map(function(e) {
                 return {

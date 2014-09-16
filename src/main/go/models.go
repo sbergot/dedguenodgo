@@ -75,7 +75,6 @@ type User struct {
 }
 
 type PartiesPresentsUsers struct {
-	Parties  []Party   `json:"parties"`
 	Presents []Present `json:"presents"`
 	Users    []User    `json:"users"`
 }

@@ -43,15 +43,8 @@ func(serv UserService) PostPresent(present Present, userId string) {
 func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
 	var c = GAEContext(serv.RestService)
 
-	var parties = make([]Party, 0)
-	err := GetAll(serv.RestService, &parties, getUserKey(c, userId))
-	if err != nil {
-		ReturnError(serv.RestService, err.Error(), 500)
-		return PartiesPresentsUsers{}
-	}
-
 	var presents = make([]Present, 0)
-	err = GetAll(serv.RestService, &presents, getUserKey(c, userId))
+	err := GetAll(serv.RestService, &presents, getUserKey(c, userId))
 	if err != nil {
 		ReturnError(serv.RestService, err.Error(), 500)
 		return PartiesPresentsUsers{}
@@ -65,7 +58,6 @@ func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
 	}
 
 	return PartiesPresentsUsers{
-		Parties: parties,
 		Presents: presents,
 		Users: users,
 	}

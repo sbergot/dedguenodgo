@@ -65,7 +65,6 @@ $(document).ready(function() {
                 console.error(e);
             }).done(function(usersAndPresents) {
                 appDiv.show();
-                appViewModel.parties(usersAndPresents.parties);
                 appViewModel.users(entitiesToMap(usersAndPresents.users, 'name'));
                 var musers = usersAndPresents.users.map(function(e) {
                     return {
