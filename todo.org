@@ -50,17 +50,14 @@
 ****** DONE manage party div with party list/ create party
 ****** DONE manage user list
 ***** DONE party drop down
-***** TODO show only viewable parties
-***** TODO show only users in party
+***** DONE show only viewable parties
+***** DONE show only users in party
+***** TODO hide manage party button for non user
+***** TODO improve design
 **** server
-***** TODO fetch visible parties
-***** TODO post party conf
-      list of parties
-      in each party:
-          list of users
+***** DONE fetch visible parties
+***** DONE post party conf
 ***** DONE party management resources
-***** TODO fetch presents for user
-***** TODO fetch all users ever
 **** mix
 ***** DONE manage session cookie
 **** bugs

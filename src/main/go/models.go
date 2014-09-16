@@ -63,11 +63,13 @@ type UserForm struct {
 	UserName      string
 	UserPassword  string
 	UserMail      string
+	UserIsAdmin   bool
 }
 
 type User struct {
 	Name    string `json:"name"`
 	Deleted bool   `json:"deleted"`
+	IsAdmin bool   `json:"isAdmin"`
 	Mail    string `json:"mail"`
 	Password       `json:"-"`
 }

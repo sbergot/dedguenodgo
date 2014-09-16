@@ -1,4 +1,5 @@
 function AppViewModel(options) {
+    var self = this;
     this.confirm = options.confirm;
     this.prompt = options.prompt;
     this.server = options.server;
@@ -7,11 +8,19 @@ function AppViewModel(options) {
     this.managing = ko.observable(false);
     this.selectedMParty = ko.observable(-1);
     this.parties = ko.observableArray([]);
-    this.selectedParty = ko.observableArray([]);
+    this.visibleParties = function() {
+        return self.parties().filter(function(e) {
+            var userIdx = e.users.findIndex(function(u) {
+                return u.name === self.loggedInUser();
+            });
+            if (userIdx === -1) { return false; }
+            return e.users[userIdx].selected();
+        });
+    };
+    this.selectedParty = ko.observable();
     this.users = ko.observable({});
     this.mPartyUsers = ko.observable([]);
     this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
-    var self = this;
     this.selectedList = ko.observable();
     //select own list by default
     this.loggedInUser.subscribe(function(value) {
@@ -89,7 +98,11 @@ AppViewModel.prototype = {
         y: true
     },
     lists: function() {
+        var selectedParty = this.selectedParty();
+        var party = this.parties().find(function(p) { return p.title() === selectedParty; });
+        if (!party) { return [{ id:"err", label:"pas d'évennement" }]; }
         var users = this.users();
+        var userMap = entitiesToMap(party.users, "name");
         var loggedInUser = this.loggedInUser();
         var ids = Object.keys(users);
         ids.sort(function(a, b) {
@@ -101,7 +114,9 @@ AppViewModel.prototype = {
             }
             return users[a].name < users[b].name ? -1 : 1;
         });
-        return ids.map(function(id) {
+        return ids.filter(function(id) {
+            return userMap[id].selected();
+        }).map(function(id) {
             var userName = users[id].name;
             var beginByVowel = AppViewModel.prototype.vowels[userName.slice(0, 1).toLowerCase()];
             var label = 'Liste ' + (beginByVowel ? "d'" : "de ") + userName;
@@ -120,6 +135,25 @@ AppViewModel.prototype = {
     },
     _comparePresents: function(a, b) {
         return a.creationDate.getTime() - b.creationDate.getTime();
+    },
+    displayedUsers: function() {
+        var selectedList = this.selectedList();
+        var loggedInUser = this.loggedInUser();
+        var self = this;
+        return this.presents().filter(function(p) {
+            if (p.to != selectedList) {
+                return false;
+            }
+            if (p.deletedBy && !self.displayPresentAsOffered(p)) {
+                return false;
+            }
+            if (p.to == loggedInUser && p.createdBy != loggedInUser) {
+                return false;
+            }
+            return true;
+        }).sort(function(a, b) {
+            return self._comparePresents(a, b);
+        });
     },
     displayedPresents: function() {
         var selectedList = this.selectedList();
