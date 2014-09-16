@@ -52,8 +52,10 @@
 ***** DONE party drop down
 ***** DONE show only viewable parties
 ***** DONE show only users in party
-***** TODO hide manage party button for non user
+***** DONE hide manage party button for non user
 ***** TODO improve design
+***** TODO use CDN for js libs
+***** TODO cache parties/users and users/presents in memcache
 **** server
 ***** DONE fetch visible parties
 ***** DONE post party conf
