@@ -18,9 +18,15 @@ function AppViewModel(options) {
         });
     };
     this.selectedParty = ko.observable();
-    this.users = ko.observable({});
+    this.users = ko.observable([]);
     this.mPartyUsers = ko.observable([]);
     this.loggedInUser = createStorageObservable(sessionStorage, 'loggedInUser');
+    this.loggedIsAdmin = ko.computed(function() {
+        var id = self.loggedInUser();
+        var user = self.users()[id];
+        if (!user) { return false; }
+        return user.isAdmin;
+    })
     this.selectedList = ko.observable();
     //select own list by default
     this.loggedInUser.subscribe(function(value) {

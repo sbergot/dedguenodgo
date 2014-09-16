@@ -63,7 +63,7 @@ type UserForm struct {
 	UserName      string
 	UserPassword  string
 	UserMail      string
-	UserIsAdmin   bool
+	UserIsAdmin   string
 }
 
 type User struct {

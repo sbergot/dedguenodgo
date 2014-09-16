@@ -31,8 +31,17 @@ type Parties struct {
 // we choose to trust the client for its format
 func(serv PartyService) PostParties(parties string) {
 	var c = GAEContext(serv.RestService)
+	user, err := GetUser(c, serv.Context.Request())
+	if err != nil {
+		ReturnError(serv.RestService, "", 403)
+		return
+	}
+	if !user.IsAdmin {
+		ReturnError(serv.RestService, "", 403)
+		return
+	}
 	var key = datastore.NewKey(c, partiesEntity, partiesKey, 0, nil)
-	_, err := datastore.Put(c, key, &Parties{ Data : parties })
+	_, err = datastore.Put(c, key, &Parties{ Data : parties })
 	CheckError(serv.RestService, err, "", 500)
 }
 

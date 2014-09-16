@@ -84,7 +84,9 @@
     </div>
 
     <div id="app">
-      <button class="btn btn-primary" data-bind="click: manageParties">Gérer les evennements</button>
+      <button class="btn btn-primary" data-bind="click: manageParties, visible: loggedIsAdmin">
+        Gérer les evennements
+      </button>
       <div id="connected-user">
         <span data-bind="text: !(loggedInUser()) ? '' : getUserName(loggedInUser())"></span><br/>
         <a href="#" data-bind="visible: loggedInUser, click: logout">déconnexion</a>

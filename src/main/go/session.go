@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"encoding/json"
 
 	"appengine"
 	"appengine/memcache"
@@ -27,11 +28,13 @@ func newUUID() string {
 	return fmt.Sprintf("%x-%x-%x-%x-%x", uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:])
 }
 
-func createSession(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func createSession(c appengine.Context, w http.ResponseWriter, r *http.Request, user User) {
 	var uuid = newUUID()
+	var b, err = json.Marshal(user)
+	if err != nil { panic(err.Error()) }
 	var item = &memcache.Item{
 		Key: uuid,
-		Value: []byte("logged"),
+		Value: b,
 	}
 	memcache.Set(c, item)
 	var cookie = &http.Cookie{
@@ -46,16 +49,16 @@ func createSession(c appengine.Context, w http.ResponseWriter, r *http.Request) 
 func checkUserCredentials(
 	c appengine.Context,
 	userId string,
-	userPassword string) bool {
+	userPassword string) (bool, User) {
 	var user User
 	err := datastore.Get(c, getUserKey(c, userId), &user)
 	if err != nil {
-		return false
+		return false, User{}
 	}
-	return user.Password.Check(userPassword)
+	return user.Password.Check(userPassword), user
 }
 
-func authenticate(c appengine.Context, r *http.Request) bool {
+func authenticate(c appengine.Context, r *http.Request) (bool, User) {
 	var password = r.Header.Get("dedguenodgo-userPassword")
 	var userId = r.Header.Get("dedguenodgo-userId")
 	return checkUserCredentials(c, password, userId)
@@ -66,6 +69,16 @@ func checkSessionCache(c appengine.Context, sessionCookie *http.Cookie) bool {
 	return err == nil
 }
 
+func GetUser(c appengine.Context, r *http.Request) (User, error) {
+	sessionCookie, err := r.Cookie(SESSION)
+	var user User
+	if err != nil { return user, err }
+	b, err := memcache.Get(c, sessionCookie.Value)
+	if err != nil { return user, err }
+	err = json.Unmarshal(b.Value, &user)
+	return user, err
+}
+
 func checkLog(c appengine.Context, w http.ResponseWriter, r *http.Request) bool {
 	sessionCookie, err := r.Cookie(SESSION)
 	if err == nil && checkSessionCache(c, sessionCookie) {
@@ -73,8 +86,8 @@ func checkLog(c appengine.Context, w http.ResponseWriter, r *http.Request) bool 
 		http.SetCookie(w, sessionCookie)
 		return true
 	}
-	var isLogged = authenticate(c, r)
-	if isLogged { createSession(c, w, r) }
+	var isLogged, user = authenticate(c, r)
+	if isLogged { createSession(c, w, r, user) }
 	return isLogged
 }
 

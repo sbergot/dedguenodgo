@@ -47,6 +47,7 @@ func(serv UnauthenticatedService) PostUser(posted UserForm) {
 	var user = User{
 		Name: posted.UserName,
 		Deleted: false,
+		IsAdmin: posted.UserIsAdmin == "on",
 		Mail: posted.UserMail,
 		Password: password,
 	}
