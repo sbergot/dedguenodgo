@@ -58,22 +58,21 @@ $(document).ready(function() {
             errorDiv.hide();
 
 
-            server.getPartiesAndUsersAndPresents().always(function() {
+            server.getUsers().always(function() {
                 loadingDiv.hide();
             }).fail(function(e) {
                 errorDiv.show();
                 console.error(e);
-            }).done(function(usersAndPresents) {
+            }).done(function(users) {
                 appDiv.show();
-                appViewModel.users(entitiesToMap(usersAndPresents.users, 'name'));
-                var musers = usersAndPresents.users.map(function(e) {
+                appViewModel.users(entitiesToMap(users, 'name'));
+                var musers = users.map(function(e) {
                     return {
                         selected:ko.observable(false),
                         name:e.name
                     };
                 });
                 appViewModel.mPartyUsers(musers);
-                appViewModel.presents(usersAndPresents.presents);
                 appViewModel.loggedInUser(login.userId);
                 appViewModel.getParties();
             });

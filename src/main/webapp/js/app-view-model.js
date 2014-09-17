@@ -65,6 +65,9 @@ function AppViewModel(options) {
     });
     this.selectedList.subscribe(function() {
         self.discardConfirm();
+        if (self.server.login) {
+            self.getPresents();
+        }
     });
 
     if (options.initOnStartup) {
@@ -77,20 +80,19 @@ AppViewModel.prototype = {
     init: function() {
         var self = this;
         this.initLoading(true);
-        return this.server.getPartiesAndUsersAndPresents().always(function() {
+        return this.server.getUsers().always(function() {
             self.initLoading(false);
         }).fail(function() {
             self.initError(true);
-        }).done(function(pAndU) {
-            self.users(entitiesToMap(pAndU.users, 'name'));
-            var musers = pAndU.users.map(function(e) {
+        }).done(function(users) {
+            self.users(entitiesToMap(users, 'name'));
+            var musers = users.map(function(e) {
                 return {
                     selected:ko.observable(false),
                     name:e.name
                 };
             });
             self.mPartyUsers(musers);
-            self.presents(pAndU.presents);
             self.getParties();
         });
     },
@@ -443,5 +445,11 @@ AppViewModel.prototype = {
     },
     manageParties: function() {
         this.managing(true);
+    },
+    getPresents: function() {
+        var self = this;
+        this.server.getPresents(this.selectedList()).done(function(result) {
+            self.presents(result);
+        });
     }
 };

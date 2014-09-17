@@ -11,6 +11,7 @@ func init() {
 	gorest.RegisterService(new(UnauthenticatedService))
 	gorest.RegisterService(new(UserService))
 	gorest.RegisterService(new(PartyService))
+	gorest.RegisterService(new(PresentService))
 	http.Handle("/",LoginManager(gorest.Handle()))
 }
 

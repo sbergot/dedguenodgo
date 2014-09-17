@@ -19,12 +19,13 @@
     };
 
     Server.prototype = {
-        getUserUri: function() {
+        getUserUri: function(userId) {
             if (!this.login) {
                 console.warn('calling server but login has not been set');
                 return;
             }
-            return 'authenticated-resources/user/' + this.login.userId;
+            userId = userId || this.login.userId
+            return 'authenticated-resources/user/' + userId;
         },
         getPartyUri: function() {
             if (!this.login) {
@@ -53,7 +54,7 @@
             var converted = Server._formatForServer(present);
             delete converted.id;
             var ajaxOptions = {
-                url: this.getUserUri() + '/present',
+                url: this.getUserUri(present.to) + '/present',
                 contentType: 'application/json',
                 type: 'POST',
                 data: JSON.stringify(converted),
@@ -65,7 +66,7 @@
         editPresent: function(oldPresent, newPresent) {
             var converted = Server._formatForServer(newPresent);
             var ajaxOptions = {
-                url: this.getUserUri() + '/present/' + oldPresent.id,
+                url: this.getUserUri(present.to) + '/present/' + oldPresent.id,
                 contentType: 'application/json',
                 type: 'PUT',
                 data: JSON.stringify(converted),
@@ -74,21 +75,27 @@
             this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions).pipe(Server._formatFromServer);
         },
-        getPartiesAndUsersAndPresents: function() {
+        getPresents: function(userId) {
             var ajaxOptions = {
-                url: this.getUserUri() + '/parties-and-users-and-presents',
+                url: this.getUserUri(userId) + '/presents',
                 contentType: 'application/json',
                 type: 'GET',
                 dataType: "json"
             };
             this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions).pipe(function(result) {
-                return {
-                    users: result.users,
-                    parties: result.parties,
-                    presents: result.presents.map(Server._formatFromServer)
-                };
+                return result.map(Server._formatFromServer);
             });
+        },
+        getUsers: function() {
+            var ajaxOptions = {
+                url: 'authenticated-resources/users',
+                contentType: 'application/json',
+                type: 'GET',
+                dataType: "json"
+            };
+            this.addAuthorizationToAjaxOptions(ajaxOptions);
+            return $.ajax(ajaxOptions);
         },
         saveParties: function(parties) {
             var ajaxOptions = {
@@ -99,9 +106,7 @@
                 dataType: "json"
             };
             this.addAuthorizationToAjaxOptions(ajaxOptions);
-            return $.ajax(ajaxOptions).pipe(function(result) {
-                return result;
-            });
+            return $.ajax(ajaxOptions);
         },
         getParties: function(parties) {
             var ajaxOptions = {
@@ -111,9 +116,7 @@
                 dataType: "json"
             };
             this.addAuthorizationToAjaxOptions(ajaxOptions);
-            return $.ajax(ajaxOptions).pipe(function(result) {
-                return result;
-            });
+            return $.ajax(ajaxOptions);
         },
     };
 })();

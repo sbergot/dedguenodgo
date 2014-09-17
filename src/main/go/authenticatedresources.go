@@ -7,58 +7,55 @@ import (
 	"code.google.com/p/gorest"
 )
 
-type UserService struct {
+type PresentService struct {
 	gorest.RestService `root:"/authenticated-resources/user/{user:string}/"
                         consumes:"application/json"
                         produces:"application/json"`
-	putPresent          gorest.EndPoint `method:"PUT"
-                                         path:"/present/{id:int64}"
-                                         postdata:"Present"`
-	postPresent         gorest.EndPoint `method:"POST"
-                                         path:"/present"
-                                         postdata:"Present"`
-	getUsersandPresents gorest.EndPoint `method:"GET"
-                                         path:"/parties-and-users-and-presents"
-                                         output:"PartiesPresentsUsers"`
+	putPresent  gorest.EndPoint `method:"PUT"
+                                 path:"/present/{id:int64}"
+                                 postdata:"Present"`
+	postPresent gorest.EndPoint `method:"POST"
+                                 path:"/present"
+                                 postdata:"Present"`
+	getPresents gorest.EndPoint `method:"GET"
+                                 path:"/presents"
+                                 output:"[]Present"`
 }
 
-func getPartyKey(c appengine.Context, partyId int64) *datastore.Key {
-	return datastore.NewKey(c, "Party", "", partyId, nil)
+type UserService struct {
+	gorest.RestService `root:"/authenticated-resources/"
+                        consumes:"application/json"
+                        produces:"application/json"`
+	getUsers    gorest.EndPoint `method:"GET"
+                                 path:"/users"
+                                 output:"[]User"`
 }
 
 func getUserKey(c appengine.Context, userId string) *datastore.Key {
 	return datastore.NewKey(c, "User", userId, 0, nil)
 }
 
-func(serv UserService) PutPresent(present Present, userId string, id int64) {
+func(serv PresentService) PutPresent(present Present, userId string, id int64) {
 	var c = GAEContext(serv.RestService)
 	PutWithKey(serv.RestService, &present, getUserKey(c, userId), "", id)
 }
 
-func(serv UserService) PostPresent(present Present, userId string) {
+func(serv PresentService) PostPresent(present Present, userId string) {
 	var c = GAEContext(serv.RestService)
 	Put(serv.RestService, &present, getUserKey(c, userId))
 }
 
-func(serv UserService) GetUsersandPresents(userId string) PartiesPresentsUsers {
+func(serv PresentService) GetPresents(userId string) []Present {
 	var c = GAEContext(serv.RestService)
-
 	var presents = make([]Present, 0)
 	err := GetAll(serv.RestService, &presents, getUserKey(c, userId))
-	if err != nil {
-		ReturnError(serv.RestService, err.Error(), 500)
-		return PartiesPresentsUsers{}
-	}
+	CheckError(serv.RestService, err, "", 500)
+	return presents
+}
 
+func(serv UserService) GetUsers() []User {
 	var users = make([]User, 0)
-	err = GetAll(serv.RestService, &users, nil)
-	if err != nil {
-		ReturnError(serv.RestService, err.Error(), 500)
-		return PartiesPresentsUsers{}
-	}
-
-	return PartiesPresentsUsers{
-		Presents: presents,
-		Users: users,
-	}
+	err := GetAll(serv.RestService, &users, nil)
+	CheckError(serv.RestService, err, "", 500)
+	return users
 }
