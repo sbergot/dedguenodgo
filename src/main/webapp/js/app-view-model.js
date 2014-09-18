@@ -248,7 +248,7 @@ AppViewModel.prototype = {
                 presents.splice(index, 1);
                 self.presents(presents);
             }).done(function() {
-                self.init().done(function () {
+                self.getPresents().done(function () {
                     self.successMessage('"' + present.title + '" a bien été créé');
                     // we should be looking for the index, but it was created by the server
                     // so we look for the title
@@ -286,7 +286,7 @@ AppViewModel.prototype = {
                 //        this.presents([]); //force redisplay
                 self.presents(presents);
             }).done(function() {
-                self.init().done(function () {
+                self.getPresents().done(function () {
                     if (!hideUndo) {
                         self.successMessage('"' + newPresent.title + '" a bien été modifié');
                         self.undoAction(function() {
