@@ -57,23 +57,21 @@
                 url: this.getUserUri(present.to) + '/present',
                 contentType: 'application/json',
                 type: 'POST',
-                data: JSON.stringify(converted),
-                dataType: "json"
+                data: JSON.stringify(converted)
             };
             this.addAuthorizationToAjaxOptions(ajaxOptions);
-            return $.ajax(ajaxOptions).pipe(Server._formatFromServer);
+            return $.ajax(ajaxOptions);
         },
         editPresent: function(oldPresent, newPresent) {
             var converted = Server._formatForServer(newPresent);
             var ajaxOptions = {
-                url: this.getUserUri(present.to) + '/present/' + oldPresent.id,
+                url: this.getUserUri(oldPresent.to) + '/present/' + oldPresent.id,
                 contentType: 'application/json',
                 type: 'PUT',
-                data: JSON.stringify(converted),
-                dataType: "json"
+                data: JSON.stringify(converted)
             };
             this.addAuthorizationToAjaxOptions(ajaxOptions);
-            return $.ajax(ajaxOptions).pipe(Server._formatFromServer);
+            return $.ajax(ajaxOptions);
         },
         getPresents: function(userId) {
             var ajaxOptions = {
@@ -102,8 +100,7 @@
                 url: this.getPartyUri(),
                 contentType: 'application/json',
                 type: 'POST',
-                data: JSON.stringify(parties),
-                dataType: "json"
+                data: JSON.stringify(parties)
             };
             this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions);
