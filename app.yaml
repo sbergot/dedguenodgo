@@ -7,9 +7,9 @@ handlers:
 - url: /
   static_files: src/main/webapp/index.html
   upload: src/main/webapp/index.html
-- url: /login
-  static_files: src/main/webapp/login.html
-  upload: src/main/webapp/login.html
+- url: /change-password
+  static_files: src/main/webapp/change-password.html
+  upload: src/main/webapp/change-password.html
 - url: /add-user
   static_files: src/main/webapp/add-user.html
   upload: src/main/webapp/add-party.html

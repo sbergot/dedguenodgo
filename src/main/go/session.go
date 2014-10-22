@@ -11,6 +11,7 @@ import (
 	"appengine"
 	"appengine/memcache"
 	"appengine/datastore"
+
 )
 
 const SESSION = "session"
@@ -46,6 +47,8 @@ func createSession(c appengine.Context, w http.ResponseWriter, r *http.Request, 
 	http.SetCookie(w, cookie)
 }
 
+
+
 func checkUserCredentials(
 	c appengine.Context,
 	userId string,
@@ -61,7 +64,7 @@ func checkUserCredentials(
 func authenticate(c appengine.Context, r *http.Request) (bool, User) {
 	var password = r.Header.Get("dedguenodgo-userPassword")
 	var userId = r.Header.Get("dedguenodgo-userId")
-	return checkUserCredentials(c, password, userId)
+	return checkUserCredentials(c, userId, password)
 }
 
 func checkSessionCache(c appengine.Context, sessionCookie *http.Cookie) bool {
@@ -91,11 +94,16 @@ func checkLog(c appengine.Context, w http.ResponseWriter, r *http.Request) bool 
 	return isLogged
 }
 
-func LoginManager(handler http.Handler) http.HandlerFunc {
+func LoginManager(handler http.Handler, safeUrls []string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var c = appengine.NewContext(r)
-		var mustBeLogged = !strings.
-			HasPrefix(r.URL.Path, "/unauthenticated-resources/")
+		var mustBeLogged = true
+		for _, prefix := range safeUrls {
+			if (strings.HasPrefix(r.URL.Path, prefix)) {
+				mustBeLogged = false
+				break
+			}
+		}
 		if mustBeLogged && !checkLog(c, w, r) {
 			http.Error(w, "you must be logged", 403)
 			return

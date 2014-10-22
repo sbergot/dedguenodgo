@@ -2,17 +2,18 @@ package dedguenodgo
 
 import (
 	"net/http"
-
 	"appengine"
 	"code.google.com/p/gorest"
 )
+
+var safeurls = []string {"/unauthenticated-resources/"}
 
 func init() {
 	gorest.RegisterService(new(UnauthenticatedService))
 	gorest.RegisterService(new(UserService))
 	gorest.RegisterService(new(PartyService))
 	gorest.RegisterService(new(PresentService))
-	http.Handle("/",LoginManager(gorest.Handle()))
+	http.Handle("/", LoginManager(gorest.Handle(), safeurls))
 }
 
 

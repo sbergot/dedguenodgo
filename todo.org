@@ -65,3 +65,8 @@
 **** bugs
 ***** DONE the app requires the user to select another party to save the selected users
 ***** DONE the map doesn't load the selected users
+* feedback
+** TODO change passwork feature
+** TODO open links in new tab
+** DONE changer les titres
+** TODO cadeaux de couples

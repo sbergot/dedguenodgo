@@ -61,9 +61,15 @@ $(document).ready(function() {
             server.getUsers().always(function() {
                 loadingDiv.hide();
             }).fail(function(e) {
-                errorDiv.show();
-                console.error(e);
+                loginDiv.show();
+                window.loginViewModel.userActionLoading(false);
+                window.loginViewModel.userLoading(false);
+                window.loginViewModel.userActionError(true);
+                server.setLogin(null);
             }).done(function(users) {
+                window.loginViewModel.userActionLoading(false);
+                window.loginViewModel.userLoading(false);
+                window.loginViewModel.userActionError(false);
                 appDiv.show();
                 appViewModel.users(entitiesToMap(users, 'name'));
                 var musers = users.map(function(e) {

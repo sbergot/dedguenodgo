@@ -1,7 +1,8 @@
 package dedguenodgo
 
 import (
-	//"fmt"
+	"fmt"
+	"errors"
 	"appengine"
 	"appengine/datastore"
 	"code.google.com/p/gorest"
@@ -14,6 +15,9 @@ type UnauthenticatedService struct {
 	postUser      gorest.EndPoint `method:"POST"
                                    path:"/user/"
                                    postdata:"UserForm"`
+	putPassword gorest.EndPoint `method:"PUT"
+                                 path:"/user/change-password"
+                                 postdata:"ChangePasswordForm"`
 }
 
 func getAdminPasswordKey(c appengine.Context) *datastore.Key {
@@ -52,4 +56,26 @@ func(serv UnauthenticatedService) PostUser(posted UserForm) {
 		Password: password,
 	}
 	PutWithKey(serv.RestService, &user, nil, posted.UserName, 0)
+}
+
+func(serv UnauthenticatedService) PutPassword(
+	form ChangePasswordForm) {
+	var c = GAEContext(serv.RestService)
+	err := datastore.RunInTransaction(c, func(c1 appengine.Context) error {
+		var user User
+		var key = getUserKey(c1, form.UserName)
+		err1 := datastore.Get(c1, key, &user)
+		if err1 != nil { return err1 }
+		if !user.Password.Check(form.OldPassword) {
+			return errors.New(fmt.Sprintf(
+				"invalid password: %v", form.OldPassword))
+		}
+		var password Password
+		password.MakeFrom(form.NewPassword)
+		user.Password = password
+		_, err1 = datastore.Put(c1, key, &user)
+		return err1
+	}, nil)
+
+	CheckError(serv.RestService, err, "", 500)
 }
