@@ -66,7 +66,10 @@
 ***** DONE the app requires the user to select another party to save the selected users
 ***** DONE the map doesn't load the selected users
 * feedback
-** TODO change passwork feature
+** DONE change passwork feature
 ** TODO open links in new tab
 ** DONE changer les titres
 ** TODO cadeaux de couples
+*** TODO ajouter une colonne "nom du +1" dans les utilisateurs
+*** TODO ajouter une colonne "cadeau de couple" dans les cadeaux
+*** TODO quand un utilisateur se logge charger les cadeaux de couples de son +1
