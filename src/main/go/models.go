@@ -21,6 +21,7 @@ type Present struct {
 	Party        Party      `json:"party"`
 	Description  string     `json:"description" datastore:",noindex"`
 	To           string     `json:"to"`
+	IsShared     bool       `json:"isshared"`
 	CreatedBy    string     `json:"createdBy"`
 	CreationDate time.Time  `json:"creationDate"`
 	OfferedBy    *string    `json:"offeredBy" datastore:"-"`
@@ -64,6 +65,7 @@ type UserForm struct {
 	UserPassword  string
 	UserMail      string
 	UserIsAdmin   string
+	UserPartner   string
 }
 
 type ChangePasswordForm struct {
@@ -78,6 +80,7 @@ type User struct {
 	IsAdmin bool   `json:"isAdmin"`
 	Mail    string `json:"mail"`
 	Password       `json:"-"`
+	Partner string `json:"partner"`
 }
 
 type PartiesPresentsUsers struct {

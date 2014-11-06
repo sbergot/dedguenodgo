@@ -27,8 +27,16 @@
   })
   });
 </script>
+<style media="screen" type="text/css">
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+</style>
 </head>
 <body>
+  <div class="container">
     <form action="../unauthenticated-resources/party" method="POST" class="form">
         <div class="form-group">
             <label for="admin-password">Admin password</label>
@@ -47,6 +55,10 @@
             <input class="form-control" type="text" id="user-mail" name="userMail" />
         </div>
         <div class="form-group">
+            <label for="user-partner">User partner</label>
+            <input class="form-control" type="text" id="user-partner" name="userPartner" />
+        </div>
+        <div class="form-group">
             <label for="user-mail">User is admin</label>
             <input class="form-control" type="checkbox" id="user-isadmin" name="userIsAdmin" />
         </div>
@@ -55,4 +67,5 @@
     <div id="msg"/>
     <script>
     </script>
+  </div>
 </body>

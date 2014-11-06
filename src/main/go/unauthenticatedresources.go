@@ -53,6 +53,7 @@ func(serv UnauthenticatedService) PostUser(posted UserForm) {
 		Deleted: false,
 		IsAdmin: posted.UserIsAdmin == "on",
 		Mail: posted.UserMail,
+		Partner: posted.UserPartner,
 		Password: password,
 	}
 	PutWithKey(serv.RestService, &user, nil, posted.UserName, 0)

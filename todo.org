@@ -67,7 +67,7 @@
 ***** DONE the map doesn't load the selected users
 * feedback
 ** DONE change passwork feature
-** TODO open links in new tab
+** DONE open links in new tab
 ** DONE changer les titres
 ** TODO cadeaux de couples
 *** TODO ajouter une colonne "nom du +1" dans les utilisateurs
