@@ -93,12 +93,20 @@
       <select
          id="party-select"
          class="form-control input-large"
-         data-bind="options: visibleParties(), value: selectedParty, optionsValue: 'title', optionsText:'title'">
+         data-bind="options: visibleParties(),
+                    value: selectedParty,
+                    optionsValue: 'title',
+                    optionsText:'title',
+                    visible: visibleParties().length > 1">
       </select>
       <select
          id="list-select"
          class="form-control input-large"
-         data-bind="options: lists(), value: selectedList, optionsValue: 'id', optionsText:'label'">
+         data-bind="options: lists(),
+                    value: selectedList,
+                    optionsValue: 'id',
+                    optionsText:'label',
+                    visible: lists().length > 1">
       </select>
       <p class="jumbotron" data-bind="visible: displayedPresents().length == 0">
       Cette liste est vide ! Vous pouvez ajouter des idées de cadeaux à l'aide du bouton ci-dessous
