@@ -38,7 +38,8 @@ function AppViewModel(options) {
     this.editedPresent = ko.observable(null);
     this.edition = {
         title: ko.observable(),
-        description: ko.observable()
+        description: ko.observable(),
+        shared: ko.observable()
     };
     this.successMessage = ko.observable();
     this.errorMessage = ko.observable();
@@ -200,13 +201,15 @@ AppViewModel.prototype = {
     isEditedPresentModified: function() {
         var beforeModification = this._isCreating() ? {
             title: '',
-            description: ''
+            description: '',
+            shared: false
         } : this.editedPresent();
         var hasChanges = false;
         if (this.edition.title() != beforeModification.title) {
             hasChanges = true;
         }
-        if (this.edition.description() != beforeModification.description) {
+        if (this.edition.description() != beforeModification.description ||
+           this.edition.shared() != beforeModification.isshared) {
             hasChanges = true;
         }
         return hasChanges;
@@ -216,6 +219,7 @@ AppViewModel.prototype = {
         this.editedPresent(present);
         this.edition.title(present.title);
         this.edition.description(present.description);
+        this.edition.shared(present.isshared);
         this.editing(true);
     },
     cancelEdition: function() {
@@ -318,12 +322,14 @@ AppViewModel.prototype = {
     saveEditedPresent: function() {
         var title = this.edition.title();
         var description = this.edition.description();
+        var isshared = this.edition.shared();
         if (this._isCreating()) {
             var id = "tempId" + this.nextId++;
             var present = {
                 id: id,
                 title: title,
                 description: description,
+                isshared: isshared,
                 to: this.selectedList(),
                 createdBy: this.loggedInUser(),
                 creationDate: new Date(),
@@ -337,6 +343,7 @@ AppViewModel.prototype = {
             var clone = $.extend({}, selected);
             clone.title = title;
             clone.description = description;
+            clone.isshared = isshared;
             this._savePresent(selected, clone);
         }
         this.editing(false);
