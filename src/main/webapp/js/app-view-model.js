@@ -168,9 +168,9 @@ AppViewModel.prototype = {
         var loggedInUser = this.loggedInUser();
         var self = this;
         return this.presents().filter(function(p) {
-            if (p.to != selectedList) {
-                return false;
-            }
+            //if (p.to != selectedList) {
+            //    return false;
+            //}
             if (p.deletedBy && !self.displayPresentAsOffered(p)) {
                 return false;
             }
