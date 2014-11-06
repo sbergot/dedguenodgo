@@ -90,7 +90,20 @@ h1 {
 #connected-user {
 	text-align: right;
 	position: absolute;
-	top: 0.4em;
+	top: -3.4em;
 	right: 0.4em;
 	font-size: 14px;
+}
+.container {
+    position: relative;
+}
+
+.page-header, .container {
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .page-header, .container {
+    max-width: 730px;
+  }
 }
