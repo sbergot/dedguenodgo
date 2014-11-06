@@ -3,6 +3,8 @@ ko.bindingHandlers.markdown = {
     update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
         var value = ko.utils.unwrapObservable(valueAccessor());
         element.innerHTML = markdown.toHTML(value);
+        // open description's links in a new tab
+        $(element).find("a").attr("target", "_blank");
     }
 };
 ko.bindingHandlers.markdownEditor = {
