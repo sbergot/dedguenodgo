@@ -2,6 +2,7 @@ package dedguenodgo
 
 import (
 	//"fmt"
+	//"log"
 	"appengine"
 	"appengine/datastore"
 	"code.google.com/p/gorest"
@@ -48,8 +49,37 @@ func(serv PresentService) PostPresent(present Present, userId string) {
 func(serv PresentService) GetPresents(userId string) []Present {
 	var c = GAEContext(serv.RestService)
 	var presents = make([]Present, 0)
-	err := GetAll(serv.RestService, &presents, getUserKey(c, userId))
+
+	var user User
+	err := datastore.Get(c, getUserKey(c, userId), &user)
+	if err != nil {
+		ReturnError(serv.RestService, "user not found", 500)
+		return presents
+	}
+
+	err = GetAll(serv.RestService, &presents, getUserKey(c, userId))
+	if err != nil {
+		ReturnError(serv.RestService, "", 403)
+		return presents
+	}
+
+	if user.Partner == "" {
+		return presents
+	}
+
+	var partnerPresents = make([]Present, 0)
+	err = GetAll(
+		serv.RestService,
+		&partnerPresents,
+		getUserKey(c, user.Partner))
 	CheckError(serv.RestService, err, "", 500)
+
+	for _, p := range partnerPresents {
+		if p.IsShared {
+			presents = append(presents, p)
+		}
+	}
+
 	return presents
 }
 
