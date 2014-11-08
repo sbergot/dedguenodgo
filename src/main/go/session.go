@@ -82,6 +82,13 @@ func GetUser(c appengine.Context, r *http.Request) (User, error) {
 	return user, err
 }
 
+func ExpireSession(c appengine.Context, r *http.Request) error {
+	sessionCookie, err := r.Cookie(SESSION)
+	if err != nil { return err }
+	err = memcache.Delete(c, sessionCookie.Value)
+	return err
+}
+
 func checkLog(c appengine.Context, w http.ResponseWriter, r *http.Request) bool {
 	sessionCookie, err := r.Cookie(SESSION)
 	if err == nil && checkSessionCache(c, sessionCookie) {

@@ -115,5 +115,13 @@
             this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions);
         },
+        disconnect: function() {
+            var ajaxOptions = {
+                url: 'authenticated-resources/disconnect',
+                type: 'POST',
+            };
+            this.addAuthorizationToAjaxOptions(ajaxOptions);
+            return $.ajax(ajaxOptions);
+        }
     };
 })();

@@ -13,6 +13,7 @@ $(document).ready(function() {
     window.appViewModel = new AppViewModel({
         server: window.server,
         logoutCallback: function() {
+            window.server.disconnect();
             loginObservable(null);
         },
         confirm: function(t) {
