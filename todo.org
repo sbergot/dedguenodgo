@@ -69,7 +69,10 @@
 ** DONE change passwork feature
 ** DONE open links in new tab
 ** DONE changer les titres
-** TODO cadeaux de couples
-*** TODO ajouter une colonne "nom du +1" dans les utilisateurs
-*** TODO ajouter une colonne "cadeau de couple" dans les cadeaux
-*** TODO quand un utilisateur se logge charger les cadeaux de couples de son +1
+** DONE cadeaux de couples
+*** DONE ajouter une colonne "nom du +1" dans les utilisateurs
+*** DONE ajouter une colonne "cadeau de couple" dans les cadeaux
+*** DONE quand un utilisateur se logge charger les cadeaux de couples de son +1
+*** DONE bug: en se connectant avec Narelle, on voit les cadeaux partagés de david
+** DONE retirer la sélection d'évennement
+** DONE masquer la liste au chargement

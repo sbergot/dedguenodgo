@@ -58,7 +58,7 @@ h1 {
 	text-decoration: line-through;
 	color: grey;
 }
-.present .offered-by, .present .deleted-by {
+.present .offered-by, .present .deleted-by, .present .is-shared {
 	font-size: 0.7em;
 }
 .present.deleted {

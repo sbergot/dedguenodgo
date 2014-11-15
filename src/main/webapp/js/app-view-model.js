@@ -106,13 +106,36 @@ AppViewModel.prototype = {
         y: true
     },
     lists: function() {
-        var selectedParty = this.selectedParty();
-        var party = this.parties().find(function(p) { return p.title() === selectedParty; });
-        if (!party) { return [{ id:"err", label:"pas d'évennement" }]; }
-        var users = this.users();
-        var userMap = entitiesToMap(party.users, "name");
+        if (this.parties().length === 0) {
+            return [{ id:"err", label:"pas d'évennement" }];
+        }
         var loggedInUser = this.loggedInUser();
+        var parties = this.parties()
+            .filter(function(party) {
+                return !!party.users
+                    .find(function(u) {
+                        return (u.name === loggedInUser) && u.selected();
+                    });
+            });
+        var users = this.users();
+        var userMap = {}
         var ids = Object.keys(users);
+        for (var i =0; i < parties.length; i++) {
+            for (var j =0; j < ids.length; j++) {
+                user = userMap[ids[j]] || {
+                    name : ids[j],
+                    selected : false
+                };
+                selUser = parties[i].users
+                    .find(function(u) {
+                        return u.name === ids[j];
+                    })
+                if (selUser) {
+                    user.selected |= selUser.selected()
+                }
+                userMap[ids[j]] = user;
+            }
+        };
         ids.sort(function(a, b) {
             if (a === loggedInUser) {
                 return -1;
@@ -123,7 +146,7 @@ AppViewModel.prototype = {
             return users[a].name < users[b].name ? -1 : 1;
         });
         return ids.filter(function(id) {
-            return userMap[id].selected();
+            return userMap[id].selected;
         }).map(function(id) {
             var userName = users[id].name;
             var beginByVowel = AppViewModel.prototype.vowels[userName.slice(0, 1).toLowerCase()];
@@ -167,14 +190,26 @@ AppViewModel.prototype = {
         var selectedList = this.selectedList();
         var loggedInUser = this.loggedInUser();
         var self = this;
+        var users = this.users();
+        if (!users || !users[selectedList]) {
+            return [];
+        }
+        var partner = users[selectedList].partner;
+        var loggedPartner = users[loggedInUser].partner;
         return this.presents().filter(function(p) {
-            //if (p.to != selectedList) {
-            //    return false;
-            //}
+            if ((p.to != selectedList) &&
+                (p.to != partner)) {
+                return false;
+            }
             if (p.deletedBy && !self.displayPresentAsOffered(p)) {
                 return false;
             }
             if (p.to == loggedInUser && p.createdBy != loggedInUser) {
+                return false;
+            }
+            if (p.isshared &&
+                (p.to == loggedPartner || p.to == loggedInUser) &&
+                p.createdBy != loggedInUser) {
                 return false;
             }
             return true;
@@ -196,7 +231,10 @@ AppViewModel.prototype = {
     },
     /**Returns a string or null*/
     displayPresentAsCreatedBy: function(present) {
-        return (present.to === present.createdBy) ? null : '(ajoutÃ© par ' + this.getUserName(present.createdBy) + ')';
+        return '(ajoutÃ© par ' + this.getUserName(present.createdBy) + ')';
+    },
+    displayPresentIsShared: function(present) {
+        return (present.isshared) ? '(partagÃ©)' : null;
     },
     isEditedPresentModified: function() {
         var beforeModification = this._isCreating() ? {
@@ -455,6 +493,8 @@ AppViewModel.prototype = {
     },
     getPresents: function() {
         var self = this;
+        // avoid displaying old data when switching users
+        self.presents([]);
         this.server.getPresents(this.selectedList()).done(function(result) {
             self.presents(result);
         });

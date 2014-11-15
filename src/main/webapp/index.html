@@ -100,7 +100,7 @@
                       value: selectedParty,
                       optionsValue: 'title',
                       optionsText:'title',
-                      visible: visibleParties().length > 1">
+                      visible: false">
         </select>
         <select
            id="list-select"
@@ -123,6 +123,7 @@
           <h4 class="list-group-item-heading">
             <span class="title" data-bind="text:title"></span>
             <span class="offered-by" data-bind="text: $root.displayPresentAsCreatedBy($data) || ''"></span>
+            <span class="is-shared" data-bind="text: $root.displayPresentIsShared($data) || ''"></span>
             <span class="offered-by" data-bind="text: $root.displayPresentAsOffered($data) || ''"></span>
             <span class="deleted-by" data-bind="visible: deletedBy, text: !deletedBy ? '' : '(Ce cadeau a été supprimé par ' + $root.getUserName(deletedBy) + ')'"></span>
           </h4>
