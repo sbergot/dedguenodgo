@@ -87,7 +87,7 @@
     <div id="app">
       <div class="container">
         <button class="btn btn-primary" data-bind="click: manageParties, visible: loggedIsAdmin">
-          Gérer les evennements
+          Gérer les événements
         </button>
         <div id="connected-user">
           <span data-bind="text: !(loggedInUser()) ? '' : getUserName(loggedInUser())"></span><br/>
@@ -179,10 +179,10 @@
                         data-bind="click: cancelManagement">
                   &times;
                 </button>
-                <h4 class="modal-title">Gérer les évennements</h4>
+                <h4 class="modal-title">Gérer les événements</h4>
               </div>
               <div class="modal-body">
-                <button class="btn btn-primary" data-bind="click: addParty">Ajouter un evennement</button>
+                <button class="btn btn-primary" data-bind="click: addParty">Ajouter un événement</button>
                 <ul class="list-group" data-bind="foreach: parties()">
                   <li class="list-group-item"
                       data-bind="click:$root.selectMParty.bind($root, $index()),
