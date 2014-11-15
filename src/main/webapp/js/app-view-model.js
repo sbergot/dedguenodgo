@@ -106,9 +106,6 @@ AppViewModel.prototype = {
         y: true
     },
     lists: function() {
-        if (this.parties().length === 0) {
-            return [{ id:"err", label:"pas d'évennement" }];
-        }
         var loggedInUser = this.loggedInUser();
         var parties = this.parties()
             .filter(function(party) {
@@ -117,6 +114,9 @@ AppViewModel.prototype = {
                         return (u.name === loggedInUser) && u.selected();
                     });
             });
+        if (parties.length === 0) {
+            return [];
+        }
         var users = this.users();
         var userMap = {}
         var ids = Object.keys(users);
@@ -469,6 +469,9 @@ AppViewModel.prototype = {
     },
     selectMParty: function(idx) {
         var parties = this.parties();
+        if (parties.length === 0) {
+            return;
+        }
         var oldSelect = this.selectedMParty();
         var oldselection = parties[oldSelect > -1 ? oldSelect : 0];
         var newselection = parties[idx > -1 ? idx : 0];
