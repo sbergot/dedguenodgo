@@ -34,16 +34,6 @@
             }
             return 'authenticated-resources/party';
         },
-        addAuthorizationToAjaxOptions: function(ajaxOptions) {
-            if (!this.login) {
-                console.warn('calling server but login has not been set');
-                return;
-            }
-            ajaxOptions.headers = {
-                'dedguenodgo-userId': this.login.userId,
-                'dedguenodgo-userPassword': this.login.userPassword,
-            };
-        },
         setLogin: function(login) {
             this.login = login;
         },
@@ -59,7 +49,6 @@
                 type: 'POST',
                 data: JSON.stringify(converted)
             };
-            this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions);
         },
         editPresent: function(oldPresent, newPresent) {
@@ -70,7 +59,6 @@
                 type: 'PUT',
                 data: JSON.stringify(converted)
             };
-            this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions);
         },
         getPresents: function(userId) {
@@ -80,7 +68,6 @@
                 type: 'GET',
                 dataType: "json"
             };
-            this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions).pipe(function(result) {
                 return result.map(Server._formatFromServer);
             });
@@ -92,7 +79,6 @@
                 type: 'GET',
                 dataType: "json"
             };
-            this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions);
         },
         saveParties: function(parties) {
@@ -102,7 +88,6 @@
                 type: 'POST',
                 data: JSON.stringify(parties)
             };
-            this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions);
         },
         getParties: function(parties) {
@@ -112,7 +97,6 @@
                 type: 'GET',
                 dataType: "json"
             };
-            this.addAuthorizationToAjaxOptions(ajaxOptions);
             return $.ajax(ajaxOptions);
         },
         disconnect: function() {
@@ -120,7 +104,18 @@
                 url: 'authenticated-resources/disconnect',
                 type: 'POST',
             };
-            this.addAuthorizationToAjaxOptions(ajaxOptions);
+            return $.ajax(ajaxOptions);
+        },
+        login1: function() {
+            var ajaxOptions = {
+                url: 'unauthenticated-resources/login',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    userName : this.login.userId,
+                    password : this.login.userPassword
+                })
+            };
             return $.ajax(ajaxOptions);
         }
     };

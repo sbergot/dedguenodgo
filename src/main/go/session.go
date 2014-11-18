@@ -5,16 +5,19 @@ import (
 	"strings"
 	"crypto/rand"
 	"fmt"
+	"time"
 	"io"
 	"encoding/json"
 
 	"appengine"
 	"appengine/memcache"
 	"appengine/datastore"
+	"code.google.com/p/gorest"
 
+	"log"
 )
 
-const SESSION = "session"
+const SESSION = "X-Xsrf-Cookie"
 
 func newUUID() string {
 	uuid := make([]byte, 16)
@@ -29,7 +32,7 @@ func newUUID() string {
 	return fmt.Sprintf("%x-%x-%x-%x-%x", uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:])
 }
 
-func createSession(c appengine.Context, w http.ResponseWriter, r *http.Request, user User) {
+func createSession(c appengine.Context, rb *gorest.ResponseBuilder, user User) {
 	var uuid = newUUID()
 	var b, err = json.Marshal(user)
 	if err != nil { panic(err.Error()) }
@@ -38,13 +41,7 @@ func createSession(c appengine.Context, w http.ResponseWriter, r *http.Request, 
 		Value: b,
 	}
 	memcache.Set(c, item)
-	var cookie = &http.Cookie{
-		Name: SESSION,
-		Value: uuid,
-		MaxAge: 3600, // seconds
-		HttpOnly: true,
-	}
-	http.SetCookie(w, cookie)
+	rb.SetSessionToken(uuid, "/", time.Now().Add(time.Hour))
 }
 
 
@@ -56,19 +53,27 @@ func checkUserCredentials(
 	var user User
 	err := datastore.Get(c, getUserKey(c, userId), &user)
 	if err != nil {
+		log.Println("User not found")
+		log.Println(err)
+		log.Println(userId)
+		log.Println(getUserKey(c, userId))
 		return false, User{}
 	}
 	return user.Password.Check(userPassword), user
 }
 
-func authenticate(c appengine.Context, r *http.Request) (bool, User) {
-	var password = r.Header.Get("dedguenodgo-userPassword")
-	var userId = r.Header.Get("dedguenodgo-userId")
+func authenticate(c appengine.Context, login LoginForm) (bool, User) {
+	var password = login.Password
+	var userId = login.UserName
+	log.Println("logging user: ", userId)
 	return checkUserCredentials(c, userId, password)
 }
 
 func checkSessionCache(c appengine.Context, sessionCookie *http.Cookie) bool {
 	_, err := memcache.Get(c, sessionCookie.Value)
+	if err != nil {
+		log.Println("memcache get error: ", err)
+	}
 	return err == nil
 }
 
@@ -89,15 +94,30 @@ func ExpireSession(c appengine.Context, r *http.Request) error {
 	return err
 }
 
-func checkLog(c appengine.Context, w http.ResponseWriter, r *http.Request) bool {
+func checkSession(
+	c appengine.Context,
+	w http.ResponseWriter,
+	r *http.Request) bool {
+
 	sessionCookie, err := r.Cookie(SESSION)
 	if err == nil && checkSessionCache(c, sessionCookie) {
 		sessionCookie.MaxAge = 3600
 		http.SetCookie(w, sessionCookie)
 		return true
 	}
-	var isLogged, user = authenticate(c, r)
-	if isLogged { createSession(c, w, r, user) }
+	log.Println("session cookie error: ", err)
+	return false
+}
+
+func CheckLogin(
+	c appengine.Context,
+	rb *gorest.ResponseBuilder,
+	login LoginForm) bool {
+	var isLogged, user = authenticate(c, login)
+	if isLogged {
+		log.Println("user logged")
+		createSession(c, rb, user)
+	}
 	return isLogged
 }
 
@@ -111,7 +131,7 @@ func LoginManager(handler http.Handler, safeUrls []string) http.HandlerFunc {
 				break
 			}
 		}
-		if mustBeLogged && !checkLog(c, w, r) {
+		if mustBeLogged && !checkSession(c, w, r) {
 			http.Error(w, "you must be logged", 403)
 			return
 		}

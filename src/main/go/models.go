@@ -74,6 +74,11 @@ type ChangePasswordForm struct {
 	NewPassword string
 }
 
+type LoginForm struct {
+	UserName string
+	Password string
+}
+
 type User struct {
 	Name    string `json:"name"`
 	Deleted bool   `json:"deleted"`

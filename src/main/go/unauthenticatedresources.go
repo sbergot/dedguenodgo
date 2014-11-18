@@ -9,15 +9,18 @@ import (
 )
 
 type UnauthenticatedService struct {
-	gorest.RestService         `root:"/unauthenticated-resources/"
-                                consumes:"application/json"
-                                produces:"application/json"`
-	postUser      gorest.EndPoint `method:"POST"
-                                   path:"/user/"
-                                   postdata:"UserForm"`
+	gorest.RestService          `root:"/unauthenticated-resources/"
+                                 consumes:"application/json"
+                                 produces:"application/json"`
+	postUser    gorest.EndPoint `method:"POST"
+                                 path:"/user/"
+                                 postdata:"UserForm"`
 	putPassword gorest.EndPoint `method:"PUT"
                                  path:"/user/change-password"
                                  postdata:"ChangePasswordForm"`
+	postLogin   gorest.EndPoint `method:"POST"
+                                 path:"/login"
+                                 postdata:"LoginForm"`
 }
 
 func getAdminPasswordKey(c appengine.Context) *datastore.Key {
@@ -79,4 +82,9 @@ func(serv UnauthenticatedService) PutPassword(
 	}, nil)
 
 	CheckError(serv.RestService, err, "", 500)
+}
+
+func(serv UnauthenticatedService) PostLogin(posted LoginForm) {
+	var c = GAEContext(serv.RestService)
+	CheckLogin(c, serv.RestService.ResponseBuilder(), posted);
 }

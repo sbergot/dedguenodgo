@@ -90,6 +90,7 @@ func(serv UserService) PostDisconnect(data string) {
 	var c = GAEContext(serv.RestService)
 	err := ExpireSession(c, serv.Context.Request())
 	CheckError(serv.RestService, err, "", 500)
+	serv.RestService.ResponseBuilder().RemoveSessionToken("/")
 }
 
 func(serv UserService) GetUsers() []User {
