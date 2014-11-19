@@ -70,6 +70,9 @@ function AppViewModel(options) {
             self.getPresents();
         }
     });
+    this.presents.subscribe(function() {
+        console.log("presents modified");
+    });
 
     if (options.initOnStartup) {
         this.init();
@@ -198,10 +201,6 @@ AppViewModel.prototype = {
         var partner = users[selectedList].partner;
         var loggedPartner = users[loggedInUser].partner;
         return this.presents().filter(function(p) {
-            if ((p.to != selectedList) &&
-                (p.to != partner)) {
-                return false;
-            }
             if (p.deletedBy && !self.displayPresentAsOffered(p)) {
                 return false;
             }
@@ -497,8 +496,7 @@ AppViewModel.prototype = {
     },
     getPresents: function() {
         var self = this;
-        // avoid displaying old data when switching users
-        this.server.getPresents(this.selectedList()).done(function(result) {
+        return this.server.getPresents(this.selectedList()).done(function(result) {
             self.presents(result);
         });
     }
