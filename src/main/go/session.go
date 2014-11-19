@@ -102,6 +102,7 @@ func checkSession(
 	sessionCookie, err := r.Cookie(SESSION)
 	if err == nil && checkSessionCache(c, sessionCookie) {
 		sessionCookie.MaxAge = 3600
+		sessionCookie.Path = "/"
 		http.SetCookie(w, sessionCookie)
 		return true
 	}

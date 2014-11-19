@@ -101,7 +101,7 @@
         },
         disconnect: function() {
             var ajaxOptions = {
-                url: 'authenticated-resources/disconnect',
+                url: 'unauthenticated-resources/disconnect',
                 type: 'POST',
             };
             return $.ajax(ajaxOptions);

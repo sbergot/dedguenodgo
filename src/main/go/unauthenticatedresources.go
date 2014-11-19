@@ -6,21 +6,25 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"code.google.com/p/gorest"
+	"log"
 )
 
 type UnauthenticatedService struct {
-	gorest.RestService          `root:"/unauthenticated-resources/"
-                                 consumes:"application/json"
-                                 produces:"application/json"`
-	postUser    gorest.EndPoint `method:"POST"
-                                 path:"/user/"
-                                 postdata:"UserForm"`
-	putPassword gorest.EndPoint `method:"PUT"
-                                 path:"/user/change-password"
-                                 postdata:"ChangePasswordForm"`
-	postLogin   gorest.EndPoint `method:"POST"
-                                 path:"/login"
-                                 postdata:"LoginForm"`
+	gorest.RestService             `root:"/unauthenticated-resources/"
+                                    consumes:"application/json"
+                                    produces:"application/json"`
+	postUser    gorest.EndPoint    `method:"POST"
+                                    path:"/user/"
+                                    postdata:"UserForm"`
+	putPassword gorest.EndPoint    `method:"PUT"
+                                    path:"/user/change-password"
+                                    postdata:"ChangePasswordForm"`
+	postLogin   gorest.EndPoint    `method:"POST"
+                                    path:"/login"
+                                    postdata:"LoginForm"`
+	postDisconnect gorest.EndPoint `method:"POST"
+                                    path:"/disconnect"
+                                    postdata:"string"`
 }
 
 func getAdminPasswordKey(c appengine.Context) *datastore.Key {
@@ -87,4 +91,12 @@ func(serv UnauthenticatedService) PutPassword(
 func(serv UnauthenticatedService) PostLogin(posted LoginForm) {
 	var c = GAEContext(serv.RestService)
 	CheckLogin(c, serv.RestService.ResponseBuilder(), posted);
+}
+
+func(serv UnauthenticatedService) PostDisconnect(data string) {
+	var c = GAEContext(serv.RestService)
+	err := ExpireSession(c, serv.Context.Request())
+	CheckError(serv.RestService, err, "", 500)
+	serv.RestService.ResponseBuilder().RemoveSessionToken("/")
+	log.Println("user disconnected")
 }

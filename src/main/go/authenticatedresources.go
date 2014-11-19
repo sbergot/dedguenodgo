@@ -30,9 +30,6 @@ type UserService struct {
 	getUsers        gorest.EndPoint `method:"GET"
                                      path:"/users"
                                      output:"[]User"`
-	postDisconnect  gorest.EndPoint `method:"POST"
-                                     path:"/disconnect"
-                                     postdata:"string"`
 }
 
 func getUserKey(c appengine.Context, userId string) *datastore.Key {
@@ -84,13 +81,6 @@ func(serv PresentService) GetPresents(userId string) []Present {
 	}
 
 	return presents
-}
-
-func(serv UserService) PostDisconnect(data string) {
-	var c = GAEContext(serv.RestService)
-	err := ExpireSession(c, serv.Context.Request())
-	CheckError(serv.RestService, err, "", 500)
-	serv.RestService.ResponseBuilder().RemoveSessionToken("/")
 }
 
 func(serv UserService) GetUsers() []User {
