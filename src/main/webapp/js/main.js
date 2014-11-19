@@ -46,7 +46,7 @@ $(document).ready(function() {
 
     function onLogin(login) {
         server.setLogin(login);
-
+        appViewModel.presents([]);
         if (!login || !login.userId) {
             appDiv.hide();
             loginDiv.show();

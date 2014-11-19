@@ -83,7 +83,6 @@ AppViewModel.prototype = {
     nextId: 1,
     init: function() {
         var self = this;
-        self.presents([]);
         this.initLoading(true);
         return this.server.getUsers().always(function() {
             self.initLoading(false);
@@ -219,11 +218,17 @@ AppViewModel.prototype = {
     },
     /**Returns a string or null*/
     displayPresentAsOffered: function(present) {
+        var users = this.users();
+        var selectedList = this.selectedList();
+        if (!users || !users[selectedList]) {
+            return [];
+        }
+        var partner = users[selectedList].partner;
         var loggedInUser = this.loggedInUser();
         if (!present.offeredBy) {
             return null;
         }
-        if (present.to == loggedInUser && present.offeredBy != loggedInUser) {
+        if (((present.to == loggedInUser) || (present.to == partner)) && present.offeredBy != loggedInUser) {
             return null;
         }
         var username = this.getUserName(present.offeredBy);
