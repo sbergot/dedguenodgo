@@ -80,6 +80,7 @@ AppViewModel.prototype = {
     nextId: 1,
     init: function() {
         var self = this;
+        self.presents([]);
         this.initLoading(true);
         return this.server.getUsers().always(function() {
             self.initLoading(false);
@@ -497,7 +498,6 @@ AppViewModel.prototype = {
     getPresents: function() {
         var self = this;
         // avoid displaying old data when switching users
-        self.presents([]);
         this.server.getPresents(this.selectedList()).done(function(result) {
             self.presents(result);
         });
